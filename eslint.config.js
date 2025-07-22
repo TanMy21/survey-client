@@ -7,6 +7,7 @@ import { globalIgnores } from "eslint/config";
 import prettier from "eslint-config-prettier";
 import prettierPlugin from "eslint-plugin-prettier";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
+import queryPlugin from "@tanstack/eslint-plugin-query";
 
 export default [
   globalIgnores(["dist", "node_modules", "vite.config.ts"]),
@@ -39,6 +40,9 @@ export default [
       "simple-import-sort/imports": "warn",
       "simple-import-sort/exports": "warn",
 
+      "@tanstack/query/no-rest-deps": "warn",
+      "@tanstack/query/no-missing-query-key": "error",
+
       "consistent-return": "warn",
       eqeqeq: ["warn", "always"],
     },
@@ -51,11 +55,13 @@ export default [
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
       "simple-import-sort": simpleImportSort,
+      "@tanstack/query": queryPlugin,
       prettier: prettierPlugin,
     },
     rules: {
       ...reactHooks.configs["recommended"].rules,
       ...reactRefresh.configs.vite.rules,
+      ...queryPlugin.configs.recommended.rules,
     },
   },
 
