@@ -1,5 +1,5 @@
 const BinaryScreen = () => {
-  return <div>BinaryScreen</div>;
+  return <div className="text-slate-800">BinaryScreen</div>;
 };
 
 export default BinaryScreen;

@@ -1,7 +1,7 @@
  
 const SingleChoiceScreen = () => {
   return (
-    <div>SingleChoiceScreen</div>
+    <div className="text-slate-800">SingleChoiceScreen</div>
   )
 }
 

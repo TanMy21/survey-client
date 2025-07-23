@@ -3,3 +3,8 @@ export interface Session {
   completed: boolean;
   completedAt: string;
 }
+
+export interface SessionArgs{
+  surveyID: string;
+  participantID: string;
+}

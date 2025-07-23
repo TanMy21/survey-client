@@ -1,7 +1,7 @@
  
 const RankScreen = () => {
   return (
-    <div>RankScreen</div>
+    <div className="text-slate-800">RankScreen</div>
   )
 }
 

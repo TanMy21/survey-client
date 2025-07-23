@@ -1,7 +1,7 @@
  
 const RangeScreen = () => {
   return (
-    <div>RangeScreen</div>
+    <div className="text-slate-800">RangeScreen</div>
   )
 }
 

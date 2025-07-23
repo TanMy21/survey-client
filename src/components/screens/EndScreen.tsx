@@ -2,7 +2,7 @@
 
 const EndScreen = () => {
   return (
-    <div>EndScreen</div>
+    <div className="text-slate-800">EndScreen</div>
   )
 }
 

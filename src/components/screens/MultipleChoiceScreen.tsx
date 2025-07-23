@@ -1,5 +1,5 @@
 const MultipleChoiceScreen = () => {
-  return <div>MultipleChoiceScreen</div>;
+  return <div className="text-slate-800">MultipleChoiceScreen</div>;
 };
 
 export default MultipleChoiceScreen;

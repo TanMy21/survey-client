@@ -2,7 +2,7 @@
 
 const WelcomeScreen = () => {
   return (
-    <div>WelcomeScreen</div>
+    <div className="text-slate-800">WelcomeScreen</div>
   )
 }
 

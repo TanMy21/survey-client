@@ -2,7 +2,7 @@
 
 const InstructionScreen = () => {
   return (
-    <div>InstructionScreen</div>
+    <div className="text-slate-800">InstructionScreen</div>
   )
 }
 

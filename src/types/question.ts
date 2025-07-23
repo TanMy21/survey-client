@@ -47,3 +47,9 @@ export interface MultipleChoiceFormData {
     [key: string]: boolean;
   };
 }
+
+export interface SlideMotionProps {
+  children: React.ReactNode;
+  direction: "left" | "right";
+  keyProp: string | number;
+}

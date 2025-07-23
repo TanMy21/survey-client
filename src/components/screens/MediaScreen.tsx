@@ -1,7 +1,7 @@
  
 const MediaScreen = () => {
   return (
-    <div>MediaScreen</div>
+    <div className="text-slate-800">MediaScreen</div>
   )
 }
 

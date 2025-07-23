@@ -1,5 +1,5 @@
 const EmailContactScreen = () => {
-  return <div>EmailContactScreen</div>;
+  return <div className="text-slate-800">EmailContactScreen</div>;
 };
 
 export default EmailContactScreen;
