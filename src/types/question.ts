@@ -17,8 +17,8 @@ export type QuestionTypeKey =
 export interface QuestionProps {
   surveyID?: string;
   qOptions?: OptionType[];
-  question: Question;
-  setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>;
+  question?: Question;
+  setCurrentQuestionIndex?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export interface Question {
@@ -32,7 +32,25 @@ export interface Question {
   minOptions: number;
   maxOptions: number;
   options: OptionType[];
+  questionPreferences: QuestionPreferences;
   required: boolean;
+}
+
+export interface QuestionPreferences {
+  preferencesID: string;
+  relatedQuestionID: string;
+  titleFontSize: number;
+  titleFontSizeMobile: number;
+  titleFontColor: string;
+  descriptionFontSize: number;
+  descriptionFontSizeMobile: number;
+  descriptionFontColor: string;
+  questionImageTemplate: boolean;
+  questionImageTemplateUrl: string;
+  questionImageTemplatePublicId: string;
+  questionBackgroundColor: string;
+  required: boolean;
+  uiConfig: Record<string, any>;
 }
 
 export interface QuestionType {
@@ -40,6 +58,11 @@ export interface QuestionType {
   type: string;
   order?: number;
   Screen?: React.ComponentType<QuestionProps>;
+}
+
+export interface QuestionTextandDescriptionProps {
+  surveyID?: string;
+  question?: Question;
 }
 
 export interface MultipleChoiceFormData {

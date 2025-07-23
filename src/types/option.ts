@@ -19,6 +19,7 @@ export interface OptionType {
   relatedQuestionID: string;
   creatorId: string;
   text: string;
+  qType: string;
   value: string;
   image: string;
   order: number;
