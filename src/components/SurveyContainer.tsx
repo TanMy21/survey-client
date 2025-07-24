@@ -78,7 +78,7 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
       <div className="h-1" />
 
       {/* Scrollable area for questions only */}
-      <div className="flex-grow overflow-y-auto overflow-x-hidden scrollbar-hide border-2 border-green-500">
+      <div className="flex-grow overflow-y-auto overflow-x-hidden scrollbar-hidden border-2 border-green-500">
         <SlideMotion direction={slideDirection} keyProp={currentQuestion.questionID}>
           <QuestionRenderer
             question={currentQuestion}

@@ -21,17 +21,60 @@ export interface ResponseListItemProps {
   index: number;
 }
 
+export interface RangeResponseProps {
+  question: Question;
+}
+
+export interface RankListItemProps {
+  response: OptionType;
+  index: number;
+}
+
 export interface InputResponseProps {
   inputPlaceholder: string;
   submitButtonText: string;
+  setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
 export interface BinaryResponseProps {
   questionID: string;
   responseOptionText: string;
-  index: number;
+  index?: number;
+  value: string;
+  checked: boolean;
+  onChange: (value: string) => void;
 }
 
 export interface BinaryResponseContainerProps {
   question: Question;
+  setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
+}
+
+export interface RankListProps {
+  options: OptionType[];
+}
+
+export interface Mark {
+  value: number;
+  label?: string;
+}
+
+export interface StaticSliderConfig {
+  tick: {
+    minSize: number;
+    increment: number;
+  };
+  segment: {
+    minThickness: number;
+    increment: number;
+  };
+  gap: number;
+}
+
+export interface MediaOptionsProps {
+  options: OptionType[];
+}
+
+export interface MediaOptionProps {
+  option: OptionType;
 }

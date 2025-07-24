@@ -1,6 +1,6 @@
 import type { QuestionProps } from "@/types/question";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import InputResponse from "../QuestionResponse/InputResponse";
+import InputResponseText from "../QuestionResponse/InputResponseText";
 
 const TextScreen = ({ surveyID, question }: QuestionProps) => {
   return (
@@ -9,7 +9,7 @@ const TextScreen = ({ surveyID, question }: QuestionProps) => {
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </div>
       <div className="absolute top-[44%] mx-auto flex h-[60%] w-full flex-col items-center justify-start border-2 border-red-500 xl:top-[50%]">
-        <InputResponse inputPlaceholder={"Enter your response..."} submitButtonText={"Submit"} />
+        <InputResponseText inputPlaceholder={"Enter your response..."} submitButtonText={"Submit"} />
       </div>
     </div>
   );
