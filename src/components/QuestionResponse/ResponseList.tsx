@@ -1,7 +1,7 @@
 import type { ResponseListProps } from "@/types/response";
 import ResponseListItem from "./ResponseListItem";
 
-const ResponseList = ({ options }: ResponseListProps) => {
+const ResponseList = ({ options,qType }: ResponseListProps) => {
   return (
     <div className="flex w-[60%] origin-bottom flex-col">
       <div className="mx-auto flex w-full flex-col items-center justify-center gap-2 px-0 md:w-4/5 md:px-2">
@@ -9,7 +9,7 @@ const ResponseList = ({ options }: ResponseListProps) => {
           {options?.map((option, index) => (
             <ResponseListItem
               key={option.optionID}
-              qType={"INSTRUCTIONS"}
+              qType={qType!}
               response={option}
               index={index}
             />

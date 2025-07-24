@@ -1,4 +1,5 @@
 import type { OptionType } from "./option";
+import type { Question } from "./question";
 
 export interface ResponseData {
   surveyID?: string;
@@ -11,6 +12,7 @@ export interface ResponseData {
 
 export interface ResponseListProps {
   options: OptionType[];
+  qType?: string;
 }
 
 export interface ResponseListItemProps {
@@ -22,4 +24,14 @@ export interface ResponseListItemProps {
 export interface InputResponseProps {
   inputPlaceholder: string;
   submitButtonText: string;
+}
+
+export interface BinaryResponseProps {
+  questionID: string;
+  responseOptionText: string;
+  index: number;
+}
+
+export interface BinaryResponseContainerProps {
+  question: Question;
 }

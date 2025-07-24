@@ -1,7 +1,9 @@
 import type { QuestionProps } from "@/types/question";
 import QuestionTextandDescription from "../QuestionTextandDescription";
+import ResponseList from "../QuestionResponse/ResponseList";
 
 const MultipleChoiceScreen = ({ surveyID, question }: QuestionProps) => {
+ const { options } = question || {};
   return (
     <div className="relative flex flex-col mx-auto w-[98%] min-h-[700px] z-20 border-2 border-black-500">
       <div
@@ -14,7 +16,7 @@ const MultipleChoiceScreen = ({ surveyID, question }: QuestionProps) => {
         className="absolute top-[44%] xl:top-[50%] flex flex-col justify-start items-center w-full
       h-[60%] mx-auto border-2 border-red-500"
       >
-        <div className="origin-bottom flex flex-col border-2 border-purple-500"></div>
+        <ResponseList options={options!} qType="MULTIPLE_CHOICE"/>
       </div>
     </div>
   );

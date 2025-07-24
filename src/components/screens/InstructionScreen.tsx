@@ -10,7 +10,7 @@ const InstructionScreen = ({ surveyID, question }: QuestionProps) => {
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </div>
       <div className="absolute top-[44%] mx-auto flex h-[60%] w-full flex-col items-center justify-start border-2 border-red-500 xl:top-[50%]">
-        <ResponseList options={options!} />
+        <ResponseList options={options!} qType="INSTRUCTIONS" />
       </div>
     </div>
   );
