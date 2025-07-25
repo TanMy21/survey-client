@@ -1,0 +1,56 @@
+import type { InputResponseProps } from "@/types/response";
+import { numberResponseSchema } from "@/utils/validationSchema";
+import { useState } from "react";
+
+const InputResponseNumber = ({
+  inputPlaceholder,
+  submitButtonText,
+  setCurrentQuestionIndex,
+}: InputResponseProps) => {
+  const [number, setNumber] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = () => {
+    const result = numberResponseSchema.safeParse({ number });
+    if (!result.success) {
+      setError(result.error.format().number?._errors[0] ?? "Invalid input");
+    } else {
+      setError(null);
+      console.log("Input submitted:", number);
+      setCurrentQuestionIndex?.((i) => i + 1);
+      // Optionally clear input: setInputValue("");
+    }
+  };
+
+  return (
+    <div className="flex w-3/5 origin-bottom flex-col border-2 border-amber-600">
+      <div className="mx-auto flex h-[60%] w-[96%] flex-col border-2 border-b-emerald-400">
+        {/* Input field */}
+        <input
+          type="text"
+          placeholder={inputPlaceholder}
+          value={number}
+          onChange={(e) => setNumber(e.target.value)}
+          className={`mx-auto block h-16 w-[92%] border-0 border-b border-gray-300 px-4 text-[24px] leading-none text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none md:w-[56%] md:text-[36px]`}
+        />
+
+        {/* Error message */}
+        {error && (
+          <p className="mx-auto mt-1 px-4 text-left text-xl text-red-500 md:w-[56%]">{error}</p>
+        )}
+
+        {/* Submit Button container */}
+        <div className="mx-auto mt-4 flex h-[25%] w-[96%] flex-col items-end pr-[4%] md:w-[60%]">
+          <button
+            onClick={handleSubmit}
+            className={`w-[120px] rounded-4xl bg-[#005BC4] px-2 py-1 text-base font-bold text-white capitalize transition hover:bg-[#005BC4] md:w-1/5 md:px-4 md:py-2`}
+          >
+            {submitButtonText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default InputResponseNumber;

@@ -21,24 +21,53 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
 
   const questions = useMemo(() => {
     if (!data?.questions) return [];
-    return [...data.questions].sort((a, b) => a.order! - b.order!);
+
+    const sortedQuestions = [...data.questions].sort((a, b) => a.order! - b.order!);
+
+    // Inject Consent screen
+    const consentScreen = {
+      questionID: "consent-screen",
+      type: "CONSENT",
+      order: -1.5,
+    };
+
+    const injected = [...sortedQuestions, consentScreen].sort((a, b) => a.order! - b.order!);
+
+    return injected;
   }, [data]);
 
   // const sessions = data?.sessions ?? [];
   const currentQuestion = questions[currentQuestionIndex];
   const progress = (currentQuestionIndex / (questions.length - 1)) * 100;
 
+  const { questionPreferences } = currentQuestion || {};
+  const { questionImageTemplate, questionImageTemplateUrl, questionBackgroundColor } =
+    questionPreferences || {};
+  const backgroundStyle = questionImageTemplate
+    ? {
+        backgroundImage: `url(${questionImageTemplateUrl})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : questionBackgroundColor
+      ? {
+          questionBackgroundColor,
+        }
+      : {
+          backgroundColor: "white",
+        };
+
   if (isLoading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-white">
-        <div className="animate-pulse h-1 w-1/2 bg-gray-400" />
+      <div className="flex h-screen w-full items-center justify-center bg-white">
+        <div className="h-1 w-1/2 animate-pulse bg-gray-400" />
       </div>
     );
   }
 
   if (isError || !data) {
     return (
-      <div className="flex justify-center items-center h-screen p-4 text-center bg-white">
+      <div className="flex h-screen items-center justify-center bg-white p-4 text-center">
         <h1 className="text-xl text-red-500">Error loading survey. Please try again.</h1>
       </div>
     );
@@ -58,16 +87,16 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
 
   if (!questions.length) {
     return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <div className="animate-pulse h-1 w-1/2 bg-gray-400" />
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="h-1 w-1/2 animate-pulse bg-gray-400" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-hidden bg-white">
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
       {/* Full-width progress bar at top */}
-      <div className="w-full h-1 bg-gray-200 fixed top-0 left-0 z-50">
+      <div className="fixed top-0 left-0 z-50 h-1 w-full bg-gray-200">
         <div
           className="h-full bg-blue-500 transition-all duration-300"
           style={{ width: `${progress}%` }}
@@ -76,31 +105,32 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
 
       {/* Spacer div to prevent overlap due to fixed progress bar */}
       <div className="h-1" />
+      <div className="flex h-full w-full flex-col" style={backgroundStyle}>
+        {/* Scrollable area for questions only */}
+        <div className="scrollbar-hidden flex-grow overflow-x-hidden overflow-y-auto border-2 border-green-500">
+          <SlideMotion direction={slideDirection} keyProp={currentQuestion.questionID}>
+            <QuestionRenderer
+              question={currentQuestion}
+              surveyID={surveyID}
+              setCurrentQuestionIndex={setCurrentQuestionIndex}
+            />
+          </SlideMotion>
+        </div>
 
-      {/* Scrollable area for questions only */}
-      <div className="flex-grow overflow-y-auto overflow-x-hidden scrollbar-hidden border-2 border-green-500">
-        <SlideMotion direction={slideDirection} keyProp={currentQuestion.questionID}>
-          <QuestionRenderer
-            question={currentQuestion}
-            surveyID={surveyID}
-            setCurrentQuestionIndex={setCurrentQuestionIndex}
-          />
-        </SlideMotion>
+        {/* Navigator stays visible and fixed in layout */}
+        <SurveyNavigator
+          currentIndex={currentQuestionIndex}
+          total={questions.length}
+          onNext={() => {
+            setSlideDirection("right");
+            setCurrentQuestionIndex((i) => i + 1);
+          }}
+          onPrev={() => {
+            setSlideDirection("left");
+            setCurrentQuestionIndex((i) => i - 1);
+          }}
+        />
       </div>
-
-      {/* Navigator stays visible and fixed in layout */}
-      <SurveyNavigator
-        currentIndex={currentQuestionIndex}
-        total={questions.length}
-        onNext={() => {
-          setSlideDirection("right");
-          setCurrentQuestionIndex((i) => i + 1);
-        }}
-        onPrev={() => {
-          setSlideDirection("left");
-          setCurrentQuestionIndex((i) => i - 1);
-        }}
-      />
     </div>
   );
 };

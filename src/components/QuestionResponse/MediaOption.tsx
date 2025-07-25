@@ -1,19 +1,21 @@
 import type { MediaOptionProps } from "@/types/response";
 
-const MediaOption = ({ option }: MediaOptionProps) => {
+const MediaOption = ({ option, isSelected, onSelect }: MediaOptionProps) => {
   const imageSrc = option.image ? option.image : null;
   return (
-    <div className="relative flex min-h-[160px] flex-1 flex-col overflow-hidden rounded-4xl border-2 border-[#F1F1F1] bg-[#F9F9F9] transition-shadow duration-200 hover:border-[#F9F9F9] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:min-h-[200px] xl:min-h-[240px]">
-      {/* Image Section */}
+    <div
+      onClick={onSelect}
+      className={`relative flex min-h-[160px] flex-1 cursor-pointer flex-col overflow-hidden rounded-4xl border-2 ${isSelected ? "border-[#005BC4] shadow-[0_0_0_4px_#D2DEFF]" : "border-[#F1F1F1]"} bg-[#F9F9F9] transition-shadow duration-200 hover:border-[#F9F9F9] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:min-h-[200px] xl:min-h-[240px]`}
+    >
+      {/* ✅ Image Section */}
       <div className="flex h-[140px] w-full shrink-0 sm:h-[160px] md:h-[180px] xl:h-[200px]">
-        <div className="flex flex-grow cursor-pointer items-center justify-center overflow-hidden rounded">
+        <div className="flex flex-grow items-center justify-center overflow-hidden rounded">
           <img src={imageSrc!} alt={option.value} className="h-full w-full object-cover" />
         </div>
       </div>
 
-      {/* Text + Index Section */}
+      {/* ✅ Text + Index Section */}
       <div className="relative flex min-h-[40px] w-full flex-grow items-start gap-1 bg-white p-1 xl:min-h-[60px]">
-        {/* Index Bubble */}
         <div
           className={`flex min-h-[80%] w-[16%] justify-center ${
             option.value.length > 24 ? "items-center" : "items-start"
@@ -24,7 +26,6 @@ const MediaOption = ({ option }: MediaOptionProps) => {
           </div>
         </div>
 
-        {/* Value Text */}
         <div className="flex min-h-[40px] flex-1 items-start justify-start px-2 pr-4 break-words">
           <p className="p-1 text-[16px] leading-[1.4] break-words whitespace-pre-wrap">
             {option.value}

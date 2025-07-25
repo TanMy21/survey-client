@@ -2,7 +2,7 @@ import type { QuestionProps } from "@/types/question";
 import QuestionTextandDescription from "../QuestionTextandDescription";
 import RankList from "../QuestionResponse/RankList";
 
-const RankScreen = ({ surveyID, question }: QuestionProps) => {
+const RankScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const { options } = question || {};
   return (
     <div className="border-black-500 relative z-20 mx-auto flex min-h-[700px] w-[98%] flex-col border-2">
@@ -10,7 +10,7 @@ const RankScreen = ({ surveyID, question }: QuestionProps) => {
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </div>
       <div className="absolute top-[44%] mx-auto flex h-[60%] w-full flex-col items-center justify-start border-2 border-red-500 xl:top-[50%]">
-        <RankList options={options!} />
+        <RankList options={options!} setCurrentQuestionIndex={setCurrentQuestionIndex}/>        
       </div>
     </div>
   );

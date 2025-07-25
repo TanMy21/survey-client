@@ -1,6 +1,6 @@
 import type { QuestionProps } from "@/types/question";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import ResponseList from "../QuestionResponse/ResponseList";
+import InstructionsList from "../QuestionResponse/InstructionsList";
 
 const InstructionScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const { options } = question || {};
@@ -10,7 +10,7 @@ const InstructionScreen = ({ surveyID, question, setCurrentQuestionIndex }: Ques
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </div>
       <div className="absolute top-[44%] mx-auto flex h-[60%] w-full flex-col items-center justify-start border-2 border-red-500 xl:top-[50%]">
-        <ResponseList options={options!} qType="INSTRUCTIONS" />
+        <InstructionsList options={options!} />
         <div className="mt-4 flex w-3/5 justify-end pr-6">
           <button
             onClick={() => setCurrentQuestionIndex?.((i) => i + 1)}

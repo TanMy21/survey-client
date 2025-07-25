@@ -1,5 +1,5 @@
-import type { Mark, RangeResponseProps } from "@/types/response";
-import { useMemo, useState, type ReactNode } from "react";
+import type { Mark, SliderProps } from "@/types/response";
+import { useMemo, type ReactNode } from "react";
 
 const STATIC_CONFIG = {
   tick: { minSize: 8, increment: 2 },
@@ -41,14 +41,13 @@ const getSegmentBackground = (
   return "linear-gradient(to right, #3777FE, #1E3A8A)";
 };
 
-const ProgressiveSlider = ({ question }: RangeResponseProps) => {
+const ProgressiveSlider = ({ question, value, setValue }: SliderProps) => {
   const { questionPreferences } = question || {};
   const { minValue, maxValue } = questionPreferences?.uiConfig || {};
 
   const min = minValue ?? 1;
   const max = maxValue ?? 5;
   const marks = useMemo(() => generateMarks(min, max), [min, max]);
-  const [value, setValue] = useState<number>(Math.ceil((min + max) / 2));
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(Number(e.target.value));
@@ -81,7 +80,7 @@ const ProgressiveSlider = ({ question }: RangeResponseProps) => {
         <div
           key={`label-${mark.value}`}
           style={{ left: `${percent}%` }}
-          className={`absolute -translate-x-1/2 text-center text-sm whitespace-nowrap transition-all duration-200 ${
+          className={`absolute -translate-x-1/2 text-center text-xl whitespace-nowrap transition-all duration-200 ${
             value === mark.value ? "font-bold text-blue-600" : "text-gray-500"
           }`}
         >

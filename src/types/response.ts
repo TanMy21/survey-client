@@ -15,14 +15,34 @@ export interface ResponseListProps {
   qType?: string;
 }
 
+export interface SingleChoiceListProps extends ResponseListProps {
+  selectedOptionID: string | null;
+  setSelectedOptionID: (id: string | null) => void;
+}
+
+export interface MultipleChoiceListProps extends ResponseListProps {
+  selectedOptions: { optionID: string; value: string }[];
+  onToggle: (optionID: string, value: string) => void;
+}
+
 export interface ResponseListItemProps {
-  qType: string;
   response: OptionType;
   index: number;
 }
 
+export interface SingleChoiceListItemProps extends ResponseListItemProps {
+  selected: boolean;
+  onSelect: () => void;
+}
+
+export interface MultipleChoiceListItemProps extends ResponseListItemProps {
+  checked: boolean;
+  onToggle: (optionID: string, value: string) => void;
+}
+
 export interface RangeResponseProps {
   question: Question;
+  setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
 export interface RankListItemProps {
@@ -52,6 +72,7 @@ export interface BinaryResponseContainerProps {
 
 export interface RankListProps {
   options: OptionType[];
+  setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
 export interface Mark {
@@ -73,8 +94,17 @@ export interface StaticSliderConfig {
 
 export interface MediaOptionsProps {
   options: OptionType[];
+  multiSelect?: boolean;
+  setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
 export interface MediaOptionProps {
   option: OptionType;
+  isSelected?: boolean;
+  onSelect?: () => void;
+}
+
+export interface SliderProps extends RangeResponseProps {
+  value: number;
+  setValue: (val: number) => void;
 }

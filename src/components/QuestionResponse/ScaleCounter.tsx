@@ -1,27 +1,26 @@
-import type { RangeResponseProps } from "@/types/response";
+import type { SliderProps } from "@/types/response";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
-const ScaleCounter = ({ question }: RangeResponseProps) => {
+const ScaleCounter = ({ question, value, setValue }: SliderProps) => {
   const { questionPreferences } = question || {};
-  const minValue = questionPreferences?.uiConfig?.minValue ?? 1;
-  const maxValue = questionPreferences?.uiConfig?.maxValue ?? 5;
+  const minValue = questionPreferences?.uiConfig?.minValue ?? {};
+  const maxValue = questionPreferences?.uiConfig?.maxValue ?? {};
 
-  const [count, setCount] = useState<number>(minValue);
   const [direction, setDirection] = useState(1);
 
   const increment = () => {
-    if (count < maxValue) {
+    if (value < maxValue) {
       setDirection(1);
-      setCount(count + 1);
+      setValue(value + 1);
     }
   };
 
   const decrement = () => {
-    if (count > minValue) {
+    if (value > minValue) {
       setDirection(-1);
-      setCount(count - 1);
+      setValue(value - 1);
     }
   };
 
@@ -48,7 +47,7 @@ const ScaleCounter = ({ question }: RangeResponseProps) => {
         {/* Decrement button */}
         <button
           onClick={decrement}
-          disabled={count === minValue}
+          disabled={value === minValue}
           aria-label="Decrement"
           className="text-gray-700 disabled:cursor-not-allowed disabled:opacity-30"
         >
@@ -59,7 +58,7 @@ const ScaleCounter = ({ question }: RangeResponseProps) => {
         <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden">
           <AnimatePresence initial={false} custom={direction} mode="wait">
             <motion.div
-              key={count}
+              key={value}
               custom={direction}
               variants={variants}
               initial="enter"
@@ -71,7 +70,7 @@ const ScaleCounter = ({ question }: RangeResponseProps) => {
               }}
               className="absolute text-4xl font-bold"
             >
-              {count}
+              {value}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -79,7 +78,7 @@ const ScaleCounter = ({ question }: RangeResponseProps) => {
         {/* Increment button */}
         <button
           onClick={increment}
-          disabled={count === maxValue}
+          disabled={value === maxValue}
           aria-label="Increment"
           className="text-gray-700 disabled:cursor-not-allowed disabled:opacity-30"
         >

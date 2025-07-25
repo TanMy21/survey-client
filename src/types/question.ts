@@ -2,6 +2,7 @@ import type { OptionType } from "./option";
 
 export type QuestionTypeKey =
   | "BINARY"
+  | "CONSENT"
   | "EMAIL_CONTACT"
   | "END_SCREEN"
   | "INSTRUCTIONS"

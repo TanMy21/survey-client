@@ -1,4 +1,5 @@
 import BinaryScreen from "@/components/screens/BinaryScreen";
+import ConsentScreen from "@/components/screens/ConsentScreen";
 import EmailContactScreen from "@/components/screens/EmailContactScreen";
 import EndScreen from "@/components/screens/EndScreen";
 import InstructionScreen from "@/components/screens/InstructionScreen";
@@ -16,6 +17,7 @@ export const questionComponents: {
   [key in QuestionTypeKey]: React.ComponentType<QuestionProps>;
 } = {
   BINARY: BinaryScreen,
+  CONSENT: ConsentScreen,
   EMAIL_CONTACT: EmailContactScreen,
   END_SCREEN: EndScreen,
   INSTRUCTIONS: InstructionScreen,
@@ -41,6 +43,10 @@ export const questionTypes: { [key: string]: QuestionType } = {
   Choice: {
     type: "Choice",
     Screen: SingleChoiceScreen,
+  },
+  Consent: {
+    type: "Consent",
+    Screen: ConsentScreen,
   },
   EmailContact: {
     type: "EmailContact",
