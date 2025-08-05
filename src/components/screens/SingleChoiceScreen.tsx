@@ -1,15 +1,23 @@
 import type { QuestionProps } from "@/types/question";
-import QuestionTextandDescription from "../QuestionTextandDescription";
-import SingleChoiceList from "../QuestionResponse/SingleChoiceList";
 import { useState } from "react";
+import QuestionTextandDescription from "../QuestionTextandDescription";
+import SingleChoiceList from "../questionresponse/SingleChoiceList";
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import { useRequiredAlert } from "@/context/RequiredAlertContext";
 
 const SingleChoiceScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const { options } = question || {};
-
+  const isRequired = useQuestionRequired(question);
+  const { showAlert } = useRequiredAlert();
   const [selectedOptionID, setSelectedOptionID] = useState<string | null>(null);
 
   const handleSubmit = () => {
     const option = options?.find((option) => option.optionID === selectedOptionID)?.value;
+
+    if (isRequired && !option) {
+      showAlert();
+      return;
+    }
 
     console.log("Selected option ID:", option);
     if (selectedOptionID) {

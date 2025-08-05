@@ -25,12 +25,12 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
   const isNonOrderableType = nonOrderableTypes.includes(type!);
 
   return (
-    <div className="origin-bottom flex flex-col w-full">
-      <div className="flex flex-col justify-center items-end mx-auto w-[92%] md:w-[98%]">
-        <div className="flex flex-row justify-center items-center mx-auto w-full">
+    <div className="flex w-full origin-bottom flex-col">
+      <div className="mx-auto flex w-[92%] flex-col items-end justify-center md:w-[98%]">
+        <div className="mx-auto flex w-full flex-row items-center justify-center">
           {!isNonOrderableType && (
             <div
-              className="flex justify-center items-center rounded-full mr-2"
+              className="mr-2 flex items-center justify-center rounded-full"
               style={{
                 width: `${circleSize}px`,
                 height: `${circleSize}px`,
@@ -43,12 +43,12 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
             </div>
           )}
 
-          <div className="flex flex-row justify-center items-center">
+          <div className="flex flex-row items-center justify-center">
             <p
-              className="whitespace-normal w-full max-w-[80ch] font-normal text-start leading-[1.4] break-words"
+              className="w-full max-w-[80ch] text-start leading-[1.4] font-normal break-words whitespace-normal"
               style={{
                 fontSize: `${actualTitleFontSize}px`,
-                color: titleFontColor,
+                color: titleFontColor || "black",
                 fontFamily:
                   "BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
                 letterSpacing: "0.01em",
@@ -61,10 +61,10 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
           </div>
         </div>
 
-        <div className="flex flex-row justify-center items-center w-full my-[8%] md:my-[1%]">
+        <div className="my-[8%] flex w-full flex-row items-center justify-center md:my-[1%]">
           <div>
             <p
-              className="whitespace-normal w-fit italic"
+              className="w-fit whitespace-normal italic"
               style={{
                 fontSize: `${actualDescriptionFontSize}px`,
                 color: descriptionFontColor,

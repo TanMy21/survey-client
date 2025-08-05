@@ -1,6 +1,6 @@
 import type { QuestionProps } from "@/types/question";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import BinaryResponseContainer from "../QuestionResponse/BinaryResponseContainer";
+import BinaryResponseContainer from "../questionresponse/BinaryResponseContainer";
 
 const BinaryScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   return (
@@ -9,7 +9,10 @@ const BinaryScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionP
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </div>
       <div className="absolute top-[44%] mx-auto flex h-[60%] w-full flex-col items-center justify-start border-2 border-red-500 xl:top-[50%]">
-        <BinaryResponseContainer question={question!} setCurrentQuestionIndex={setCurrentQuestionIndex}/>
+        <BinaryResponseContainer
+          question={question!}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import type { QuestionProps } from "@/types/question";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import MediaOptionsContainer from "../QuestionResponse/MediaOptionsContainer";
+import MediaOptionsContainer from "../questionresponse/MediaOptionsContainer";
 
 const MediaScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const { options } = question ?? {};
@@ -12,7 +12,12 @@ const MediaScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionPr
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </div>
       <div className="absolute top-[44%] mx-auto flex h-[60%] w-full flex-col items-center justify-start border-2 border-red-500 xl:top-[50%]">
-        <MediaOptionsContainer options={options!} multiSelect={multiSelect}  setCurrentQuestionIndex={setCurrentQuestionIndex}/>
+        <MediaOptionsContainer
+          options={options!}
+          multiSelect={multiSelect}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
+          question={question}
+        />
       </div>
     </div>
   );

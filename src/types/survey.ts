@@ -1,6 +1,7 @@
 export interface SurveyNavigatorProps {
   currentIndex: number;
   total: number;
+  disableNext?: boolean;
   onNext: () => void;
   onPrev: () => void;
 }
@@ -29,3 +30,8 @@ export interface ISurvey {
 export interface SurveyContainerProps {
     surveyID: string;
 }
+
+export type FlowContextType = {
+  canProceed: boolean;
+  setCanProceed: (val: boolean) => void;
+};

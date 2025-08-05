@@ -3,14 +3,22 @@ import ProgressiveSlider from "./ProgressiveSlider";
 import ScaleCounter from "./ScaleCounter";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useState } from "react";
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import { useRequiredAlert } from "@/context/RequiredAlertContext";
 
 const RangeResponse = ({ question, setCurrentQuestionIndex }: RangeResponseProps) => {
   const isMobile = useIsMobile();
   const { minValue, maxValue } = question.questionPreferences?.uiConfig || {};
-
+  const isRequired = useQuestionRequired(question);
+  const { showAlert } = useRequiredAlert();
   const [selectedValue, setSelectedValue] = useState(Math.ceil((minValue + maxValue) / 2));
 
   const handleSubmit = () => {
+    if (isRequired && selectedValue === null) {
+      showAlert();
+      return;
+    }
+
     console.log("Submitted Range Value:", selectedValue);
     setCurrentQuestionIndex?.((i) => i + 1);
   };

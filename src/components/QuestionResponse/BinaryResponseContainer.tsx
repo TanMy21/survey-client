@@ -2,23 +2,29 @@ import type { BinaryResponseContainerProps } from "@/types/response";
 
 import BinaryResponseYes, { BinaryResponseNo } from "./BinaryResponseYes";
 import { useState } from "react";
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import { useRequiredAlert } from "@/context/RequiredAlertContext";
 
 const BinaryResponseContainer = ({
   question,
   setCurrentQuestionIndex,
+  setCanProceed,
 }: BinaryResponseContainerProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const { questionID, questionPreferences } = question;
+  const isRequired = useQuestionRequired(question);
+  const { showAlert } = useRequiredAlert();
   const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "Yes";
   const buttonTextNo = questionPreferences.uiConfig?.buttonTextNo || "No";
 
   const handleSubmit = () => {
-    if (selectedValue === null) {
-      alert("Please select an option");
+    if (isRequired && selectedValue === null) {
+      showAlert();
       return;
     }
 
     console.log("Selected response:", selectedValue);
+    setCanProceed?.(true);
     setCurrentQuestionIndex?.((i) => i + 1);
   };
 

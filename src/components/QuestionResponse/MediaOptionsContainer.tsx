@@ -2,14 +2,18 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import MediaOption from "./MediaOption";
 import type { MediaOptionsProps } from "@/types/response";
 import { useState } from "react";
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import { useRequiredAlert } from "@/context/RequiredAlertContext";
 
 const MediaOptionsContainer = ({
   options,
   multiSelect,
   setCurrentQuestionIndex,
+  question,
 }: MediaOptionsProps) => {
   const isMobile = useIsMobile();
-
+  const isRequired = useQuestionRequired(question);
+  const { showAlert } = useRequiredAlert();
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
   const toggleSelect = (optionID: string) => {
@@ -23,6 +27,11 @@ const MediaOptionsContainer = ({
   };
 
   const handleSubmit = () => {
+    if (isRequired && selectedOptions.length === 0) {
+      showAlert();
+      return;
+    }
+
     const selected = options
       .filter((opt) => selectedOptions.includes(opt.optionID))
       .map(({ optionID, value }) => ({ optionID, value }));

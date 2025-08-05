@@ -4,7 +4,7 @@ import { questionComponents } from "@/utils/questionConfig";
 const QuestionRenderer = ({ question, surveyID, setCurrentQuestionIndex }: QuestionProps) => {
   const Component = questionComponents[question?.type as QuestionTypeKey];
   return (
-    <div className="mx-auto h-full p-4 border-2 border-blue-500" style={{ width: "92%" }}>
+    <div className="mx-auto h-fit w-[92%] border-2 border-blue-500 p-4">
       <Component
         question={question}
         surveyID={surveyID}

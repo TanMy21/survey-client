@@ -54,6 +54,9 @@ export interface InputResponseProps {
   inputPlaceholder: string;
   submitButtonText: string;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
+  setCanProceed?: (val: boolean) => void;
+  disabled?: boolean;
+  question?: Question;
 }
 
 export interface BinaryResponseProps {
@@ -68,10 +71,13 @@ export interface BinaryResponseProps {
 export interface BinaryResponseContainerProps {
   question: Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
+  setCanProceed?: (val: boolean) => void;
 }
 
 export interface RankListProps {
   options: OptionType[];
+  disabled?: boolean;
+  question?:Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
@@ -95,6 +101,7 @@ export interface StaticSliderConfig {
 export interface MediaOptionsProps {
   options: OptionType[];
   multiSelect?: boolean;
+  question?:Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 

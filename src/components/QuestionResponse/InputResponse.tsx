@@ -1,3 +1,5 @@
+import { useRequiredAlert } from "@/context/RequiredAlertContext";
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import type { InputResponseProps } from "@/types/response";
 import { elementSchema } from "@/utils/validationSchema";
 import { useState } from "react";
@@ -6,19 +8,28 @@ const InputResponse = ({
   inputPlaceholder,
   submitButtonText,
   setCurrentQuestionIndex,
+  question,
 }: InputResponseProps) => {
   const [emailContact, setEmailContact] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const isRequired = useQuestionRequired(question);
+  const { showAlert } = useRequiredAlert();
 
   const handleSubmit = () => {
     const result = elementSchema.safeParse({ emailContact });
+
+    if (isRequired && !result.success) {
+      showAlert();
+      return;
+    }
+
     if (!result.success) {
       setError(result.error.format().emailContact?._errors[0] ?? "Invalid input");
     } else {
       setError(null);
       console.log("Input submitted:", emailContact);
+
       setCurrentQuestionIndex?.((i) => i + 1);
-      // Optionally clear input: setInputValue("");
     }
   };
 

@@ -1,10 +1,12 @@
 import type { QuestionProps } from "@/types/question";
 import QuestionTextandDescription from "../QuestionTextandDescription";
 import { MoveRight } from "lucide-react";
+import { useSurveyFlow } from "@/context/useSurveyFlow";
 
 const WelcomeScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const { questionPreferences } = question || {};
-
+  const { setCanProceed } = useSurveyFlow();
+  setCanProceed(true);
   const buttonText = questionPreferences?.uiConfig?.buttonText || "Next";
   return (
     <div className="border-black-500 relative z-20 mx-auto flex min-h-[700px] w-[98%] flex-col border-2">

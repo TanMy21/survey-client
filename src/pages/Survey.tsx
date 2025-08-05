@@ -1,12 +1,15 @@
 import SurveyContainer from "@/components/SurveyContainer";
+import { SurveyFlowProvider } from "@/context/useSurveyFlow";
 import { useParams } from "react-router";
 
 const Survey = () => {
-  const { surveyID } = useParams<{ surveyID: string }>();
-  if (!surveyID) return null;
+  const { shareID } = useParams<{ shareID: string }>();
+  if (!shareID) return null;
   return (
-    <div className="w-screen h-screen bg-white">
-      <SurveyContainer surveyID={surveyID} />
+    <div className="h-screen w-screen bg-white">
+      <SurveyFlowProvider>
+        <SurveyContainer surveyID={shareID} />
+      </SurveyFlowProvider>
     </div>
   );
 };

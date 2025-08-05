@@ -1,6 +1,6 @@
 import type { QuestionProps } from "@/types/question";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import InputResponseNumber from "../QuestionResponse/InputResponseNumber";
+import InputResponseNumber from "../questionresponse/InputResponseNumber";
 
 const NumberScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   return (
@@ -13,6 +13,7 @@ const NumberScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionP
           inputPlaceholder={"Enter your response..."}
           submitButtonText={"Submit"}
           setCurrentQuestionIndex={setCurrentQuestionIndex}
+          question={question}
         />
       </div>
     </div>

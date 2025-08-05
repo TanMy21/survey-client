@@ -1,20 +1,29 @@
+import { collectionItems } from "@/constants/collectionItems";
+import { useSurveyFlow } from "@/context/useSurveyFlow";
 import type { QuestionProps } from "@/types/question";
 import { useState } from "react";
 
-const ConsentScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
+const ConsentScreen = ({ setCurrentQuestionIndex }: QuestionProps) => {
+  const { setCanProceed } = useSurveyFlow();
   const [agreed, setAgreed] = useState(false);
-
+  setCanProceed(false);
   const handleSubmit = () => {
     if (!agreed) return;
 
     console.log("User consented to data collection.");
-
+    setCanProceed(true);
     setCurrentQuestionIndex?.((i) => i + 1);
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-lg sm:p-8 md:p-10">
+    <div className="flex min-h-screen justify-center border-2 border-amber-400 px-4">
+      <div
+        className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-lg sm:p-8 md:p-10"
+        style={{
+          height: "90%",
+          marginTop: "5%",
+        }}
+      >
         <div className="flex flex-col items-center gap-6 md:flex-row md:items-start md:gap-8">
           {/* Illustration */}
           <div className="flex-shrink-0">
@@ -51,30 +60,12 @@ const ConsentScreen = ({ surveyID, question, setCurrentQuestionIndex }: Question
             <div className="mt-6 text-left">
               <p className="mb-3 font-semibold text-gray-700">What we collect:</p>
               <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start">
-                  <span className="mr-3 text-blue-500">📝</span>
-                  Responses to survey questions
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-3 text-blue-500">⏱️</span>
-                  Time spent on each question
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-3 text-blue-500">🖱️</span>
-                  Mouse movements and interactions
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-3 text-blue-500">💻</span>
-                  Device, OS, and browser information
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-3 text-blue-500">🌐</span>
-                  Language preferences
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-3 text-blue-500">🔒</span>
-                  Anonymous session ID
-                </li>
+                {collectionItems.map(({ icon, label }, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="w-6 text-center text-xl leading-6 text-blue-500">{icon}</span>
+                    <span className="leading-6">{label}</span>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -89,17 +80,18 @@ const ConsentScreen = ({ surveyID, question, setCurrentQuestionIndex }: Question
                 .
               </p>
             </div>
-
-            {/* Consent and Button */}
+            {/* consent button*/}
             <div className="mt-8">
               <label className="flex cursor-pointer items-start text-left">
                 <input
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-1 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  style={{ backgroundColor: "white" }}
+                  className="mt-1 h-5 w-5 rounded border-2 border-gray-300 bg-white text-white checked:bg-blue-600 checked:text-white focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="ml-3 text-sm text-gray-700">
+
+                <span className="mt-1 ml-3 text-sm text-gray-700">
                   I agree to the terms and consent to data collection for this session.
                 </span>
               </label>

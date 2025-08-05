@@ -2,10 +2,10 @@ import { fetchSurvey } from "@/api/surveyApi";
 import { useQuery } from "@tanstack/react-query";
 
 
-export const useFetchSurvey = (surveyID: string) => {
+export const useFetchSurvey = (shareID: string) => {
   return useQuery({
-    queryKey: ["survey", surveyID],
-    queryFn: () => fetchSurvey(surveyID),
+    queryKey: ["survey", shareID],
+    queryFn: () => fetchSurvey(shareID),
     staleTime: 5 * 60 * 1000, // 5 mins
   });
 };

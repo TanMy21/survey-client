@@ -1,11 +1,14 @@
 import type { QuestionProps } from "@/types/question";
-import QuestionTextandDescription from "../QuestionTextandDescription";
-import MultipleChoiceList from "../QuestionResponse/MultipleChoiceList";
 import { useState } from "react";
+import QuestionTextandDescription from "../QuestionTextandDescription";
+import MultipleChoiceList from "../questionresponse/MultipleChoiceList";
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import { useRequiredAlert } from "@/context/RequiredAlertContext";
 
 const MultipleChoiceScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const { options } = question || {};
-
+  const isRequired = useQuestionRequired(question);
+  const { showAlert } = useRequiredAlert();
   const [selectedOptions, setSelectedOptions] = useState<{ optionID: string; value: string }[]>([]);
 
   const handleOptionToggle = (optionID: string, value: string) => {
@@ -20,8 +23,8 @@ const MultipleChoiceScreen = ({ surveyID, question, setCurrentQuestionIndex }: Q
   };
 
   const handleSubmit = () => {
-    if (selectedOptions.length === 0) {
-      alert("Please select at least one option before submitting.");
+    if (isRequired && selectedOptions.length === 0) {
+      showAlert();
       return;
     }
 

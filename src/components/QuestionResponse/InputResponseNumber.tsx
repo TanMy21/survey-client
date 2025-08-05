@@ -1,24 +1,34 @@
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import type { InputResponseProps } from "@/types/response";
 import { numberResponseSchema } from "@/utils/validationSchema";
 import { useState } from "react";
+import { useRequiredAlert } from "@/context/RequiredAlertContext";
 
 const InputResponseNumber = ({
   inputPlaceholder,
   submitButtonText,
   setCurrentQuestionIndex,
+  question,
 }: InputResponseProps) => {
+  const isRequired = useQuestionRequired(question);
+  const { showAlert } = useRequiredAlert();
   const [number, setNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = () => {
     const result = numberResponseSchema.safeParse({ number });
+
+    if (isRequired && !result.success) {
+      showAlert();
+      return;
+    }
+
     if (!result.success) {
       setError(result.error.format().number?._errors[0] ?? "Invalid input");
     } else {
       setError(null);
       console.log("Input submitted:", number);
       setCurrentQuestionIndex?.((i) => i + 1);
-      // Optionally clear input: setInputValue("");
     }
   };
 
@@ -27,7 +37,7 @@ const InputResponseNumber = ({
       <div className="mx-auto flex h-[60%] w-[96%] flex-col border-2 border-b-emerald-400">
         {/* Input field */}
         <input
-          type="text"
+          type="number"
           placeholder={inputPlaceholder}
           value={number}
           onChange={(e) => setNumber(e.target.value)}

@@ -1,6 +1,6 @@
 import type { QuestionProps } from "@/types/question";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import RangeResponse from "../QuestionResponse/RangeResponse";
+import RangeResponse from "../questionresponse/RangeResponse";
 
 const RangeScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   return (

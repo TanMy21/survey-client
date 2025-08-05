@@ -1,6 +1,6 @@
 import type { QuestionProps } from "@/types/question";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import InputResponse from "../QuestionResponse/InputResponse";
+import InputResponse from "../questionresponse/InputResponse";
 
 const EmailContactScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   return (
@@ -9,7 +9,12 @@ const EmailContactScreen = ({ surveyID, question, setCurrentQuestionIndex }: Que
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </div>
       <div className="absolute top-[44%] mx-auto flex h-[60%] w-full flex-col items-center justify-start border-2 border-red-500 xl:top-[50%]">
-        <InputResponse inputPlaceholder={"Enter your email..."} submitButtonText={"Submit"} setCurrentQuestionIndex={setCurrentQuestionIndex}/>
+        <InputResponse
+          inputPlaceholder={"Enter your email..."}
+          submitButtonText={"Submit"}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
+          question={question}
+        />
       </div>
     </div>
   );

@@ -1,15 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import SurveyNavigator from "./SurveyNavigator";
-import type { Question } from "@/types/question";
-import type { Session } from "@/types/session";
 import QuestionRenderer from "./QuestionRenderer";
 import type { SurveyContainerProps } from "@/types/survey";
 import { useFetchSurvey } from "@/hooks/useSurvey";
 import { SlideMotion } from "./motion/SlideMotion";
+import { LogoLoader } from "./loader/LogoLoader";
+import { useSurveyFlow } from "@/context/useSurveyFlow";
+import { RequiredAlertProvider } from "@/context/RequiredAlertContext";
 
 const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
-  // const [questions, setQuestions] = useState<Question[]>([]);
-  // const [sessions, setSessions] = useState<Session[]>([]);
+  const { canProceed } = useSurveyFlow();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
 
@@ -28,7 +28,7 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
     const consentScreen = {
       questionID: "consent-screen",
       type: "CONSENT",
-      order: -1.5,
+      order: -2,
     };
 
     const injected = [...sortedQuestions, consentScreen].sort((a, b) => a.order! - b.order!);
@@ -51,7 +51,7 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
       }
     : questionBackgroundColor
       ? {
-          questionBackgroundColor,
+          backgroundColor: questionBackgroundColor,
         }
       : {
           backgroundColor: "white",
@@ -60,7 +60,7 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="h-1 w-1/2 animate-pulse bg-gray-400" />
+        <LogoLoader />
       </div>
     );
   }
@@ -83,55 +83,56 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   //   );
   // }
 
-  console.log("Current Question :", currentQuestion);
+  console.log("BG COlor: ", questionBackgroundColor);
 
   if (!questions.length) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="h-1 w-1/2 animate-pulse bg-gray-400" />
-      </div>
+      <div className="flex h-screen w-full items-center justify-center">Error Loading Survey.</div>
     );
   }
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
-      {/* Full-width progress bar at top */}
-      <div className="fixed top-0 left-0 z-50 h-1 w-full bg-gray-200">
-        <div
-          className="h-full bg-blue-500 transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      {/* Spacer div to prevent overlap due to fixed progress bar */}
-      <div className="h-1" />
-      <div className="flex h-full w-full flex-col" style={backgroundStyle}>
-        {/* Scrollable area for questions only */}
-        <div className="scrollbar-hidden flex-grow overflow-x-hidden overflow-y-auto border-2 border-green-500">
-          <SlideMotion direction={slideDirection} keyProp={currentQuestion.questionID}>
-            <QuestionRenderer
-              question={currentQuestion}
-              surveyID={surveyID}
-              setCurrentQuestionIndex={setCurrentQuestionIndex}
-            />
-          </SlideMotion>
+    <RequiredAlertProvider>
+      <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
+        {/* Full-width progress bar at top */}
+        <div className="fixed top-0 left-0 z-50 h-1 w-full bg-gray-200">
+          <div
+            className="h-full bg-blue-500 transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
         </div>
 
-        {/* Navigator stays visible and fixed in layout */}
-        <SurveyNavigator
-          currentIndex={currentQuestionIndex}
-          total={questions.length}
-          onNext={() => {
-            setSlideDirection("right");
-            setCurrentQuestionIndex((i) => i + 1);
-          }}
-          onPrev={() => {
-            setSlideDirection("left");
-            setCurrentQuestionIndex((i) => i - 1);
-          }}
-        />
+        {/* Spacer div to prevent overlap due to fixed progress bar */}
+        <div className="h-1" />
+        <div className="flex h-full w-full flex-col" style={backgroundStyle}>
+          {/* Scrollable area for questions only */}
+          <div className="scrollbar-hidden flex-grow overflow-x-hidden overflow-y-auto border-2 border-green-500">
+            <SlideMotion direction={slideDirection} keyProp={currentQuestion.questionID}>
+              <QuestionRenderer
+                question={currentQuestion}
+                surveyID={surveyID}
+                setCurrentQuestionIndex={setCurrentQuestionIndex}
+              />
+            </SlideMotion>
+          </div>
+
+          {/* Navigator stays visible and fixed in layout */}
+          <SurveyNavigator
+            currentIndex={currentQuestionIndex}
+            total={questions.length}
+            disableNext={!canProceed}
+            onNext={() => {
+              setSlideDirection("right");
+              setCurrentQuestionIndex((i) => i + 1);
+            }}
+            onPrev={() => {
+              setSlideDirection("left");
+              setCurrentQuestionIndex((i) => i - 1);
+            }}
+          />
+        </div>
       </div>
-    </div>
+    </RequiredAlertProvider>
   );
 };
 
