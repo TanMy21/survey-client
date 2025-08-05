@@ -104,7 +104,7 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
 
         {/* Spacer div to prevent overlap due to fixed progress bar */}
         <div className="h-1" />
-        <div className="flex h-full w-full flex-col" style={backgroundStyle}>
+        <div className="flex min-h-screen w-full flex-col" style={backgroundStyle}>
           {/* Scrollable area for questions only */}
           <div className="scrollbar-hidden flex-grow overflow-x-hidden overflow-y-auto border-2 border-green-500">
             <SlideMotion direction={slideDirection} keyProp={currentQuestion.questionID}>

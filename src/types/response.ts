@@ -13,11 +13,12 @@ export interface ResponseData {
 export interface ResponseListProps {
   options: OptionType[];
   qType?: string;
+  setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
-export interface SingleChoiceListProps extends ResponseListProps {
-  selectedOptionID: string | null;
-  setSelectedOptionID: (id: string | null) => void;
+export interface SingleChoiceListProps {
+  question?: Question;
+  setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
 export interface MultipleChoiceListProps extends ResponseListProps {
@@ -77,7 +78,7 @@ export interface BinaryResponseContainerProps {
 export interface RankListProps {
   options: OptionType[];
   disabled?: boolean;
-  question?:Question;
+  question?: Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
@@ -101,7 +102,7 @@ export interface StaticSliderConfig {
 export interface MediaOptionsProps {
   options: OptionType[];
   multiSelect?: boolean;
-  question?:Question;
+  question?: Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
