@@ -6,7 +6,6 @@ import { useFetchSurvey } from "@/hooks/useSurvey";
 import { SlideMotion } from "./motion/SlideMotion";
 import { LogoLoader } from "./loader/LogoLoader";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
-import { RequiredAlertProvider } from "@/context/RequiredAlertContext";
 
 const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   const { canProceed } = useSurveyFlow();
@@ -92,47 +91,45 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   }
 
   return (
-    <RequiredAlertProvider>
-      <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
-        {/* Full-width progress bar at top */}
-        <div className="fixed top-0 left-0 z-50 h-1 w-full bg-gray-200">
-          <div
-            className="h-full bg-blue-500 transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        {/* Spacer div to prevent overlap due to fixed progress bar */}
-        <div className="h-1" />
-        <div className="flex min-h-screen w-full flex-col" style={backgroundStyle}>
-          {/* Scrollable area for questions only */}
-          <div className="scrollbar-hidden flex-grow overflow-x-hidden overflow-y-auto border-2 border-green-500">
-            <SlideMotion direction={slideDirection} keyProp={currentQuestion.questionID}>
-              <QuestionRenderer
-                question={currentQuestion}
-                surveyID={surveyID}
-                setCurrentQuestionIndex={setCurrentQuestionIndex}
-              />
-            </SlideMotion>
-          </div>
-
-          {/* Navigator stays visible and fixed in layout */}
-          <SurveyNavigator
-            currentIndex={currentQuestionIndex}
-            total={questions.length}
-            disableNext={!canProceed}
-            onNext={() => {
-              setSlideDirection("right");
-              setCurrentQuestionIndex((i) => i + 1);
-            }}
-            onPrev={() => {
-              setSlideDirection("left");
-              setCurrentQuestionIndex((i) => i - 1);
-            }}
-          />
-        </div>
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
+      {/* Full-width progress bar at top */}
+      <div className="fixed top-0 left-0 z-50 h-1 w-full bg-gray-200">
+        <div
+          className="h-full bg-blue-500 transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        />
       </div>
-    </RequiredAlertProvider>
+
+      {/* Spacer div to prevent overlap due to fixed progress bar */}
+      <div className="h-1" />
+      <div className="flex min-h-screen w-full flex-col" style={backgroundStyle}>
+        {/* Scrollable area for questions only */}
+        <div className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 border-green-500">
+          <SlideMotion direction={slideDirection} keyProp={currentQuestion.questionID}>
+            <QuestionRenderer
+              question={currentQuestion}
+              surveyID={surveyID}
+              setCurrentQuestionIndex={setCurrentQuestionIndex}
+            />
+          </SlideMotion>
+        </div>
+
+        {/* Navigator stays visible and fixed in layout */}
+        <SurveyNavigator
+          currentIndex={currentQuestionIndex}
+          total={questions.length}
+          disableNext={!canProceed}
+          onNext={() => {
+            setSlideDirection("right");
+            setCurrentQuestionIndex((i) => i + 1);
+          }}
+          onPrev={() => {
+            setSlideDirection("left");
+            setCurrentQuestionIndex((i) => i - 1);
+          }}
+        />
+      </div>
+    </div>
   );
 };
 

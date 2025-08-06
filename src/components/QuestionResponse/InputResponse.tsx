@@ -1,8 +1,9 @@
-import { useRequiredAlert } from "@/context/RequiredAlertContext";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import type { InputResponseProps } from "@/types/response";
 import { elementSchema } from "@/utils/validationSchema";
 import { useState } from "react";
+import { InputError } from "../alert/ResponseErrorAlert";
+import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 
 const InputResponse = ({
   inputPlaceholder,
@@ -13,13 +14,13 @@ const InputResponse = ({
   const [emailContact, setEmailContact] = useState("");
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
-  const { showAlert } = useRequiredAlert();
 
   const handleSubmit = () => {
-    const result = elementSchema.safeParse({ emailContact });
+    const trimmed = emailContact.trim();
+    const result = elementSchema.safeParse({ emailContact: trimmed });
 
-    if (isRequired && !result.success) {
-      showAlert();
+    if (isRequired && trimmed === "") {
+      setError("Your response is required for this question");
       return;
     }
 
@@ -28,8 +29,27 @@ const InputResponse = ({
     } else {
       setError(null);
       console.log("Input submitted:", emailContact);
-
       setCurrentQuestionIndex?.((i) => i + 1);
+    }
+  };
+
+  const handleKeyDown = useSubmitOnEnter(handleSubmit);
+
+  const handleBlur = () => {
+    const trimmed = emailContact.trim();
+
+    if (trimmed === "") {
+      if (isRequired) {
+        setError("This field is required.");
+      }
+      return;
+    }
+
+    const result = elementSchema.safeParse({ emailContact: trimmed });
+    if (!result.success) {
+      setError(result.error.format().emailContact?._errors[0] ?? "Invalid email format");
+    } else {
+      setError(null);
     }
   };
 
@@ -41,14 +61,14 @@ const InputResponse = ({
           type="text"
           placeholder={inputPlaceholder}
           value={emailContact}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           onChange={(e) => setEmailContact(e.target.value)}
           className={`mx-auto block h-16 w-[92%] border-0 border-b border-gray-300 px-4 text-[24px] leading-none text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none md:w-[56%] md:text-[36px]`}
         />
 
         {/* Error message */}
-        {error && (
-          <p className="mx-auto mt-1 px-4 text-left text-xl text-red-500 md:w-[56%]">{error}</p>
-        )}
+        {error && <InputError error={error} />}
 
         {/* Submit Button container */}
         <div className="mx-auto mt-4 flex h-[25%] w-[96%] flex-col items-end pr-[4%] md:w-[60%]">

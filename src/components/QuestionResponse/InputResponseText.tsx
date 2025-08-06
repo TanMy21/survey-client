@@ -1,8 +1,9 @@
-import { useRequiredAlert } from "@/context/RequiredAlertContext";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import type { InputResponseProps } from "@/types/response";
 import { textResponseSchema } from "@/utils/validationSchema";
 import { useState } from "react";
+import { InputError } from "../alert/ResponseErrorAlert";
+import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 
 const InputResponseText = ({
   inputPlaceholder,
@@ -10,17 +11,16 @@ const InputResponseText = ({
   question,
   setCurrentQuestionIndex,
 }: InputResponseProps) => {
-  const isRequired = useQuestionRequired(question);
-  const { showAlert } = useRequiredAlert();
-
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const isRequired = useQuestionRequired(question);
 
   const handleSubmit = () => {
-    const result = textResponseSchema.safeParse({ text });
+    const trimmed = text.trim();
+    const result = textResponseSchema.safeParse({ text: trimmed });
 
-    if (isRequired && !result.success) {
-      showAlert();
+    if (isRequired && trimmed === "") {
+      setError("Your response is required for this question");
       return;
     }
 
@@ -30,8 +30,28 @@ const InputResponseText = ({
     } else {
       setError(null);
       console.log("Submitted response:", text);
-      setText(""); // Clear input
+      setText("");
       setCurrentQuestionIndex?.((i) => i + 1);
+    }
+  };
+
+  const handleKeyDown = useSubmitOnEnter(handleSubmit);
+
+  const handleBlur = () => {
+    const trimmed = text.trim();
+
+    if (trimmed === "") {
+      if (isRequired) {
+        setError("This field is required.");
+      }
+      return;
+    }
+
+    const result = textResponseSchema.safeParse({ text: trimmed });
+    if (!result.success) {
+      setError(result.error.format().text?._errors[0] ?? "Invalid email format");
+    } else {
+      setError(null);
     }
   };
 
@@ -42,6 +62,8 @@ const InputResponseText = ({
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           placeholder={inputPlaceholder}
           rows={1}
           className="scrollbar-hidden mx-auto block max-h-64 min-h-16 w-[92%] resize-none overflow-y-auto border-0 border-b border-gray-300 px-4 text-[24px] leading-tight text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none md:w-[56%] md:text-[36px]"
@@ -52,8 +74,8 @@ const InputResponseText = ({
           }}
         />
 
-        {/* Error Message */}
-        {error && <div className="mt-1 w-full px-4 text-sm text-red-600 md:w-[56%]">{error}</div>}
+        {/* Error message */}
+        {error && <InputError error={error} />}
 
         {/* Submit Button */}
         <div className="mx-auto mt-4 flex h-[25%] w-[96%] flex-col items-end pr-[4%] md:w-[60%]">

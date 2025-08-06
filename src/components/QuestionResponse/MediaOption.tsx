@@ -27,7 +27,7 @@ const MediaOption = ({ option, isSelected, onSelect }: MediaOptionProps) => {
         </div>
 
         <div className="flex min-h-[40px] flex-1 items-start justify-start px-2 pr-4 break-words">
-          <p className="p-1 text-[16px] leading-[1.4] break-words whitespace-pre-wrap">
+          <p className="p-1 text-[16px] leading-[1.4] font-medium break-words whitespace-pre-wrap text-black">
             {option.value}
           </p>
         </div>

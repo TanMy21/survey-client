@@ -1,12 +1,15 @@
 import { collectionItems } from "@/constants/collectionItems";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
+import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 import type { QuestionProps } from "@/types/question";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const ConsentScreen = ({ setCurrentQuestionIndex }: QuestionProps) => {
   const { setCanProceed } = useSurveyFlow();
   const [agreed, setAgreed] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   setCanProceed(false);
+
   const handleSubmit = () => {
     if (!agreed) return;
 
@@ -15,9 +18,18 @@ const ConsentScreen = ({ setCurrentQuestionIndex }: QuestionProps) => {
     setCurrentQuestionIndex?.((i) => i + 1);
   };
 
+  const handleKeyDown = useSubmitOnEnter(handleSubmit);
+
+  useEffect(() => {
+    containerRef.current?.focus();
+  }, []);
+
   return (
     <div className="flex min-h-screen justify-center border-2 border-amber-400 px-4">
       <div
+        ref={containerRef}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
         className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-lg sm:p-8 md:p-10"
         style={{
           height: "90%",
@@ -87,7 +99,7 @@ const ConsentScreen = ({ setCurrentQuestionIndex }: QuestionProps) => {
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  style={{ backgroundColor: "white" }}
+                  style={{ colorScheme: "light" }}
                   className="mt-1 h-5 w-5 rounded border-2 border-gray-300 bg-white text-white checked:bg-blue-600 checked:text-white focus:ring-2 focus:ring-blue-500"
                 />
 

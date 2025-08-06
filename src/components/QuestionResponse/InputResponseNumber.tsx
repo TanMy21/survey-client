@@ -1,8 +1,9 @@
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 import type { InputResponseProps } from "@/types/response";
 import { numberResponseSchema } from "@/utils/validationSchema";
 import { useState } from "react";
-import { useRequiredAlert } from "@/context/RequiredAlertContext";
+import { InputError } from "../alert/ResponseErrorAlert";
 
 const InputResponseNumber = ({
   inputPlaceholder,
@@ -11,15 +12,15 @@ const InputResponseNumber = ({
   question,
 }: InputResponseProps) => {
   const isRequired = useQuestionRequired(question);
-  const { showAlert } = useRequiredAlert();
   const [number, setNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = () => {
-    const result = numberResponseSchema.safeParse({ number });
+    const trimmed = number.trim();
+    const result = numberResponseSchema.safeParse({ number: trimmed });
 
     if (isRequired && !result.success) {
-      showAlert();
+      setError("Your response is required for this question");
       return;
     }
 
@@ -32,6 +33,26 @@ const InputResponseNumber = ({
     }
   };
 
+  const handleKeyDown = useSubmitOnEnter(handleSubmit);
+
+  const handleBlur = () => {
+    const trimmed = number.trim();
+
+    if (trimmed === "") {
+      if (isRequired) {
+        setError("This field is required.");
+      }
+      return;
+    }
+
+    const result = numberResponseSchema.safeParse({ number: trimmed });
+    if (!result.success) {
+      setError(result.error.format().number?._errors[0] ?? "Invalid email format");
+    } else {
+      setError(null);
+    }
+  };
+
   return (
     <div className="flex w-3/5 origin-bottom flex-col border-2 border-amber-600">
       <div className="mx-auto flex h-[60%] w-[96%] flex-col border-2 border-b-emerald-400">
@@ -41,13 +62,13 @@ const InputResponseNumber = ({
           placeholder={inputPlaceholder}
           value={number}
           onChange={(e) => setNumber(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           className={`mx-auto block h-16 w-[92%] border-0 border-b border-gray-300 px-4 text-[24px] leading-none text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none md:w-[56%] md:text-[36px]`}
         />
 
         {/* Error message */}
-        {error && (
-          <p className="mx-auto mt-1 px-4 text-left text-xl text-red-500 md:w-[56%]">{error}</p>
-        )}
+        {error && <InputError error={error} />}
 
         {/* Submit Button container */}
         <div className="mx-auto mt-4 flex h-[25%] w-[96%] flex-col items-end pr-[4%] md:w-[60%]">

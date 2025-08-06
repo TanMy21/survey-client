@@ -27,7 +27,7 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
   return (
     <div className="flex w-full origin-bottom flex-col">
       <div className="mx-auto flex w-[92%] flex-col items-end justify-center md:w-[98%]">
-        <div className="mx-auto flex w-full flex-row items-center justify-center">
+        <div className="mx-auto flex w-full flex-row items-center justify-center gap-2">
           {!isNonOrderableType && (
             <div
               className="mr-2 flex items-center justify-center rounded-full"

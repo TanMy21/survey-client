@@ -1,5 +1,12 @@
 import type { OptionType } from "./option";
 
+
+export interface InputErrorProps {
+  error?: string | null;
+  className?: string;
+}
+
+
 export type QuestionTypeKey =
   | "BINARY"
   | "CONSENT"

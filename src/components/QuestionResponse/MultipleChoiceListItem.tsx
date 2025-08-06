@@ -8,7 +8,8 @@ const MultipleChoiceListItem = ({ response, checked, onToggle }: MultipleChoiceL
           type="checkbox"
           checked={checked}
           onChange={() => onToggle(response.optionID, response.text)}
-          className="h-5 w-5 appearance-none rounded-full border-2 border-[#CFD3D9] bg-transparent checked:border-[6px] checked:border-[#005BC4] hover:bg-transparent focus:outline-none"
+          style={{ colorScheme: "light" }}
+          className="h-5 w-5 rounded border-4 border-[#CFD3D9] bg-white text-[#005BC4] hover:bg-transparent focus:ring-[#005BC4] focus:outline-none"
         />
       </div>
 
