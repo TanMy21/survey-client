@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 import { InputError } from "../alert/ResponseErrorAlert";
+import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const MediaOptionsContainer = ({
   options,
@@ -18,7 +19,12 @@ const MediaOptionsContainer = ({
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const { handleFirstInteraction, handleClick, markSubmission, collectBehaviorData } =
+    useBehavior();
+
   const toggleSelect = (optionID: string) => {
+    handleFirstInteraction();
+    handleClick();
     setSelectedOptions((prev) => {
       if (multiSelect) {
         return prev.includes(optionID) ? prev.filter((id) => id !== optionID) : [...prev, optionID];
@@ -37,7 +43,9 @@ const MediaOptionsContainer = ({
     const selected = options
       .filter((opt) => selectedOptions.includes(opt.optionID))
       .map(({ optionID, value }) => ({ optionID, value }));
-
+    markSubmission();
+    const behaviorData = collectBehaviorData();
+    console.log("📦 MediaScreen behavior data:", behaviorData);
     console.log("Selected Media Options:", selected);
     setCurrentQuestionIndex?.((i) => i + 1);
   };

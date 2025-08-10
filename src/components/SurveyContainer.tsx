@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import SurveyNavigator from "./SurveyNavigator";
 import QuestionRenderer from "./QuestionRenderer";
 import type { SurveyContainerProps } from "@/types/survey";
@@ -6,12 +6,15 @@ import { useFetchSurvey } from "@/hooks/useSurvey";
 import { SlideMotion } from "./motion/SlideMotion";
 import { LogoLoader } from "./loader/LogoLoader";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
+import { BehaviorTrackerProvider } from "@/context/BehaviorTrackerContext";
+import { BacktrackLogger } from "./BacktrackLogger";
 
 const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   const { canProceed } = useSurveyFlow();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
-
+  const visitedRef = useRef<string[]>([]);
+  const backtrackCountMapRef = useRef<Map<string, number>>(new Map());
   const { data, isLoading, isError } = useFetchSurvey(surveyID);
 
   // useEffect(() => {
@@ -42,6 +45,7 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   const { questionPreferences } = currentQuestion || {};
   const { questionImageTemplate, questionImageTemplateUrl, questionBackgroundColor } =
     questionPreferences || {};
+
   const backgroundStyle = questionImageTemplate
     ? {
         backgroundImage: `url(${questionImageTemplateUrl})`,
@@ -82,8 +86,6 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   //   );
   // }
 
-  console.log("BG COlor: ", questionBackgroundColor);
-
   if (!questions.length) {
     return (
       <div className="flex h-screen w-full items-center justify-center">Error Loading Survey.</div>
@@ -106,15 +108,21 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
         {/* Scrollable area for questions only */}
         <div className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 border-green-500">
           <SlideMotion direction={slideDirection} keyProp={currentQuestion.questionID}>
-            <QuestionRenderer
-              question={currentQuestion}
-              surveyID={surveyID}
-              setCurrentQuestionIndex={setCurrentQuestionIndex}
-            />
+            <BehaviorTrackerProvider
+              questionID={currentQuestion.questionID}
+              questionType={currentQuestion.type}
+              backtrackCountMapRef={backtrackCountMapRef}
+            >
+              <BacktrackLogger questionID={currentQuestion.questionID} visitedRef={visitedRef} />
+              <QuestionRenderer
+                question={currentQuestion}
+                surveyID={surveyID}
+                setCurrentQuestionIndex={setCurrentQuestionIndex}
+              />
+            </BehaviorTrackerProvider>
           </SlideMotion>
         </div>
 
-        {/* Navigator stays visible and fixed in layout */}
         <SurveyNavigator
           currentIndex={currentQuestionIndex}
           total={questions.length}

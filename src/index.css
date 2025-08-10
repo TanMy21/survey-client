@@ -42,8 +42,11 @@ button {
   &::-webkit-scrollbar {
     display: none;
   }
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none;    /* Firefox */
+
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 @media (prefers-color-scheme: light) {
@@ -60,3 +63,44 @@ button {
     background-color: #f9f9f9;
   }
 }
+
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ff-pulse-loop, .ff-pulse-kick { animation: none !important; }
+}
+
+/* Continuous subtle pulse while auto-submit is pending */
+.ff-pulse-loop {
+  animation: ffPulseLoop 900ms ease-in-out infinite;
+  will-change: transform, background-color;
+}
+@keyframes ffPulseLoop {
+  0%   { transform: scale(1);   background-color: transparent; }
+  50%  { transform: scale(1.03); background-color: rgba(0, 91, 196, 0.06); }
+  100% { transform: scale(1);   background-color: transparent; }
+}
+
+/* Stronger one-time bump right before submission */
+.ff-pulse-kick {
+  animation: ffPulseKick 0.28s ease;
+}
+@keyframes ffPulseKick {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.05); background-color: rgba(0, 91, 196, 0.10); }
+  100% { transform: scale(1); }
+}
+
+
+.choice-wrapper,
+.choice-wrapper:focus,
+.choice-wrapper:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.choice-wrapper *:focus,
+.choice-wrapper *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.choice-wrapper { -webkit-tap-highlight-color: transparent; }

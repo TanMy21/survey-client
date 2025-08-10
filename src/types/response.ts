@@ -24,6 +24,7 @@ export interface SingleChoiceListProps {
 export interface MultipleChoiceListProps extends ResponseListProps {
   selectedOptions: { optionID: string; value: string }[];
   onToggle: (optionID: string, value: string) => void;
+   registerOptionRef?: (optionID: string, el: HTMLDivElement | null) => void; 
 }
 
 export interface ResponseListItemProps {
@@ -39,6 +40,8 @@ export interface SingleChoiceListItemProps extends ResponseListItemProps {
 export interface MultipleChoiceListItemProps extends ResponseListItemProps {
   checked: boolean;
   onToggle: (optionID: string, value: string) => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export interface RangeResponseProps {

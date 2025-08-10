@@ -1,9 +1,9 @@
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import type { InputResponseProps } from "@/types/response";
 import { textResponseSchema } from "@/utils/validationSchema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
-import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
+import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const InputResponseText = ({
   inputPlaceholder,
@@ -14,6 +14,16 @@ const InputResponseText = ({
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
+
+  const {
+    handleFirstInteraction,
+    handleBacktrack,
+    handleTyping,
+    handlePaste,
+    handleClick,
+    markSubmission,
+    collectBehaviorData,
+  } = useBehavior();
 
   const handleSubmit = () => {
     const trimmed = text.trim();
@@ -29,13 +39,27 @@ const InputResponseText = ({
       setError(errorMessage);
     } else {
       setError(null);
+      handleClick();
+      markSubmission();
+      const data = collectBehaviorData();
+      console.log("📦 TextScreen behavior data:", data);
       console.log("Submitted response:", text);
       setText("");
       setCurrentQuestionIndex?.((i) => i + 1);
     }
   };
 
-  const handleKeyDown = useSubmitOnEnter(handleSubmit);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const key = e.key;
+    if (key === "Backspace" || key.length === 1) {
+      handleTyping(key);
+    }
+
+    if (key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
 
   const handleBlur = () => {
     const trimmed = text.trim();
@@ -55,15 +79,31 @@ const InputResponseText = ({
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    handleTyping(newValue);
+    setText(newValue);
+  };
+
+  const handlePasteEvent = () => {
+    handlePaste();
+  };
+
+  useEffect(() => {
+    handleBacktrack();
+  }, []);
+
   return (
     <div className="flex w-3/5 origin-bottom flex-col border-2 border-amber-600">
       <div className="mx-auto flex h-[60%] w-[96%] flex-col border-2 border-b-emerald-400">
         {/* Input field  */}
         <textarea
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={handleChange}
+          onPaste={handlePasteEvent}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
+          onFocus={handleFirstInteraction}
           placeholder={inputPlaceholder}
           rows={1}
           className="scrollbar-hidden mx-auto block max-h-64 min-h-16 w-[92%] resize-none overflow-y-auto border-0 border-b border-gray-300 px-4 text-[24px] leading-tight text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none md:w-[56%] md:text-[36px]"

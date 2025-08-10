@@ -1,11 +1,14 @@
 import type { OptionType } from "./option";
 
-
 export interface InputErrorProps {
   error?: string | null;
   className?: string;
 }
 
+export interface BacktrackLoggerProps {
+  questionID: string;
+  visitedRef: React.RefObject<string[]>;
+}
 
 export type QuestionTypeKey =
   | "BINARY"
@@ -68,8 +71,6 @@ export interface QuestionType {
   Screen?: React.ComponentType<QuestionProps>;
 }
 
- 
-
 export interface QuestionTextandDescriptionProps {
   surveyID?: string;
   question?: Question;
@@ -85,4 +86,16 @@ export interface SlideMotionProps {
   children: React.ReactNode;
   direction: "left" | "right";
   keyProp: string | number;
+}
+
+
+export type GetPulseTargets = () => Array<HTMLElement | null>;
+
+export interface UseAutoSubmitPulseOptions {
+  active: boolean;            
+  delayMs: number;            
+  feedbackMs?: number;        
+  onSubmit: () => void;       
+  getPulseTargets: GetPulseTargets;  
+  vibrate?: boolean;         
 }

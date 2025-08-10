@@ -4,6 +4,7 @@ import ScaleCounter from "./ScaleCounter";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useState } from "react";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const RangeResponse = ({ question, setCurrentQuestionIndex }: RangeResponseProps) => {
   const isMobile = useIsMobile();
@@ -12,12 +13,30 @@ const RangeResponse = ({ question, setCurrentQuestionIndex }: RangeResponseProps
   const [error, setError] = useState<string | null>(null);
   const [selectedValue, setSelectedValue] = useState(Math.ceil((minValue + maxValue) / 2));
 
+  const {
+    handleFirstInteraction,
+    handleClick,
+    handleOptionChange,
+    markSubmission,
+    collectBehaviorData,
+  } = useBehavior();
+
+  const handleSliderChange = (value: number) => {
+    handleFirstInteraction(); // for touch/click
+    handleClick(); // for touch/click
+    handleOptionChange();
+    setSelectedValue(value);
+  };
+
   const handleSubmit = () => {
     if (isRequired && selectedValue === null) {
       setError("Your response is required for this question");
       return;
     }
 
+    markSubmission();
+    const data = collectBehaviorData();
+    console.log("📦 RangeScreen behavior data:", data);
     console.log("Submitted Range Value:", selectedValue);
     setCurrentQuestionIndex?.((i) => i + 1);
   };
@@ -25,9 +44,13 @@ const RangeResponse = ({ question, setCurrentQuestionIndex }: RangeResponseProps
   return (
     <div className="w-4/5 p-2 sm:p-3 md:p-4 xl:p-6">
       {isMobile ? (
-        <ScaleCounter question={question} value={selectedValue} setValue={setSelectedValue} />
+        <ScaleCounter question={question} value={selectedValue} setValue={handleSliderChange} />
       ) : (
-        <ProgressiveSlider question={question} value={selectedValue} setValue={setSelectedValue} />
+        <ProgressiveSlider
+          question={question}
+          value={selectedValue}
+          setValue={handleSliderChange}
+        />
       )}
       <div className="mt-4 flex w-3/5 justify-end pr-6">
         <button

@@ -4,6 +4,7 @@ import type { InputResponseProps } from "@/types/response";
 import { numberResponseSchema } from "@/utils/validationSchema";
 import { useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
+import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const InputResponseNumber = ({
   inputPlaceholder,
@@ -14,6 +15,19 @@ const InputResponseNumber = ({
   const isRequired = useQuestionRequired(question);
   const [number, setNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  const { handleFirstInteraction, handleTyping, handlePaste, markSubmission, collectBehaviorData } =
+    useBehavior();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    handleTyping(newValue);
+    setNumber(newValue);
+  };
+
+  const handlePasteEvent = () => {
+    handlePaste();
+  };
 
   const handleSubmit = () => {
     const trimmed = number.trim();
@@ -28,6 +42,10 @@ const InputResponseNumber = ({
       setError(result.error.format().number?._errors[0] ?? "Invalid input");
     } else {
       setError(null);
+
+      markSubmission();
+      const data = collectBehaviorData();
+      console.log("📦 Number input behavior data:", data);
       console.log("Input submitted:", number);
       setCurrentQuestionIndex?.((i) => i + 1);
     }
@@ -61,7 +79,9 @@ const InputResponseNumber = ({
           type="number"
           placeholder={inputPlaceholder}
           value={number}
-          onChange={(e) => setNumber(e.target.value)}
+          onChange={handleChange}
+          onPaste={handlePasteEvent}
+          onFocus={handleFirstInteraction}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           className={`mx-auto block h-16 w-[92%] border-0 border-b border-gray-300 px-4 text-[24px] leading-none text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none md:w-[56%] md:text-[36px]`}

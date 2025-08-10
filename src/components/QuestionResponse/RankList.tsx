@@ -3,13 +3,26 @@ import type { RankListProps } from "@/types/response";
 import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-pangea/dnd";
 import { useState } from "react";
 import RankListItem from "./RankListItem";
+import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const RankList = ({ options, setCurrentQuestionIndex }: RankListProps) => {
   const [localOptions, setLocalOptions] = useState<OptionType[]>(options);
 
+  const {
+    handleFirstInteraction,
+    handleClick,
+    handleOptionChange,
+    markSubmission,
+    collectBehaviorData,
+  } = useBehavior();
+
   const handleDragEnd = async (result: DropResult) => {
     const { source, destination } = result;
     if (!destination || source.index === destination.index) return;
+
+    handleFirstInteraction();
+    handleClick();
+    handleOptionChange();
 
     const reordered = Array.from(localOptions);
     const [moved] = reordered.splice(source.index, 1);
@@ -36,6 +49,9 @@ const RankList = ({ options, setCurrentQuestionIndex }: RankListProps) => {
       order,
     }));
 
+    markSubmission();
+    const data = collectBehaviorData();
+    console.log("📦 RankScreen behavior data:", data);
     console.log("User Ranked Options:", rankedData);
 
     setCurrentQuestionIndex?.((i) => i + 1);

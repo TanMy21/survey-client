@@ -4,6 +4,7 @@ import { elementSchema } from "@/utils/validationSchema";
 import { useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
+import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const InputResponse = ({
   inputPlaceholder,
@@ -14,6 +15,15 @@ const InputResponse = ({
   const [emailContact, setEmailContact] = useState("");
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
+
+  const {
+    handleFirstInteraction,
+    handleClick,
+    handleTyping,
+    handlePaste,
+    markSubmission,
+    collectBehaviorData,
+  } = useBehavior();
 
   const handleSubmit = () => {
     const trimmed = emailContact.trim();
@@ -28,7 +38,11 @@ const InputResponse = ({
       setError(result.error.format().emailContact?._errors[0] ?? "Invalid input");
     } else {
       setError(null);
-      console.log("Input submitted:", emailContact);
+      markSubmission();
+      const behavior = collectBehaviorData();
+
+      console.log("📦 EmailContactScreen behavior data:", behavior);
+      console.log("Input submitted:", result);
       setCurrentQuestionIndex?.((i) => i + 1);
     }
   };
@@ -63,7 +77,13 @@ const InputResponse = ({
           value={emailContact}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          onChange={(e) => setEmailContact(e.target.value)}
+          onClick={handleClick}
+          onFocus={handleFirstInteraction}
+          onPaste={handlePaste}
+          onChange={(e) => {
+            setEmailContact(e.target.value);
+            handleTyping(e.target.value);
+          }}
           className={`mx-auto block h-16 w-[92%] border-0 border-b border-gray-300 px-4 text-[24px] leading-none text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none md:w-[56%] md:text-[36px]`}
         />
 
