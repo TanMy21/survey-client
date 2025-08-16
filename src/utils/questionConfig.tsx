@@ -10,6 +10,7 @@ import RangeScreen from "@/components/screens/RangeScreen";
 import RankScreen from "@/components/screens/RankScreen";
 import SingleChoiceScreen from "@/components/screens/SingleChoiceScreen";
 import TextScreen from "@/components/screens/TextScreen";
+import ThreeDModelScreen from "@/components/screens/ThreeDModelScreen";
 import WelcomeScreen from "@/components/screens/WelcomeScreen";
 import type { QuestionProps, QuestionType, QuestionTypeKey } from "@/types/question";
 
@@ -28,6 +29,7 @@ export const questionComponents: {
   RANK: RankScreen,
   RANGE: RangeScreen,
   TEXT: TextScreen,
+  THREE_D: ThreeDModelScreen,
   WELCOME_SCREEN: WelcomeScreen,
 };
 
@@ -79,6 +81,10 @@ export const questionTypes: { [key: string]: QuestionType } = {
   Text: {
     type: "Text",
     Screen: TextScreen,
+  },
+  Three_D: {
+    type: "THREE_D",
+    Screen: ThreeDModelScreen,
   },
   WelcomeScreen: {
     type: "WelcomeScreen",

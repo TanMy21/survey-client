@@ -22,6 +22,7 @@ export type QuestionTypeKey =
   | "RANK"
   | "RANGE"
   | "TEXT"
+  | "THREE_D"
   | "MULTIPLE_CHOICE"
   | "WELCOME_SCREEN";
 
@@ -31,6 +32,25 @@ export interface QuestionProps {
   question?: Question;
   setCurrentQuestionIndex?: React.Dispatch<React.SetStateAction<number>>;
 }
+
+export type Model3D = {
+  model3DID: string;
+  relatedQuestionID: string;
+  name: string;
+  fileUrl: string;
+  posterUrl: string;
+  public_id: string;
+  format: string;
+  sizeBytes: number;
+  polycount: number;
+  materialCount: number;
+  width: number;
+  height: number;
+  depth: number;
+  draco: boolean;
+  ktx2: boolean;
+  showQuestion: boolean;
+};
 
 export interface Question {
   questionID: string;
@@ -43,6 +63,7 @@ export interface Question {
   minOptions: number;
   maxOptions: number;
   options: OptionType[];
+  Model3D: Model3D;
   questionPreferences: QuestionPreferences;
   required: boolean;
 }
@@ -88,14 +109,13 @@ export interface SlideMotionProps {
   keyProp: string | number;
 }
 
-
 export type GetPulseTargets = () => Array<HTMLElement | null>;
 
 export interface UseAutoSubmitPulseOptions {
-  active: boolean;            
-  delayMs: number;            
-  feedbackMs?: number;        
-  onSubmit: () => void;       
-  getPulseTargets: GetPulseTargets;  
-  vibrate?: boolean;         
+  active: boolean;
+  delayMs: number;
+  feedbackMs?: number;
+  onSubmit: () => void;
+  getPulseTargets: GetPulseTargets;
+  vibrate?: boolean;
 }
