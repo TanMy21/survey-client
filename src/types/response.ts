@@ -119,3 +119,9 @@ export interface SliderProps extends RangeResponseProps {
   value: number;
   setValue: (val: number) => void;
 }
+
+export interface ThreeDViewProps{
+  url: string;
+  showQuestion?: boolean;
+  setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
+}

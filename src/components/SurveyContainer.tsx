@@ -92,6 +92,15 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
     );
   }
 
+  console.log("Survey ID:", surveyID);
+  console.log("Data:", data);
+  console.log("Current Question Index:", currentQuestionIndex);
+  console.log("Total Questions:", questions.length);
+  console.log("Current Question:", currentQuestion);
+  console.log("Can Proceed:", canProceed);
+  console.log("Q.type =", currentQuestion?.type);
+
+
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
       {/* Full-width progress bar at top */}
@@ -128,6 +137,7 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
           total={questions.length}
           disableNext={!canProceed}
           onNext={() => {
+            console.log("Next question clicked");
             setSlideDirection("right");
             setCurrentQuestionIndex((i) => i + 1);
           }}

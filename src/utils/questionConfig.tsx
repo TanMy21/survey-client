@@ -83,7 +83,7 @@ export const questionTypes: { [key: string]: QuestionType } = {
     Screen: TextScreen,
   },
   Three_D: {
-    type: "THREE_D",
+    type: "Three_D",
     Screen: ThreeDModelScreen,
   },
   WelcomeScreen: {

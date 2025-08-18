@@ -8,6 +8,9 @@ const SurveyNavigator = ({
   onNext,
   onPrev,
 }: SurveyNavigatorProps) => {
+  console.log("currentIndex:", currentIndex);
+  console.log("total:", total);
+  console.log("disableNext:", disableNext);
   return (
     <div className="flex h-16 items-center justify-end gap-4 border-2 border-red-500 px-4">
       {currentIndex > 0 && (
