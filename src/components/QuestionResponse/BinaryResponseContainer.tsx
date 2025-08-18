@@ -158,7 +158,7 @@ const BinaryResponseContainer = ({
             ref={noRef}
             role="radio"
             aria-checked={selectedValue === "NO"}
-            tabIndex={0}
+            tabIndex={1}
             onClick={selectNo}
             onKeyDown={onOptionKeyDown(selectNo)}
             className={`cursor-pointer rounded-xl transition`}

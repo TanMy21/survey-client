@@ -20,7 +20,19 @@ const ThreeDModelScreen = ({ surveyID, question, setCurrentQuestionIndex }: Ques
           </div>
         )}
       </div>
-      {isMobile ? <ThreeDMobileViewer url={url!} /> : <ThreeDViewer url={url!} />}
+      {isMobile ? (
+        <ThreeDMobileViewer
+          url={url!}
+          question={question!}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
+        />
+      ) : (
+        <ThreeDViewer
+          url={url!}
+          question={question!}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
+        />
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import type { ThreeDViewProps } from "@/types/response";
-import { Heart, X } from "lucide-react";
+import ThreeDResponseContainer from "./ThreeDResponseContainer";
 
-const ThreeDViewer = ({ url }: ThreeDViewProps) => {
+const ThreeDViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDViewProps) => {
   return (
     <div className="flex h-full w-full flex-col items-center gap-4">
       {/* 3D Model Section */}
@@ -26,27 +26,10 @@ const ThreeDViewer = ({ url }: ThreeDViewProps) => {
 
       {/* Action Buttons Section */}
       <div className="flex h-16 w-[96%]">
-        <div className="m-auto flex h-[80%] w-[32%] gap-4">
-          {/* Delete Button */}
-          <div className="flex h-[96%] w-[48%] justify-center">
-            <button
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-all duration-150 ease-in-out hover:scale-105 hover:bg-red-600 active:scale-95"
-              aria-label="delete"
-            >
-              <X className="h-6 w-6 font-bold" />
-            </button>
-          </div>
-
-          {/* Like Button */}
-          <div className="flex h-[96%] w-[48%] justify-center">
-            <button
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500 text-white shadow-md transition-all duration-150 ease-in-out hover:scale-105 hover:bg-green-600 active:scale-95"
-              aria-label="like"
-            >
-              <Heart className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
+        <ThreeDResponseContainer
+          question={question}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
+        />
       </div>
     </div>
   );

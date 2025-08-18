@@ -24,7 +24,7 @@ export interface SingleChoiceListProps {
 export interface MultipleChoiceListProps extends ResponseListProps {
   selectedOptions: { optionID: string; value: string }[];
   onToggle: (optionID: string, value: string) => void;
-   registerOptionRef?: (optionID: string, el: HTMLDivElement | null) => void; 
+  registerOptionRef?: (optionID: string, el: HTMLDivElement | null) => void;
 }
 
 export interface ResponseListItemProps {
@@ -78,6 +78,12 @@ export interface BinaryResponseContainerProps {
   setCanProceed?: (val: boolean) => void;
 }
 
+export interface ThreeDResponseContainerProps {
+  question: Question;
+  setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
+  setCanProceed?: (val: boolean) => void;
+}
+
 export interface RankListProps {
   options: OptionType[];
   disabled?: boolean;
@@ -120,8 +126,9 @@ export interface SliderProps extends RangeResponseProps {
   setValue: (val: number) => void;
 }
 
-export interface ThreeDViewProps{
+export interface ThreeDViewProps {
   url: string;
+  question: Question;
   showQuestion?: boolean;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
