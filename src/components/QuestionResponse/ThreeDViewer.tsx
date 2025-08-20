@@ -1,27 +1,39 @@
 import type { ThreeDViewProps } from "@/types/response";
 import ThreeDResponseContainer from "./ThreeDResponseContainer";
+import { Interactive3DModelViewer } from "../screen-components/Interactive3DModelViewer";
+import { useEffect, useState } from "react";
+import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const ThreeDViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDViewProps) => {
+  const [viewerUrl, setViewerUrl] = useState<string | null>(url ?? null);
+  const { handleInputMethodSwitch } = useBehavior();
+
+  useEffect(() => {
+    setViewerUrl(url ?? null);
+  }, [url]);
+
+  useEffect(() => {
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === "touch") handleInputMethodSwitch();
+    };
+    window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    return () => window.removeEventListener("pointerdown", onPointerDown as any);
+  }, [handleInputMethodSwitch]);
+
   return (
     <div className="flex h-full w-full flex-col items-center gap-4">
       {/* 3D Model Section */}
-      <div className="flex h-[400px] w-[96%] bg-gray-400 p-1">
-        {/* <div className="m-auto flex h-[98%] w-[60%]">
-          {ready ? (
+      <div className="flex max-h-[800px] w-[75%]">
+        <div className="m-auto flex h-[100%] w-[100%]">
+          {viewerUrl && (
             <Interactive3DModelViewer
-              key={viewerUrl}
+              questionID={question.questionID}
               src={viewerUrl}
               autoRotate
               autoRotateSpeed={0.4}
-              height={400}
             />
-          ) : (
-            <div className="grid h-full w-full place-items-center rounded-xl bg-[#fafafa] text-sm text-[#666]">
-              <Model3dLoader />
-              Loading your 3D model …
-            </div>
           )}
-        </div> */}
+        </div>
       </div>
 
       {/* Action Buttons Section */}

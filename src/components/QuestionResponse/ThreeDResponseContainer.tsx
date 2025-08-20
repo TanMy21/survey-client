@@ -30,6 +30,8 @@ const ThreeDResponseContainer = ({
     }
     markSubmission();
     const data = collectBehaviorData();
+    const three = (window as any).__r3f_collect__?.();
+    console.log("📦 Three D Model behavior data:", three);
     console.log("📦 Three D Response behavior data:", data);
     console.log("Selected response:", selectedValue);
     setCanProceed?.(true);
@@ -62,10 +64,10 @@ const ThreeDResponseContainer = ({
 
   return (
     <div className="m-auto flex h-[80%] w-[32%] gap-4">
-      {/* Delete Button */}
+      {/* Dislike Button */}
       <div className="flex h-[96%] w-[48%] justify-center">
         <button
-          onClick={clickLike}
+          onClick={clickDislike}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-all duration-150 ease-in-out hover:scale-105 hover:bg-red-600 active:scale-95"
           aria-label="delete"
         >
@@ -76,7 +78,7 @@ const ThreeDResponseContainer = ({
       {/* Like Button */}
       <div className="flex h-[96%] w-[48%] justify-center">
         <button
-          onClick={clickDislike}
+          onClick={clickLike}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500 text-white shadow-md transition-all duration-150 ease-in-out hover:scale-105 hover:bg-green-600 active:scale-95"
           aria-label="like"
         >

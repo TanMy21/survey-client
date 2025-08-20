@@ -1,4 +1,6 @@
+import type { ThreeEvent } from "@react-three/fiber";
 import type { OptionType } from "./option";
+import * as THREE from "three";
 
 export interface InputErrorProps {
   error?: string | null;
@@ -9,6 +11,17 @@ export interface BacktrackLoggerProps {
   questionID: string;
   visitedRef: React.RefObject<string[]>;
 }
+
+type MeshEventHandler = (name: string, e: ThreeEvent<PointerEvent>) => void;
+
+export type Model3DParams = {
+  readonly src: string;
+  readonly onReady?: (root: THREE.Object3D) => void;
+  onMeshOver?: MeshEventHandler;
+  onMeshOut?: MeshEventHandler;
+  onMeshClick?: MeshEventHandler;
+  onFit?: () => void;
+};
 
 export type QuestionTypeKey =
   | "BINARY"
@@ -30,7 +43,9 @@ export interface QuestionProps {
   surveyID?: string;
   qOptions?: OptionType[];
   question?: Question;
+  currentIndex?: number;
   setCurrentQuestionIndex?: React.Dispatch<React.SetStateAction<number>>;
+  preloadWindow?: number;
 }
 
 export type Model3D = {
@@ -110,6 +125,7 @@ export interface SlideMotionProps {
 }
 
 export type GetPulseTargets = () => Array<HTMLElement | null>;
+export type ViewName = "front" | "back" | "left" | "right" | "top" | "bottom";
 
 export interface UseAutoSubmitPulseOptions {
   active: boolean;
@@ -119,3 +135,60 @@ export interface UseAutoSubmitPulseOptions {
   getPulseTargets: GetPulseTargets;
   vibrate?: boolean;
 }
+export interface SetInitialViewParams {
+  camera: THREE.PerspectiveCamera;
+  controls: any;
+  object: THREE.Object3D;
+  view?: ViewName;
+  fov?: number;
+  aspect?: number;
+  padding?: number;
+  frontIsNegZ?: boolean;
+}
+
+export interface InitialViewParams {
+  object: THREE.Object3D | null;
+  initialView: ViewName;
+  frontIsNegZ: boolean;
+  controlsRef: React.RefObject<any>;
+}
+
+export interface Interactive3DModelViewerProps {
+  src: string;
+  questionID?: string;
+  hdrEnvUrl?: string;
+  height?: number;
+  background?: string;
+  autoRotate?: boolean;
+  autoRotateSpeed?: number;
+  minDistance?: number;
+  maxDistance?: number;
+  maxPolarAngle?: number;
+  initialView?: ViewName;
+  frontIsNegZ?: boolean;
+  exposure?: number;
+  envIntensity?: number;
+  ambientIntensity?: number;
+  hemiIntensity?: number;
+  envResolution?: 256 | 512;
+  onAttachControls?: (c: any) => void;
+  onMeshOver?: (name: string, e?: ThreeEvent<PointerEvent>) => void;
+  onMeshOut?: (name: string, e?: ThreeEvent<PointerEvent>) => void;
+  onMeshClick?: (name: string, e?: ThreeEvent<PointerEvent>) => void;
+  onFit?: () => void;
+}
+
+export interface CachedModelProps {
+  url: string;
+  onReady?: (obj: THREE.Object3D) => void;
+  onPointerOver?: (e: ThreeEvent<PointerEvent>) => void;
+  onPointerOut?: (e: ThreeEvent<PointerEvent>) => void;
+  onClick?: (e: ThreeEvent<MouseEvent>) => void;
+  onFit?: () => void;
+}
+
+export type Question3Dish = {
+  Model3D?: {
+    fileUrl?: string | null;
+  } | null;
+};

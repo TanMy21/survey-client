@@ -8,6 +8,7 @@ import { LogoLoader } from "./loader/LogoLoader";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
 import { BehaviorTrackerProvider } from "@/context/BehaviorTrackerContext";
 import { BacktrackLogger } from "./BacktrackLogger";
+import { usePreloadNeighbors, warmGLTF } from "@/hooks/usePreloadQuestions";
 
 const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   const { canProceed } = useSurveyFlow();
@@ -39,8 +40,11 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   }, [data]);
 
   // const sessions = data?.sessions ?? [];
+  const total = questions.length;
   const currentQuestion = questions[currentQuestionIndex];
-  const progress = (currentQuestionIndex / (questions.length - 1)) * 100;
+  const progress = total > 1 ? (currentQuestionIndex / (questions.length - 1)) * 100 : 0;
+
+  usePreloadNeighbors(questions, currentQuestionIndex, 1);
 
   const { questionPreferences } = currentQuestion || {};
   const { questionImageTemplate, questionImageTemplateUrl, questionBackgroundColor } =
@@ -92,15 +96,6 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
     );
   }
 
-  console.log("Survey ID:", surveyID);
-  console.log("Data:", data);
-  console.log("Current Question Index:", currentQuestionIndex);
-  console.log("Total Questions:", questions.length);
-  console.log("Current Question:", currentQuestion);
-  console.log("Can Proceed:", canProceed);
-  console.log("Q.type =", currentQuestion?.type);
-
-
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
       {/* Full-width progress bar at top */}
@@ -126,6 +121,7 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
               <QuestionRenderer
                 question={currentQuestion}
                 surveyID={surveyID}
+                currentIndex={currentQuestionIndex}
                 setCurrentQuestionIndex={setCurrentQuestionIndex}
               />
             </BehaviorTrackerProvider>
@@ -137,13 +133,21 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
           total={questions.length}
           disableNext={!canProceed}
           onNext={() => {
-            console.log("Next question clicked");
             setSlideDirection("right");
-            setCurrentQuestionIndex((i) => i + 1);
+            setCurrentQuestionIndex((i) => {
+              const nextIndex = Math.min(i + 1, questions.length - 1);
+
+              const nextNext = questions[nextIndex + 1];
+              if (nextNext?.Model3D?.fileUrl) {
+                warmGLTF(nextNext.Model3D.fileUrl);
+              }
+
+              return nextIndex;
+            });
           }}
           onPrev={() => {
             setSlideDirection("left");
-            setCurrentQuestionIndex((i) => i - 1);
+            setCurrentQuestionIndex((i) => Math.max(i - 1, 0));
           }}
         />
       </div>
