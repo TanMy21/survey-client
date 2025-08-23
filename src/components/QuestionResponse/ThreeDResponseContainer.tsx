@@ -1,6 +1,6 @@
 import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
-import type { ThreeDResponseContainerProps } from "@/types/response";
+import type { ThreeDResponseContainerProps } from "@/types/responseTypes";
 import { Heart, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";

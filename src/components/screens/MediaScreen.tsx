@@ -1,4 +1,4 @@
-import type { QuestionProps } from "@/types/question";
+import type { QuestionProps } from "@/types/questionTypes";
 import QuestionTextandDescription from "../QuestionTextandDescription";
 import MediaOptionsContainer from "../questionresponse/MediaOptionsContainer";
 

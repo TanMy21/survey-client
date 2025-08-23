@@ -1,11 +1,11 @@
+import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import MediaOption from "./MediaOption";
-import type { MediaOptionsProps } from "@/types/response";
-import { useEffect, useRef, useState } from "react";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
+import type { MediaOptionsProps } from "@/types/responseTypes";
+import { useEffect, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
-import { useBehavior } from "@/context/BehaviorTrackerContext";
+import MediaOption from "./MediaOption";
 
 const MediaOptionsContainer = ({
   options,

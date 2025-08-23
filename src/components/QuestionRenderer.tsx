@@ -1,4 +1,4 @@
-import type { QuestionProps, QuestionTypeKey } from "@/types/question";
+import type { QuestionProps, QuestionTypeKey } from "@/types/questionTypes";
 import { questionComponents } from "@/utils/questionConfig";
 
 const QuestionRenderer = ({

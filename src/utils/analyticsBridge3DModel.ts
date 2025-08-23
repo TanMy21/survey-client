@@ -1,5 +1,5 @@
 import { use3DModelTracker } from "@/hooks/use3DModelTracker";
-import type { AnalyticsBridge3DModelProps, AnalyticsBridgeApi } from "@/types/analytics";
+import type { AnalyticsBridge3DModelProps, AnalyticsBridgeApi } from "@/types/analyticsTypes";
 import { useEffect, useMemo } from "react";
 
 export function AnalyticsBridge3DModel({ questionID, onReady }: AnalyticsBridge3DModelProps) {

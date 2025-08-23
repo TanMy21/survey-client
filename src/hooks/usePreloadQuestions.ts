@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from "react";
+import type { Question3Dish } from "@/types/questionTypes";
 import { useGLTF } from "@react-three/drei";
-import type { Question3Dish } from "@/types/question";
+import { useEffect, useMemo } from "react";
 
 export function warmGLTF(url?: string | null) {
   if (!url) return;

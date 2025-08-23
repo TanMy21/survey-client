@@ -1,4 +1,4 @@
-import type { ResponseListProps } from "@/types/response";
+import type { ResponseListProps } from "@/types/responseTypes";
 import InstructionsListItem from "./InstructionsListItem";
 
 const InstructionsList = ({ options, setCurrentQuestionIndex }: ResponseListProps) => {

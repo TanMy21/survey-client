@@ -1,8 +1,8 @@
-import type { ThreeDViewProps } from "@/types/response";
-import ThreeDResponseContainer from "./ThreeDResponseContainer";
-import { Interactive3DModelViewer } from "../screen-components/Interactive3DModelViewer";
-import { useEffect, useState } from "react";
 import { useBehavior } from "@/context/BehaviorTrackerContext";
+import type { ThreeDViewProps } from "@/types/responseTypes";
+import { useEffect, useState } from "react";
+import { Interactive3DModelViewer } from "../screen-components/Interactive3DModelViewer";
+import ThreeDResponseContainer from "./ThreeDResponseContainer";
 
 const ThreeDViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDViewProps) => {
   const [viewerUrl, setViewerUrl] = useState<string | null>(url ?? null);

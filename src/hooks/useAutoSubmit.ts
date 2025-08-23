@@ -1,4 +1,4 @@
-import type { UseAutoSubmitPulseOptions } from "@/types/question";
+import type { UseAutoSubmitPulseOptions } from "@/types/questionTypes";
 import { useEffect, useRef, useState } from "react";
 
 export function useAutoSubmitPulse({

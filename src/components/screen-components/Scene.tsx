@@ -1,5 +1,5 @@
-import type { SceneProps } from "@/types/model3D";
-import type { InitialViewParams, SetInitialViewParams, ViewName } from "@/types/question";
+import type { SceneProps } from "@/types/model3DTypes";
+import type { InitialViewParams, SetInitialViewParams, ViewName } from "@/types/questionTypes";
 import { AnalyticsBridge3DModel } from "@/utils/analyticsBridge3DModel";
 import { Environment, OrbitControls, PerformanceMonitor } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";

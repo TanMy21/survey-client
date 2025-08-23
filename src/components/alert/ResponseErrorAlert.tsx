@@ -1,4 +1,4 @@
-import type { InputErrorProps } from "@/types/question";
+import type { InputErrorProps } from "@/types/questionTypes";
 import { AnimatePresence, motion } from "motion/react";
 
 export const InputError = ({ error, className = "" }: InputErrorProps) => {

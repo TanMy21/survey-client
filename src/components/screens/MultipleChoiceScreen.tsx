@@ -1,12 +1,12 @@
-import type { QuestionProps } from "@/types/question";
-import { useCallback, useEffect, useRef, useState } from "react";
-import QuestionTextandDescription from "../QuestionTextandDescription";
-import MultipleChoiceList from "../questionresponse/MultipleChoiceList";
-import { useQuestionRequired } from "@/hooks/useQuestionRequired";
-import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
-import { InputError } from "../alert/ResponseErrorAlert";
 import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
+import type { QuestionProps } from "@/types/questionTypes";
+import { useCallback, useEffect, useRef, useState } from "react";
+import QuestionTextandDescription from "../QuestionTextandDescription";
+import { InputError } from "../alert/ResponseErrorAlert";
+import MultipleChoiceList from "../questionresponse/MultipleChoiceList";
 
 const MultipleChoiceScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const { options } = question || {};

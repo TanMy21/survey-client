@@ -1,10 +1,10 @@
 import { useIsMobile } from "@/hooks/useIsMobile";
-import type { CachedModelProps } from "@/types/question";
+import type { CachedModelProps } from "@/types/questionTypes";
 import { Bounds, Html, useBounds, useGLTF } from "@react-three/drei";
 import { Focus } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import { SkeletonUtils } from "three/examples/jsm/Addons.js";
 import * as THREE from "three";
+import { SkeletonUtils } from "three/examples/jsm/Addons.js";
 
 function FitButton({ onFit }: { onFit?: () => void }) {
   const bounds = useBounds();

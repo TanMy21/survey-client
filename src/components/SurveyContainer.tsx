@@ -1,14 +1,14 @@
-import { useMemo, useRef, useState } from "react";
-import SurveyNavigator from "./SurveyNavigator";
-import QuestionRenderer from "./QuestionRenderer";
-import type { SurveyContainerProps } from "@/types/survey";
-import { useFetchSurvey } from "@/hooks/useSurvey";
-import { SlideMotion } from "./motion/SlideMotion";
-import { LogoLoader } from "./loader/LogoLoader";
-import { useSurveyFlow } from "@/context/useSurveyFlow";
 import { BehaviorTrackerProvider } from "@/context/BehaviorTrackerContext";
-import { BacktrackLogger } from "./BacktrackLogger";
+import { useSurveyFlow } from "@/context/useSurveyFlow";
 import { usePreloadNeighbors, warmGLTF } from "@/hooks/usePreloadQuestions";
+import { useFetchSurvey } from "@/hooks/useSurvey";
+import type { SurveyContainerProps } from "@/types/surveyTypes";
+import { useMemo, useRef, useState } from "react";
+import { BacktrackLogger } from "./BacktrackLogger";
+import { LogoLoader } from "./loader/LogoLoader";
+import { SlideMotion } from "./motion/SlideMotion";
+import QuestionRenderer from "./QuestionRenderer";
+import SurveyNavigator from "./SurveyNavigator";
 
 const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   const { canProceed } = useSurveyFlow();
@@ -95,6 +95,8 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
       <div className="flex h-screen w-full items-center justify-center">Error Loading Survey.</div>
     );
   }
+
+  console.log("Data from be: ", data);
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-white">

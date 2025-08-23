@@ -1,10 +1,10 @@
-import type { RangeResponseProps } from "@/types/response";
+import { useBehavior } from "@/context/BehaviorTrackerContext";
+import { useIsMobile } from "@/hooks/useIsMobile";
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import type { RangeResponseProps } from "@/types/responseTypes";
+import { useState } from "react";
 import ProgressiveSlider from "./ProgressiveSlider";
 import ScaleCounter from "./ScaleCounter";
-import { useIsMobile } from "@/hooks/useIsMobile";
-import { useState } from "react";
-import { useQuestionRequired } from "@/hooks/useQuestionRequired";
-import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const RangeResponse = ({ question, setCurrentQuestionIndex }: RangeResponseProps) => {
   const isMobile = useIsMobile();

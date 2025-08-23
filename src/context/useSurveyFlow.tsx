@@ -1,4 +1,4 @@
-import type { FlowContextType } from "@/types/survey";
+import type { FlowContextType } from "@/types/surveyTypes";
 import { createContext, useContext, useState } from "react";
 
 const SurveyFlowContext = createContext<FlowContextType>({

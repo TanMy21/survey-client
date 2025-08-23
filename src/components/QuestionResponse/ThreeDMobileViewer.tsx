@@ -1,7 +1,7 @@
-import type { ThreeDViewProps } from "@/types/response";
-import ThreeDResponseContainer from "./ThreeDResponseContainer";
+import type { ThreeDViewProps } from "@/types/responseTypes";
 import { useEffect, useState } from "react";
 import { Interactive3DModelViewer } from "../screen-components/Interactive3DModelViewer";
+import ThreeDResponseContainer from "./ThreeDResponseContainer";
 
 const ThreeDMobileViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDViewProps) => {
   const [viewerUrl, setViewerUrl] = useState<string | null>(url ?? null);

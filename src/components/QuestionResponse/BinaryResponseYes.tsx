@@ -1,4 +1,4 @@
-import type { BinaryResponseProps } from "@/types/response";
+import type { BinaryResponseProps } from "@/types/responseTypes";
 
 const BinaryResponseYes = ({
   questionID,

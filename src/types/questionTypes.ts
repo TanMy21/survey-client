@@ -1,6 +1,6 @@
 import type { ThreeEvent } from "@react-three/fiber";
-import type { OptionType } from "./option";
 import * as THREE from "three";
+import type { OptionType } from "./optionTypes";
 
 export interface InputErrorProps {
   error?: string | null;

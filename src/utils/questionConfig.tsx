@@ -12,7 +12,7 @@ import SingleChoiceScreen from "@/components/screens/SingleChoiceScreen";
 import TextScreen from "@/components/screens/TextScreen";
 import ThreeDModelScreen from "@/components/screens/ThreeDModelScreen";
 import WelcomeScreen from "@/components/screens/WelcomeScreen";
-import type { QuestionProps, QuestionType, QuestionTypeKey } from "@/types/question";
+import type { QuestionProps, QuestionType, QuestionTypeKey } from "@/types/questionTypes";
 
 export const questionComponents: {
   [key in QuestionTypeKey]: React.ComponentType<QuestionProps>;

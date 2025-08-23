@@ -1,9 +1,9 @@
+import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
-import type { InputResponseProps } from "@/types/response";
+import type { InputResponseProps } from "@/types/responseTypes";
 import { textResponseSchema } from "@/utils/validationSchema";
 import { useEffect, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
-import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const InputResponseText = ({
   inputPlaceholder,

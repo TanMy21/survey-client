@@ -1,7 +1,7 @@
-import type { QuestionProps } from "@/types/question";
-import QuestionTextandDescription from "../QuestionTextandDescription";
-import { motion } from "motion/react";
 import { useBehavior } from "@/context/BehaviorTrackerContext";
+import type { QuestionProps } from "@/types/questionTypes";
+import { motion } from "motion/react";
+import QuestionTextandDescription from "../QuestionTextandDescription";
 
 const EndScreen = ({ surveyID, question }: QuestionProps) => {
   const { handleClick, markSubmission, collectBehaviorData } = useBehavior();

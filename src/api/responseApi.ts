@@ -1,4 +1,4 @@
-import type { ResponseData } from "@/types/response";
+import type { ResponseData } from "@/types/responseTypes";
 
 export const postResponse = async ({
   questionID,
@@ -16,16 +16,13 @@ export const postResponse = async ({
       participantID,
     };
 
-    const responseCreated = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/q/res`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
+    const responseCreated = await fetch(`${import.meta.env.VITE_BASE_URL}/q/res`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
     if (!responseCreated.ok) {
       throw new Error("Failed to post response");

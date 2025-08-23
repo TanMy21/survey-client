@@ -1,5 +1,5 @@
 import { useIsMobile } from "@/hooks/useIsMobile";
-import type { QuestionTextandDescriptionProps } from "@/types/question";
+import type { QuestionTextandDescriptionProps } from "@/types/questionTypes";
 
 const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProps) => {
   const isMobile = useIsMobile();

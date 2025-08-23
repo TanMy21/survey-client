@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { SingleChoiceListProps } from "@/types/response";
-import SingleChoiceListItem from "./SingleChoiceListItem";
-import { useQuestionRequired } from "@/hooks/useQuestionRequired";
-import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
-import { InputError } from "../alert/ResponseErrorAlert";
 import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
+import type { SingleChoiceListProps } from "@/types/responseTypes";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { InputError } from "../alert/ResponseErrorAlert";
+import SingleChoiceListItem from "./SingleChoiceListItem";
 
 const SingleChoiceList = ({ question, setCurrentQuestionIndex }: SingleChoiceListProps) => {
   const { options } = question || {};

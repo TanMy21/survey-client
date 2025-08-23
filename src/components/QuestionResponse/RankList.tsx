@@ -1,9 +1,9 @@
-import type { OptionType } from "@/types/option";
-import type { RankListProps } from "@/types/response";
+import { useBehavior } from "@/context/BehaviorTrackerContext";
+import type { OptionType } from "@/types/optionTypes";
+import type { RankListProps } from "@/types/responseTypes";
 import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-pangea/dnd";
 import { useState } from "react";
 import RankListItem from "./RankListItem";
-import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const RankList = ({ options, setCurrentQuestionIndex }: RankListProps) => {
   const [localOptions, setLocalOptions] = useState<OptionType[]>(options);

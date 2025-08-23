@@ -1,5 +1,5 @@
 import { useBehavior } from "@/context/BehaviorTrackerContext";
-import type { BacktrackLoggerProps } from "@/types/question";
+import type { BacktrackLoggerProps } from "@/types/questionTypes";
 import { useEffect, useRef } from "react";
 
 export const BacktrackLogger = ({ questionID, visitedRef }: BacktrackLoggerProps) => {

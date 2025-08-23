@@ -1,11 +1,11 @@
-import type { QuestionProps } from "@/types/question";
-import QuestionTextandDescription from "../QuestionTextandDescription";
-import { MoveRight } from "lucide-react";
-import { useSurveyFlow } from "@/context/useSurveyFlow";
-import { PositionedBlock } from "../layout/PositionedBlock";
-import CenteredStack from "../layout/CenteredStack";
-import { useEffect } from "react";
 import { useBehavior } from "@/context/BehaviorTrackerContext";
+import { useSurveyFlow } from "@/context/useSurveyFlow";
+import type { QuestionProps } from "@/types/questionTypes";
+import { MoveRight } from "lucide-react";
+import { useEffect } from "react";
+import CenteredStack from "../layout/CenteredStack";
+import { PositionedBlock } from "../layout/PositionedBlock";
+import QuestionTextandDescription from "../QuestionTextandDescription";
 
 const WelcomeScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const { questionPreferences } = question || {};

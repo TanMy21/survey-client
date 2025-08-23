@@ -1,4 +1,4 @@
-import type { ResponseListItemProps } from "@/types/response";
+import type { ResponseListItemProps } from "@/types/responseTypes";
 
 const InstructionsListItem = ({ response, index }: ResponseListItemProps) => {
   return (

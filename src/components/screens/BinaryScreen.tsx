@@ -1,8 +1,8 @@
-import type { QuestionProps } from "@/types/question";
+import type { QuestionProps } from "@/types/questionTypes";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import BinaryResponseContainer from "../questionresponse/BinaryResponseContainer";
 import CenteredStack from "../layout/CenteredStack";
 import { PositionedBlock } from "../layout/PositionedBlock";
+import BinaryResponseContainer from "../questionresponse/BinaryResponseContainer";
 
 const BinaryScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   return (

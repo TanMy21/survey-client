@@ -1,7 +1,7 @@
 import { collectionItems } from "@/constants/collectionItems";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
-import type { QuestionProps } from "@/types/question";
+import type { QuestionProps } from "@/types/questionTypes";
 import { useEffect, useRef, useState } from "react";
 
 const ConsentScreen = ({ setCurrentQuestionIndex }: QuestionProps) => {

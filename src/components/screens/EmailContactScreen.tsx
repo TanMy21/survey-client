@@ -1,8 +1,8 @@
-import type { QuestionProps } from "@/types/question";
+import type { QuestionProps } from "@/types/questionTypes";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import InputResponse from "../questionresponse/InputResponse";
 import CenteredStack from "../layout/CenteredStack";
 import { PositionedBlock } from "../layout/PositionedBlock";
+import InputResponse from "../questionresponse/InputResponse";
 
 const EmailContactScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   return (

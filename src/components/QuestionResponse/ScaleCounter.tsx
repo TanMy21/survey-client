@@ -1,4 +1,4 @@
-import type { SliderProps } from "@/types/response";
+import type { SliderProps } from "@/types/responseTypes";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";

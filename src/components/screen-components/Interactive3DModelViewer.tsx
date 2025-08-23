@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { useIsMobile } from "@/hooks/useIsMobile";
+import type { AnalyticsBridgeApi } from "@/types/analyticsTypes";
+import type { Interactive3DModelViewerProps } from "@/types/questionTypes";
 import { useGLTF } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
-import type { Interactive3DModelViewerProps } from "@/types/question";
-import { useIsMobile } from "@/hooks/useIsMobile";
-import type { AnalyticsBridgeApi } from "@/types/analytics";
 import Scene from "./Scene";
 
 export const Interactive3DModelViewer = ({

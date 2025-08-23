@@ -1,4 +1,4 @@
-import type { RankListItemProps } from "@/types/response";
+import type { RankListItemProps } from "@/types/responseTypes";
 import { GripVertical } from "lucide-react";
 
 const RankListItem = ({ response, index }: RankListItemProps) => {

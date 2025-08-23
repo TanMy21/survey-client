@@ -1,12 +1,12 @@
-import type { BinaryResponseContainerProps } from "@/types/response";
+import type { BinaryResponseContainerProps } from "@/types/responseTypes";
 
-import BinaryResponseYes, { BinaryResponseNo } from "./BinaryResponseYes";
-import { useCallback, useRef, useState } from "react";
-import { useQuestionRequired } from "@/hooks/useQuestionRequired";
-import { InputError } from "../alert/ResponseErrorAlert";
-import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
+import { useQuestionRequired } from "@/hooks/useQuestionRequired";
+import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
+import { useCallback, useRef, useState } from "react";
+import { InputError } from "../alert/ResponseErrorAlert";
+import BinaryResponseYes, { BinaryResponseNo } from "./BinaryResponseYes";
 
 const BinaryResponseContainer = ({
   question,

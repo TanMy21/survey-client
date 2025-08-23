@@ -1,9 +1,9 @@
-import type { QuestionProps } from "@/types/question";
-import QuestionTextandDescription from "../QuestionTextandDescription";
-import InstructionsList from "../questionresponse/InstructionsList";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
+import type { QuestionProps } from "@/types/questionTypes";
+import QuestionTextandDescription from "../QuestionTextandDescription";
 import CenteredStack from "../layout/CenteredStack";
 import { PositionedBlock } from "../layout/PositionedBlock";
+import InstructionsList from "../questionresponse/InstructionsList";
 
 const InstructionScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const { setCanProceed } = useSurveyFlow();

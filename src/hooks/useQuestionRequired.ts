@@ -1,5 +1,5 @@
 import { useSurveyFlow } from "@/context/useSurveyFlow";
-import type { Question } from "@/types/question";
+import type { Question } from "@/types/questionTypes";
 import { useEffect } from "react";
 
 export const useQuestionRequired = (question?: Question) => {

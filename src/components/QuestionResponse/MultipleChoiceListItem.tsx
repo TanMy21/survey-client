@@ -1,4 +1,4 @@
-import type { MultipleChoiceListItemProps } from "@/types/response";
+import type { MultipleChoiceListItemProps } from "@/types/responseTypes";
 
 const MultipleChoiceListItem = ({ response, checked, onToggle }: MultipleChoiceListItemProps) => {
   return (

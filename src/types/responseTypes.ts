@@ -1,5 +1,5 @@
-import type { OptionType } from "./option";
-import type { Question } from "./question";
+import type { OptionType } from "./optionTypes";
+import type { Question } from "./questionTypes";
 
 export interface ResponseData {
   surveyID?: string;

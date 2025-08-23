@@ -1,4 +1,4 @@
-import type { PositionedBlockProps } from "@/types/layout";
+import type { PositionedBlockProps } from "@/types/layoutTypes";
 
 export const PositionedBlock = ({ children, className = "" }: PositionedBlockProps) => {
   return (

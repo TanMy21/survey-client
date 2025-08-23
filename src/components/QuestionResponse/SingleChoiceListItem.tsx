@@ -1,4 +1,4 @@
-import type { SingleChoiceListItemProps } from "@/types/response";
+import type { SingleChoiceListItemProps } from "@/types/responseTypes";
 
 const SingleChoiceListItem = ({ response, selected, onSelect }: SingleChoiceListItemProps) => {
   return (

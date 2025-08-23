@@ -1,4 +1,4 @@
-import type { Mark, SliderProps } from "@/types/response";
+import type { Mark, SliderProps } from "@/types/responseTypes";
 import { useMemo, type ReactNode } from "react";
 
 const STATIC_CONFIG = {

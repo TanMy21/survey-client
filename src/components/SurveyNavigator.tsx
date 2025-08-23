@@ -1,4 +1,4 @@
-import type { SurveyNavigatorProps } from "@/types/survey";
+import type { SurveyNavigatorProps } from "@/types/surveyTypes";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const SurveyNavigator = ({

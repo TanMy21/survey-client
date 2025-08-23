@@ -1,4 +1,4 @@
-import type { SlideMotionProps } from "@/types/question";
+import type { SlideMotionProps } from "@/types/questionTypes";
 import { AnimatePresence, motion } from "motion/react";
 
 const variants = {
@@ -30,7 +30,7 @@ export const SlideMotion = ({ children, direction, keyProp }: SlideMotionProps) 
         animate="center"
         exit="exit"
         transition={{ duration: 0.3 }}
-        className="w-full h-full"
+        className="h-full w-full"
       >
         {children}
       </motion.div>

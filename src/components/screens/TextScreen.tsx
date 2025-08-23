@@ -1,8 +1,8 @@
-import type { QuestionProps } from "@/types/question";
+import type { QuestionProps } from "@/types/questionTypes";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import InputResponseText from "../questionresponse/InputResponseText";
 import CenteredStack from "../layout/CenteredStack";
 import { PositionedBlock } from "../layout/PositionedBlock";
+import InputResponseText from "../questionresponse/InputResponseText";
 
 const TextScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   return (

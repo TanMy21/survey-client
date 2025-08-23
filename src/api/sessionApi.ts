@@ -1,4 +1,4 @@
-import type { SessionArgs } from "@/types/session";
+import type { SessionArgs } from "@/types/sessionTypes";
 
 export const createSession = async ({ surveyID, participantID }: SessionArgs) => {
   try {

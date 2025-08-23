@@ -1,10 +1,10 @@
+import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
-import type { InputResponseProps } from "@/types/response";
+import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
+import type { InputResponseProps } from "@/types/responseTypes";
 import { elementSchema } from "@/utils/validationSchema";
 import { useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
-import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
-import { useBehavior } from "@/context/BehaviorTrackerContext";
 
 const InputResponse = ({
   inputPlaceholder,

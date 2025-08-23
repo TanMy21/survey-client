@@ -1,4 +1,4 @@
-import type { MultipleChoiceListProps } from "@/types/response";
+import type { MultipleChoiceListProps } from "@/types/responseTypes";
 import MultipleChoiceListItem from "./MultipleChoiceListItem";
 
 const MultipleChoiceList = ({

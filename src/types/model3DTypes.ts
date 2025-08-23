@@ -1,7 +1,7 @@
 import type { MutableRefObject } from "react";
-import type { AnalyticsBridgeApi } from "./analytics";
-import type { ViewName } from "./question";
 import * as THREE from "three";
+import type { AnalyticsBridgeApi } from "./analyticsTypes";
+import type { ViewName } from "./questionTypes";
 
 export interface SceneProps {
   isMobile: boolean;

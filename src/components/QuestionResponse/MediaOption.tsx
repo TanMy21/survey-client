@@ -1,4 +1,4 @@
-import type { MediaOptionProps } from "@/types/response";
+import type { MediaOptionProps } from "@/types/responseTypes";
 
 const MediaOption = ({ option, isSelected, onSelect }: MediaOptionProps) => {
   const imageSrc = option.image ? option.image : null;
