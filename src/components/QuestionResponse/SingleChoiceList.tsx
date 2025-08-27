@@ -6,10 +6,12 @@ import type { SingleChoiceListProps } from "@/types/responseTypes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import SingleChoiceListItem from "./SingleChoiceListItem";
+import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 
 const SingleChoiceList = ({ question, setCurrentQuestionIndex }: SingleChoiceListProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
+  const { onSubmitAnswer } = useFlowRuntime();
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedOptionID, setSelectedOptionID] = useState<string | null>(null);
@@ -37,11 +39,13 @@ const SingleChoiceList = ({ question, setCurrentQuestionIndex }: SingleChoiceLis
     console.log("📦 SingleChoiceList behavior data:", data);
     console.log("Selected option value:", optionValue);
 
-    if (selectedOptionID) {
-      setCurrentQuestionIndex?.((i) => i + 1);
-    } else {
-      alert("Please select an option before submitting.");
-    }
+    onSubmitAnswer(optionValue!);
+
+    // if (selectedOptionID) {
+    //   setCurrentQuestionIndex?.((i) => i + 1);
+    // } else {
+    //   alert("Please select an option before submitting.");
+    // }
   }, [
     options,
     selectedOptionID,

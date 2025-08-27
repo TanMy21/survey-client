@@ -4,10 +4,11 @@ import type { RankListProps } from "@/types/responseTypes";
 import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-pangea/dnd";
 import { useState } from "react";
 import RankListItem from "./RankListItem";
+import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 
 const RankList = ({ options, setCurrentQuestionIndex }: RankListProps) => {
   const [localOptions, setLocalOptions] = useState<OptionType[]>(options);
-
+  const { onSubmitAnswer } = useFlowRuntime();
   const {
     handleFirstInteraction,
     handleClick,
@@ -53,8 +54,9 @@ const RankList = ({ options, setCurrentQuestionIndex }: RankListProps) => {
     const data = collectBehaviorData();
     console.log("📦 RankScreen behavior data:", data);
     console.log("User Ranked Options:", rankedData);
-
-    setCurrentQuestionIndex?.((i) => i + 1);
+    const rankings = rankedData.map((o) => o.value);
+    onSubmitAnswer(rankings);
+    // setCurrentQuestionIndex?.((i) => i + 1);
   };
 
   return (

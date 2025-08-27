@@ -4,9 +4,11 @@ import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import BinaryResponseYes, { BinaryResponseNo } from "./BinaryResponseYes";
+import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
+import { useQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const BinaryResponseContainer = ({
   question,
@@ -17,6 +19,8 @@ const BinaryResponseContainer = ({
   const { questionID, questionPreferences } = question;
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
+  const { onSubmitAnswer } = useFlowRuntime();
+  // const { setSubmitHandler } = useQuestionSubmit();
   const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "Yes";
   const buttonTextNo = questionPreferences.uiConfig?.buttonTextNo || "No";
 
@@ -43,7 +47,8 @@ const BinaryResponseContainer = ({
     console.log("📦 BinaryResponse behavior data:", data);
     console.log("Selected response:", selectedValue);
     setCanProceed?.(true);
-    setCurrentQuestionIndex?.((i) => i + 1);
+    onSubmitAnswer(selectedValue);
+    // setCurrentQuestionIndex?.((i) => i + 1);
   }, [
     collectBehaviorData,
     isRequired,
@@ -51,6 +56,7 @@ const BinaryResponseContainer = ({
     setCanProceed,
     setCurrentQuestionIndex,
     markSubmission,
+    onSubmitAnswer,
   ]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
@@ -93,6 +99,11 @@ const BinaryResponseContainer = ({
   };
 
   const fmtSeconds = (ms: number) => (ms / 1000).toFixed(1);
+
+  // useEffect(() => {
+  //   setSubmitHandler(() => handleSubmit);
+  //   return () => setSubmitHandler(null);
+  // }, [handleSubmit, setSubmitHandler]);
 
   return (
     <div className="mx-auto flex h-full w-3/5 flex-col items-center justify-center gap-2 border-2 border-amber-500 p-2">

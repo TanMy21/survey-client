@@ -1,4 +1,4 @@
-import type { Question } from "./questionTypes";
+import type { Question, QuestionType } from "./questionTypes";
 
 export interface FlowCondition {
   flowConditionID: string;
@@ -6,7 +6,6 @@ export interface FlowCondition {
   relatedQuestionID: string;
   goto_questionID: string | null;
   conditionType: string;
-
   conditionValue: string | string[] | null;
 }
 
@@ -33,12 +32,38 @@ export interface FlowRuntimeState {
   visitedStack: string[];
   currentQuestionID: string;
   endScreenQuestionID: string | null;
-  lastQuestionQuestionID: string | null;
+  lastQuestionID: string | null;
+  navAll: Question[];
+  navIndexById: Record<string, number>;
+  history: string[];
+  cursor: number;
+}
+
+export interface UseFlowControllerApi {
+  currentQuestion: Question;
+  currentQuestionID: string;
+  currentDisplayIndex: number | null;
+  onSubmitAnswer: (answer: AnswerPrimitive) => void;
+  onPrev: () => void;
+  goNext: () => void;
+  getDisplayIndex: (qid: string) => number | null;
+  canGoPrev: boolean;
+  isTerminal: boolean;
+  visitedStack: string[];
+  flowEligible: Question[];
 }
 
 export interface NextDecision {
   nextQuestionID: string | null;
 }
+
+export const NON_ORDERED_TYPES = new Set([
+  "WELCOME_SCREEN",
+  "INSTRUCTIONS",
+  "EMAIL_CONTACT",
+  "CONSENT",
+  "END_SCREEN",
+]);
 
 export const NON_FLOW_TYPES = new Set([
   "WELCOME_SCREEN",
@@ -48,3 +73,5 @@ export const NON_FLOW_TYPES = new Set([
 ]);
 
 export const END_SCREEN_TYPE: string = "END_SCREEN";
+
+export const isQuestionScreen = (t: QuestionType) => !NON_ORDERED_TYPES.has(t);

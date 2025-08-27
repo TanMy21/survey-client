@@ -5,11 +5,13 @@ import type { RangeResponseProps } from "@/types/responseTypes";
 import { useState } from "react";
 import ProgressiveSlider from "./ProgressiveSlider";
 import ScaleCounter from "./ScaleCounter";
+import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 
 const RangeResponse = ({ question, setCurrentQuestionIndex }: RangeResponseProps) => {
   const isMobile = useIsMobile();
   const { minValue, maxValue } = question.questionPreferences?.uiConfig || {};
   const isRequired = useQuestionRequired(question);
+  const { onSubmitAnswer } = useFlowRuntime();
   const [error, setError] = useState<string | null>(null);
   const [selectedValue, setSelectedValue] = useState(Math.ceil((minValue + maxValue) / 2));
 
@@ -38,6 +40,7 @@ const RangeResponse = ({ question, setCurrentQuestionIndex }: RangeResponseProps
     const data = collectBehaviorData();
     console.log("📦 RangeScreen behavior data:", data);
     console.log("Submitted Range Value:", selectedValue);
+    onSubmitAnswer(selectedValue);
     setCurrentQuestionIndex?.((i) => i + 1);
   };
 

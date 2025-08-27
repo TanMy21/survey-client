@@ -7,10 +7,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import QuestionTextandDescription from "../QuestionTextandDescription";
 import { InputError } from "../alert/ResponseErrorAlert";
 import MultipleChoiceList from "../questionresponse/MultipleChoiceList";
+import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 
 const MultipleChoiceScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
+  const { onSubmitAnswer } = useFlowRuntime();
   const [selectedOptions, setSelectedOptions] = useState<{ optionID: string; value: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,8 +52,17 @@ const MultipleChoiceScreen = ({ surveyID, question, setCurrentQuestionIndex }: Q
     const data = collectBehaviorData();
     console.log("📦 MultipleChoiceScreen behavior data:", data);
     console.log("Selected Options:", selectedOptions);
-    setCurrentQuestionIndex?.((i) => i + 1);
-  }, [isRequired, selectedOptions, markSubmission, collectBehaviorData, setCurrentQuestionIndex]);
+    const selectedValues = selectedOptions.map((o) => o.value);
+    onSubmitAnswer(selectedValues);
+    // setCurrentQuestionIndex?.((i) => i + 1);
+  }, [
+    isRequired,
+    selectedOptions,
+    markSubmission,
+    collectBehaviorData,
+    setCurrentQuestionIndex,
+    onSubmitAnswer,
+  ]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 

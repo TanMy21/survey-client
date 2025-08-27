@@ -6,6 +6,7 @@ import type { MediaOptionsProps } from "@/types/responseTypes";
 import { useEffect, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import MediaOption from "./MediaOption";
+import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 
 const MediaOptionsContainer = ({
   options,
@@ -15,6 +16,7 @@ const MediaOptionsContainer = ({
 }: MediaOptionsProps) => {
   const isMobile = useIsMobile();
   const isRequired = useQuestionRequired(question);
+  const { onSubmitAnswer } = useFlowRuntime();
   const [error, setError] = useState<string | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,6 +49,7 @@ const MediaOptionsContainer = ({
     const behaviorData = collectBehaviorData();
     console.log("📦 MediaScreen behavior data:", behaviorData);
     console.log("Selected Media Options:", selected);
+    // onSubmitAnswer(selected.value);
     setCurrentQuestionIndex?.((i) => i + 1);
   };
 

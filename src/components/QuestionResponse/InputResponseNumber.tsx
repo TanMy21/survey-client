@@ -5,6 +5,7 @@ import type { InputResponseProps } from "@/types/responseTypes";
 import { numberResponseSchema } from "@/utils/validationSchema";
 import { useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
+import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 
 const InputResponseNumber = ({
   inputPlaceholder,
@@ -15,7 +16,7 @@ const InputResponseNumber = ({
   const isRequired = useQuestionRequired(question);
   const [number, setNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
-
+  const { onSubmitAnswer } = useFlowRuntime();
   const { handleFirstInteraction, handleTyping, handlePaste, markSubmission, collectBehaviorData } =
     useBehavior();
 
@@ -47,6 +48,7 @@ const InputResponseNumber = ({
       const data = collectBehaviorData();
       console.log("📦 Number input behavior data:", data);
       console.log("Input submitted:", number);
+      onSubmitAnswer(number);
       setCurrentQuestionIndex?.((i) => i + 1);
     }
   };

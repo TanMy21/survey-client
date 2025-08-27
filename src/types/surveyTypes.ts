@@ -26,12 +26,15 @@ export interface ISurvey {
   isTemplate: boolean;
 }
 
-
 export interface SurveyContainerProps {
-    surveyID: string;
+  surveyID: string;
 }
 
 export type FlowContextType = {
   canProceed: boolean;
   setCanProceed: (val: boolean) => void;
 };
+
+export interface SurveyNavigatorCompactProps {
+  disableNext: boolean;
+}

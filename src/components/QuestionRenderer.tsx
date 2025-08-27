@@ -14,7 +14,7 @@ const QuestionRenderer = ({
         question={question}
         surveyID={surveyID}
         currentIndex={currentIndex}
-        setCurrentQuestionIndex={setCurrentQuestionIndex}
+        // setCurrentQuestionIndex={setCurrentQuestionIndex}
       />
     </div>
   );

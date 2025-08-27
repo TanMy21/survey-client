@@ -1,68 +1,22 @@
-import { BehaviorTrackerProvider } from "@/context/BehaviorTrackerContext";
-import { useSurveyFlow } from "@/context/useSurveyFlow";
-import { usePreloadNeighbors, warmGLTF } from "@/hooks/usePreloadQuestions";
-import { useFetchSurvey } from "@/hooks/useSurvey";
+import { FlowRuntimeProvider } from "@/context/FlowRuntimeProvider";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
-import { useMemo, useRef, useState } from "react";
-import { BacktrackLogger } from "./BacktrackLogger";
+import SurveyScreenLayout from "./SurveyScreenLayout";
+import { useFetchSurvey } from "@/hooks/useSurvey";
+import { useMemo } from "react";
 import { LogoLoader } from "./loader/LogoLoader";
-import { SlideMotion } from "./motion/SlideMotion";
-import QuestionRenderer from "./QuestionRenderer";
-import SurveyNavigator from "./SurveyNavigator";
 
 const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
-  const { canProceed } = useSurveyFlow();
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
-  const visitedRef = useRef<string[]>([]);
-  const backtrackCountMapRef = useRef<Map<string, number>>(new Map());
   const { data, isLoading, isError } = useFetchSurvey(surveyID);
 
-  // useEffect(() => {
-  //   if (surveyID) quizSessionStarted(surveyID);
-  // }, [surveyID]);
-
-  const questions = useMemo(() => {
-    if (!data?.questions) return [];
-
-    const sortedQuestions = [...data.questions].sort((a, b) => a.order! - b.order!);
-
-    // Inject Consent screen
-    const consentScreen = {
-      questionID: "consent-screen",
-      type: "CONSENT",
-      order: -2,
+  // Build payload only when data is ready
+  const payload = useMemo(() => {
+    if (!data) return null;
+    return {
+      surveyID,
+      questions: data.questions, // as-is from backend
+      FlowCondition: data.FlowCondition, // as-is from backend
     };
-
-    const injected = [...sortedQuestions, consentScreen].sort((a, b) => a.order! - b.order!);
-
-    return injected;
-  }, [data]);
-
-  // const sessions = data?.sessions ?? [];
-  const total = questions.length;
-  const currentQuestion = questions[currentQuestionIndex];
-  const progress = total > 1 ? (currentQuestionIndex / (questions.length - 1)) * 100 : 0;
-
-  usePreloadNeighbors(questions, currentQuestionIndex, 1);
-
-  const { questionPreferences } = currentQuestion || {};
-  const { questionImageTemplate, questionImageTemplateUrl, questionBackgroundColor } =
-    questionPreferences || {};
-
-  const backgroundStyle = questionImageTemplate
-    ? {
-        backgroundImage: `url(${questionImageTemplateUrl})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }
-    : questionBackgroundColor
-      ? {
-          backgroundColor: questionBackgroundColor,
-        }
-      : {
-          backgroundColor: "white",
-        };
+  }, [data, surveyID]);
 
   if (isLoading) {
     return (
@@ -80,80 +34,10 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
     );
   }
 
-  // if (isSessionCompleted(sessions)) {
-  //   return (
-  //     <div className="flex justify-center items-center h-screen p-4 text-center bg-white">
-  //       <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold">
-  //         You have already completed the survey.
-  //       </h1>
-  //     </div>
-  //   );
-  // }
-
-  if (!questions.length) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">Error Loading Survey.</div>
-    );
-  }
-
-  console.log("Data from be: ", data);
-
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
-      {/* Full-width progress bar at top */}
-      <div className="fixed top-0 left-0 z-50 h-1 w-full bg-gray-200">
-        <div
-          className="h-full bg-blue-500 transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      {/* Spacer div to prevent overlap due to fixed progress bar */}
-      <div className="h-1" />
-      <div className="flex min-h-screen w-full flex-col" style={backgroundStyle}>
-        {/* Scrollable area for questions only */}
-        <div className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 border-green-500">
-          <SlideMotion direction={slideDirection} keyProp={currentQuestion.questionID}>
-            <BehaviorTrackerProvider
-              questionID={currentQuestion.questionID}
-              questionType={currentQuestion.type}
-              backtrackCountMapRef={backtrackCountMapRef}
-            >
-              <BacktrackLogger questionID={currentQuestion.questionID} visitedRef={visitedRef} />
-              <QuestionRenderer
-                question={currentQuestion}
-                surveyID={surveyID}
-                currentIndex={currentQuestionIndex}
-                setCurrentQuestionIndex={setCurrentQuestionIndex}
-              />
-            </BehaviorTrackerProvider>
-          </SlideMotion>
-        </div>
-
-        <SurveyNavigator
-          currentIndex={currentQuestionIndex}
-          total={questions.length}
-          disableNext={!canProceed}
-          onNext={() => {
-            setSlideDirection("right");
-            setCurrentQuestionIndex((i) => {
-              const nextIndex = Math.min(i + 1, questions.length - 1);
-
-              const nextNext = questions[nextIndex + 1];
-              if (nextNext?.Model3D?.fileUrl) {
-                warmGLTF(nextNext.Model3D.fileUrl);
-              }
-
-              return nextIndex;
-            });
-          }}
-          onPrev={() => {
-            setSlideDirection("left");
-            setCurrentQuestionIndex((i) => Math.max(i - 1, 0));
-          }}
-        />
-      </div>
-    </div>
+    <FlowRuntimeProvider payload={payload!}>
+      <SurveyScreenLayout surveyID={surveyID} />
+    </FlowRuntimeProvider>
   );
 };
 

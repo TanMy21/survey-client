@@ -4,6 +4,7 @@ import type { InputResponseProps } from "@/types/responseTypes";
 import { textResponseSchema } from "@/utils/validationSchema";
 import { useEffect, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
+import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 
 const InputResponseText = ({
   inputPlaceholder,
@@ -14,6 +15,7 @@ const InputResponseText = ({
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
+  const { onSubmitAnswer } = useFlowRuntime();
 
   const {
     handleFirstInteraction,
@@ -44,8 +46,9 @@ const InputResponseText = ({
       const data = collectBehaviorData();
       console.log("📦 TextScreen behavior data:", data);
       console.log("Submitted response:", text);
+      onSubmitAnswer(text);
       setText("");
-      setCurrentQuestionIndex?.((i) => i + 1);
+      // setCurrentQuestionIndex?.((i) => i + 1);
     }
   };
 
