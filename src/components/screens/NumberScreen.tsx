@@ -1,22 +1,28 @@
 import type { QuestionProps } from "@/types/questionTypes";
 import QuestionTextandDescription from "../QuestionTextandDescription";
 import InputResponseNumber from "../questionresponse/InputResponseNumber";
+import CenteredStack from "../layout/CenteredStack";
+import { PositionedBlock } from "../layout/PositionedBlock";
+import ScreenRoot from "../layout/ScreenRoot";
+import { ResponseContainer } from "../layout/ResponseContainer";
 
 const NumberScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   return (
-    <div className="border-black-500 relative z-20 mx-auto flex min-h-[700px] w-[98%] flex-col border-2">
-      <div className="absolute bottom-[56%] z-2 my-[8%] mb-5 flex w-full flex-row items-end justify-center border-2 border-red-500 xl:bottom-[50%]">
-        <QuestionTextandDescription surveyID={surveyID} question={question} />
-      </div>
-      <div className="absolute top-[44%] mx-auto flex h-[60%] w-full flex-col items-center justify-start border-2 border-red-500 xl:top-[50%]">
-        <InputResponseNumber
-          inputPlaceholder={"Enter your response..."}
-          submitButtonText={"Submit"}
-          setCurrentQuestionIndex={setCurrentQuestionIndex}
-          question={question}
-        />
-      </div>
-    </div>
+    <ScreenRoot>
+      <CenteredStack>
+        <PositionedBlock>
+          <QuestionTextandDescription surveyID={surveyID} question={question} />
+        </PositionedBlock>
+        <ResponseContainer>
+          <InputResponseNumber
+            inputPlaceholder={"Enter your response..."}
+            submitButtonText={"OK"}
+            setCurrentQuestionIndex={setCurrentQuestionIndex}
+            question={question}
+          />
+        </ResponseContainer>
+      </CenteredStack>
+    </ScreenRoot>
   );
 };
 

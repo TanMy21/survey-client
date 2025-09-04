@@ -1,19 +1,25 @@
 import type { QuestionProps } from "@/types/questionTypes";
 import QuestionTextandDescription from "../QuestionTextandDescription";
 import RankList from "../questionresponse/RankList";
+import CenteredStack from "../layout/CenteredStack";
+import { PositionedBlock } from "../layout/PositionedBlock";
+import ScreenRoot from "../layout/ScreenRoot";
+import { ResponseContainer } from "../layout/ResponseContainer";
 
-const RankScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
+const RankScreen = ({ surveyID, question }: QuestionProps) => {
   const { options } = question || {};
 
   return (
-    <div className="border-black-500 relative z-20 mx-auto flex min-h-[700px] w-[98%] flex-col border-2">
-      <div className="absolute bottom-[56%] z-2 my-[8%] mb-5 flex w-full flex-row items-end justify-center border-2 border-red-500 xl:bottom-[50%]">
-        <QuestionTextandDescription surveyID={surveyID} question={question} />
-      </div>
-      <div className="absolute top-[44%] mx-auto flex h-[60%] w-full flex-col items-center justify-start border-2 border-red-500 xl:top-[50%]">
-        <RankList options={options!} setCurrentQuestionIndex={setCurrentQuestionIndex} />
-      </div>
-    </div>
+    <ScreenRoot>
+      <CenteredStack>
+        <PositionedBlock>
+          <QuestionTextandDescription surveyID={surveyID} question={question} />
+        </PositionedBlock>
+        <ResponseContainer>
+          <RankList options={options!} />
+        </ResponseContainer>
+      </CenteredStack>
+    </ScreenRoot>
   );
 };
 

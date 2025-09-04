@@ -38,6 +38,28 @@ button {
   cursor: pointer;
 }
 
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* tailwind */
+
+
+@custom-variant tall (@media (min-height: 800px));
+@custom-variant tall-narrow (@media (min-height: 800px) and (max-width: 500px));
+@custom-variant taller (@media (min-height: 1000px));
+@custom-variant short (@media (max-height: 600px));
+@custom-variant compact (@media (max-width: 700px) and (max-height: 799px),
+  (max-height: 420px) and (min-width: 701px));
+@custom-variant wide (@media (min-width: 701px));
+
 @utility scrollbar-hidden {
   &::-webkit-scrollbar {
     display: none;
@@ -67,7 +89,11 @@ button {
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .ff-pulse-loop, .ff-pulse-kick { animation: none !important; }
+
+  .ff-pulse-loop,
+  .ff-pulse-kick {
+    animation: none !important;
+  }
 }
 
 /* Continuous subtle pulse while auto-submit is pending */
@@ -75,22 +101,68 @@ button {
   animation: ffPulseLoop 900ms ease-in-out infinite;
   will-change: transform, background-color;
 }
+
 @keyframes ffPulseLoop {
-  0%   { transform: scale(1);   background-color: transparent; }
-  50%  { transform: scale(1.03); background-color: rgba(0, 91, 196, 0.06); }
-  100% { transform: scale(1);   background-color: transparent; }
+  0% {
+    transform: scale(1);
+    background-color: transparent;
+  }
+
+  50% {
+    transform: scale(1.03);
+    background-color: rgba(0, 91, 196, 0.06);
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: transparent;
+  }
 }
 
 /* Stronger one-time bump right before submission */
 .ff-pulse-kick {
   animation: ffPulseKick 0.28s ease;
 }
+
 @keyframes ffPulseKick {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.05); background-color: rgba(0, 91, 196, 0.10); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+    background-color: rgba(0, 91, 196, 0.10);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
+@keyframes shrink-bounce {
+  0% {
+    transform: scale(1);
+  }
+
+  33% {
+    transform: scale(0.85);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Draw the check stroke from 0 to full */
+@keyframes draw-check {
+  0% {
+    stroke-dashoffset: 20;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
 
 .choice-wrapper,
 .choice-wrapper:focus,
@@ -98,9 +170,13 @@ button {
   outline: none !important;
   box-shadow: none !important;
 }
+
 .choice-wrapper *:focus,
 .choice-wrapper *:focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
-.choice-wrapper { -webkit-tap-highlight-color: transparent; }
+
+.choice-wrapper {
+  -webkit-tap-highlight-color: transparent;
+}

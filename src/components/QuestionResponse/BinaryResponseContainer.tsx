@@ -4,11 +4,10 @@ import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import BinaryResponseYes, { BinaryResponseNo } from "./BinaryResponseYes";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
-import { useQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const BinaryResponseContainer = ({
   question,
@@ -20,7 +19,6 @@ const BinaryResponseContainer = ({
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
-  // const { setSubmitHandler } = useQuestionSubmit();
   const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "Yes";
   const buttonTextNo = questionPreferences.uiConfig?.buttonTextNo || "No";
 
@@ -48,7 +46,6 @@ const BinaryResponseContainer = ({
     console.log("Selected response:", selectedValue);
     setCanProceed?.(true);
     onSubmitAnswer(selectedValue);
-    // setCurrentQuestionIndex?.((i) => i + 1);
   }, [
     collectBehaviorData,
     isRequired,
@@ -100,13 +97,8 @@ const BinaryResponseContainer = ({
 
   const fmtSeconds = (ms: number) => (ms / 1000).toFixed(1);
 
-  // useEffect(() => {
-  //   setSubmitHandler(() => handleSubmit);
-  //   return () => setSubmitHandler(null);
-  // }, [handleSubmit, setSubmitHandler]);
-
   return (
-    <div className="mx-auto flex h-full w-3/5 flex-col items-center justify-center gap-2 border-2 border-amber-500 p-2">
+    <div className="mx-auto flex h-full w-3/5 flex-col items-center justify-center gap-2 p-2">
       {/* Pending auto-submit hint & cancel */}
       {isAutoSubmitting && (
         <div
@@ -133,7 +125,7 @@ const BinaryResponseContainer = ({
         aria-label="Binary response container"
         className="flex h-full w-[98%] flex-col gap-2 md:w-4/5"
       >
-        <div className="mx-auto flex h-full w-[80%] flex-col gap-2 border-2 border-amber-400">
+        <div className="mx-auto flex h-full w-[80%] flex-col gap-2">
           {/* YES */}
           <div
             ref={yesRef}
@@ -190,9 +182,9 @@ const BinaryResponseContainer = ({
         <div className="mt-4 flex w-full justify-end pr-6">
           <button
             onClick={handleSubmit}
-            className="min-w-[120px] rounded-[16px] bg-[#005BC4] px-4 py-2 font-semibold text-white transition hover:bg-[#004a9f]"
+            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"
           >
-            Submit
+            OK
           </button>
         </div>
       </div>

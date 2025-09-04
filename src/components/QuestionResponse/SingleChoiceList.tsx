@@ -8,7 +8,7 @@ import { InputError } from "../alert/ResponseErrorAlert";
 import SingleChoiceListItem from "./SingleChoiceListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 
-const SingleChoiceList = ({ question, setCurrentQuestionIndex }: SingleChoiceListProps) => {
+const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
@@ -40,20 +40,7 @@ const SingleChoiceList = ({ question, setCurrentQuestionIndex }: SingleChoiceLis
     console.log("Selected option value:", optionValue);
 
     onSubmitAnswer(optionValue!);
-
-    // if (selectedOptionID) {
-    //   setCurrentQuestionIndex?.((i) => i + 1);
-    // } else {
-    //   alert("Please select an option before submitting.");
-    // }
-  }, [
-    options,
-    selectedOptionID,
-    isRequired,
-    markSubmission,
-    collectBehaviorData,
-    setCurrentQuestionIndex,
-  ]);
+  }, [options, selectedOptionID, isRequired, markSubmission, collectBehaviorData]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
@@ -116,7 +103,7 @@ const SingleChoiceList = ({ question, setCurrentQuestionIndex }: SingleChoiceLis
         </div>
 
         {/* Error message */}
-        <div className="mx-auto flex h-[12%] w-[98%] flex-col items-center justify-start border-2 border-amber-700 xl:top-[50%]">
+        <div className="mx-auto flex h-[12%] w-[98%] flex-col items-center justify-start xl:top-[50%]">
           {error && <InputError error={error} />}
         </div>
 
@@ -139,12 +126,12 @@ const SingleChoiceList = ({ question, setCurrentQuestionIndex }: SingleChoiceLis
           </div>
         )}
 
-        <div className="mt-4 flex w-3/5 justify-end pr-6">
+        <div className="mt-2 flex w-[112%] justify-end pr-6">
           <button
             onClick={handleSubmit}
-            className="mr-8 min-w-[100px] rounded-[16px] bg-[#005BC4] px-4 py-2 font-semibold text-white transition hover:bg-[#004a9f]"
+            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"
           >
-            Submit
+            OK
           </button>
         </div>
       </div>

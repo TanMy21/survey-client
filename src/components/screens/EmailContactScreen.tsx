@@ -3,24 +3,25 @@ import QuestionTextandDescription from "../QuestionTextandDescription";
 import CenteredStack from "../layout/CenteredStack";
 import { PositionedBlock } from "../layout/PositionedBlock";
 import InputResponse from "../questionresponse/InputResponse";
+import ScreenRoot from "../layout/ScreenRoot";
+import { ResponseContainer } from "../layout/ResponseContainer";
 
-const EmailContactScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
+const EmailContactScreen = ({ surveyID, question }: QuestionProps) => {
   return (
-    <div className="mx-auto flex w-full flex-col border-2 border-black">
+    <ScreenRoot>
       <CenteredStack>
         <PositionedBlock>
           <QuestionTextandDescription surveyID={surveyID} question={question} />
         </PositionedBlock>
-        <PositionedBlock>
+        <ResponseContainer>
           <InputResponse
             inputPlaceholder={"Enter your email..."}
-            submitButtonText={"Submit"}
-            setCurrentQuestionIndex={setCurrentQuestionIndex}
+            submitButtonText={"OK"}
             question={question}
           />
-        </PositionedBlock>
+        </ResponseContainer>
       </CenteredStack>
-    </div>
+    </ScreenRoot>
   );
 };
 

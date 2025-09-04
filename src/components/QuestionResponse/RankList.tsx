@@ -6,7 +6,7 @@ import { useState } from "react";
 import RankListItem from "./RankListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 
-const RankList = ({ options, setCurrentQuestionIndex }: RankListProps) => {
+const RankList = ({ options }: RankListProps) => {
   const [localOptions, setLocalOptions] = useState<OptionType[]>(options);
   const { onSubmitAnswer } = useFlowRuntime();
   const {
@@ -56,13 +56,12 @@ const RankList = ({ options, setCurrentQuestionIndex }: RankListProps) => {
     console.log("User Ranked Options:", rankedData);
     const rankings = rankedData.map((o) => o.value);
     onSubmitAnswer(rankings);
-    // setCurrentQuestionIndex?.((i) => i + 1);
   };
 
   return (
-    <div className="flex w-3/5 origin-bottom flex-col border-2 border-gray-300">
-      <div className="mx-auto flex w-full flex-col items-center justify-center gap-2 border-2 border-red-500 px-0 md:w-4/5 md:px-2">
-        <div className="mx-auto flex w-[92%] flex-col items-center border-2 border-blue-500 p-1 md:w-full">
+    <div className="flex w-3/5 origin-bottom flex-col">
+      <div className="mx-auto flex w-full flex-col items-center justify-center gap-2 px-0 md:w-4/5 md:px-2">
+        <div className="mx-auto flex w-[92%] flex-col items-center p-1 md:w-full">
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="responses">
               {(provided) => (
@@ -90,12 +89,12 @@ const RankList = ({ options, setCurrentQuestionIndex }: RankListProps) => {
             </Droppable>
           </DragDropContext>
 
-          <div className="mt-4 flex w-3/5 justify-end pr-6">
+          <div className="mt-2 flex w-[92%] justify-end pr-6">
             <button
               onClick={handleSubmit}
-              className="mr-8 min-w-[100px] rounded-[16px] bg-[#005BC4] px-4 py-2 font-semibold text-white transition hover:bg-[#004a9f]"
+              className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-semibold text-white transition hover:bg-[#004a9f]"
             >
-              Submit
+              OK
             </button>
           </div>
         </div>

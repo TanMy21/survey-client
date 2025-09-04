@@ -4,18 +4,16 @@ import QuestionRenderer from "./QuestionRenderer";
 import { BacktrackLogger } from "./BacktrackLogger";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { NON_FLOW_TYPES } from "@/types/flowTypes";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
 import SurveyNavigatorCompact from "./SurveyNavigatorCompact";
-import { QuestionSubmitProvider } from "@/context/QuestionNavigationContext";
 
 const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
   const { currentQuestion, currentQuestionID, currentDisplayIndex, visitedStack, flowEligible } =
     useFlowRuntime();
-  const { canProceed } = useSurveyFlow(); // your existing canProceed gate
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(currentDisplayIndex);
-  //   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
+  const { canProceed } = useSurveyFlow();
+
   const visitedRef = useRef<string[]>([]);
   const backtrackCountMapRef = useRef<Map<string, number>>(new Map());
 
@@ -23,44 +21,9 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
   //   if (surveyID) quizSessionStarted(surveyID);
   // }, [surveyID]);
 
-  //   const questions = useMemo(() => {
-  //     if (!data?.questions) return [];
-
-  //     const sortedQuestions = [...data.questions].sort((a, b) => a.order! - b.order!);
-
-  //     // Inject Consent screen
-  //     const consentScreen = {
-  //       questionID: "consent-screen",
-  //       type: "CONSENT",
-  //       order: -2,
-  //     };
-
-  //     const injected = [...sortedQuestions, consentScreen].sort((a, b) => a.order! - b.order!);
-
-  //     return injected;
-  //   }, [data]);
-
   // const sessions = data?.sessions ?? [];
 
   //   usePreloadNeighbors(questions, currentQuestionIndex, 1);
-
-  //   const { questionPreferences } = currentQuestion || {};
-  //   const { questionImageTemplate, questionImageTemplateUrl, questionBackgroundColor } =
-  // questionPreferences || {};
-
-  //   const backgroundStyle = questionImageTemplate
-  //     ? {
-  //         backgroundImage: `url(${questionImageTemplateUrl})`,
-  //         backgroundSize: "cover",
-  //         backgroundPosition: "center",
-  //       }
-  //     : questionBackgroundColor
-  //       ? {
-  //           backgroundColor: questionBackgroundColor,
-  //         }
-  //       : {
-  //           backgroundColor: "white",
-  //         };
 
   // if (isSessionCompleted(sessions)) {
   //   return (
@@ -78,13 +41,7 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
   //     );
   //   }
 
-  //   console.log("Data from be: ", data);
-
-  //   const total = questions.length;
-  //   const currentQuestion = questions[currentQuestionIndex];
-  //   const progress = total > 1 ? (currentQuestionIndex / (questions.length - 1)) * 100 : 0;
-
-  // progress: show proportion of visited vs total flow-eligible (excluding non-questions)
+  // progress
   const totalCount = useMemo(
     () => flowEligible.filter((q) => !NON_FLOW_TYPES.has(q.type)).length,
     [flowEligible]
@@ -97,7 +54,6 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
     return totalCount > 0 ? (visitedQuestions / totalCount) * 100 : 0;
   }, [visitedStack, flowEligible, totalCount]);
 
-  // background styling logic can remain as you had it; pulling from currentQ.questionPreferences
   const { questionPreferences } = currentQuestion || {};
   const { questionImageTemplate, questionImageTemplateUrl, questionBackgroundColor } =
     questionPreferences || {};
@@ -124,8 +80,6 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
       {/* Spacer div to prevent overlap due to fixed progress bar */}
       <div className="h-1" />
       <div className="flex min-h-screen w-full flex-col" style={backgroundStyle}>
-        {/* Scrollable area for questions only */}
-        {/* <QuestionSubmitProvider> */}
         <div className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 border-green-500">
           <SlideMotion direction={"right"} keyProp={currentQuestionID}>
             <BehaviorTrackerProvider
@@ -138,37 +92,12 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
                 question={currentQuestion}
                 surveyID={surveyID}
                 currentIndex={currentDisplayIndex!}
-                // setCurrentQuestionIndex={setCurrentQuestionIndex}
               />
             </BehaviorTrackerProvider>
           </SlideMotion>
         </div>
 
         <SurveyNavigatorCompact disableNext={!canProceed} />
-
-        {/* <SurveyNavigator
-          currentIndex={currentQuestionIndex}
-          total={totalCount}
-          disableNext={!canProceed}
-          onNext={() => {
-            setSlideDirection("right");
-            setCurrentQuestionIndex((i) => {
-              const nextIndex = Math.min(i + 1, totalCount - 1);
-
-              const nextNext = questions[nextIndex + 1];
-              if (nextNext?.Model3D?.fileUrl) {
-                warmGLTF(nextNext.Model3D.fileUrl);
-              }
-
-              return nextIndex;
-            });
-          }}
-          onPrev={() => {
-            setSlideDirection("left");
-            setCurrentQuestionIndex((i) => Math.max(i - 1, 0));
-          }}
-        /> */}
-        {/* </QuestionSubmitProvider> */}
       </div>
     </div>
   );

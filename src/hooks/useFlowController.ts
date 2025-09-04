@@ -50,7 +50,7 @@ export function useFlowController(payload: SurveyPayload): UseFlowControllerApi 
   const lastQuestionID = useMemo(() => findLastQuestionID(flowEligible), [flowEligible]);
 
   // pick initial starting node: first flow-eligible (should be the first question)
-  const initialQID = flowEligible[0]?.questionID ?? "";
+  const initialQID = navAll[0]?.questionID ?? "";
 
   // Single mutable source of truth for runtime (kept in React state)
   const [state, setState] = useState<FlowRuntimeState>(() => ({
@@ -107,16 +107,16 @@ export function useFlowController(payload: SurveyPayload): UseFlowControllerApi 
       lastQuestionID,
       navAll,
       navIndexById,
-      // Keep currentQID & visitedStack as-is if still valid; if invalid, reset
+
       currentQuestionID:
-        indexMap[s.currentQuestionID] !== undefined
+        navIndexById[s.currentQuestionID] !== undefined
           ? s.currentQuestionID
-          : (flowEligible[0]?.questionID ?? ""),
+          : (navAll[0]?.questionID ?? ""),
       visitedStack:
-        indexMap[s.currentQuestionID] !== undefined
+        navIndexById[s.currentQuestionID] !== undefined
           ? s.visitedStack
-          : flowEligible[0]?.questionID
-            ? [flowEligible[0].questionID]
+          : navAll[0]?.questionID
+            ? [navAll[0].questionID]
             : [],
     }));
   }
@@ -133,10 +133,10 @@ export function useFlowController(payload: SurveyPayload): UseFlowControllerApi 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.currentQuestionID]);
 
-  const getDisplayIndex = useCallback(
-    (qid: string) => state.displayIndexMap[qid] ?? null,
-    [state.displayIndexMap]
-  );
+  // const getDisplayIndex = useCallback(
+  //   (qid: string) => state.displayIndexMap[qid] ?? null,
+  //   [state.displayIndexMap]
+  // );
 
   const goNext = useCallback(() => {
     setState((s) => {

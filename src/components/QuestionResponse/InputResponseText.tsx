@@ -10,7 +10,6 @@ const InputResponseText = ({
   inputPlaceholder,
   submitButtonText,
   question,
-  setCurrentQuestionIndex,
 }: InputResponseProps) => {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +47,6 @@ const InputResponseText = ({
       console.log("Submitted response:", text);
       onSubmitAnswer(text);
       setText("");
-      // setCurrentQuestionIndex?.((i) => i + 1);
     }
   };
 
@@ -97,8 +95,8 @@ const InputResponseText = ({
   }, []);
 
   return (
-    <div className="flex w-3/5 origin-bottom flex-col border-2 border-amber-600">
-      <div className="mx-auto flex h-[60%] w-[96%] flex-col border-2 border-b-emerald-400">
+    <div className="flex w-4/5 origin-bottom flex-col">
+      <div className="mx-auto flex h-[60%] w-[100%] flex-col">
         {/* Input field  */}
         <textarea
           value={text}
@@ -109,7 +107,7 @@ const InputResponseText = ({
           onFocus={handleFirstInteraction}
           placeholder={inputPlaceholder}
           rows={1}
-          className="scrollbar-hidden mx-auto block max-h-64 min-h-16 w-[92%] resize-none overflow-y-auto border-0 border-b border-gray-300 px-4 text-[24px] leading-tight text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none md:w-[56%] md:text-[36px]"
+          className="scrollbar-hidden mx-auto block max-h-64 min-h-16 w-[98%] resize-none overflow-y-auto border-0 border-b border-gray-300 px-4 text-[24px] leading-tight text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none md:w-[56%] md:text-[36px]"
           onInput={(e) => {
             const target = e.currentTarget;
             target.style.height = "auto";
@@ -124,7 +122,7 @@ const InputResponseText = ({
         <div className="mx-auto mt-4 flex h-[25%] w-[96%] flex-col items-end pr-[4%] md:w-[60%]">
           <button
             onClick={handleSubmit}
-            className="w-[120px] rounded-4xl bg-[#005BC4] px-2 py-1 text-base font-bold text-white capitalize transition hover:bg-[#004aad] md:w-1/5 md:px-4 md:py-2"
+            className="w-[80px] rounded-4xl bg-[#005BC4] px-2 py-1 text-base font-bold text-white capitalize transition hover:bg-[#004aad] md:px-4 md:py-2"
           >
             {submitButtonText}
           </button>

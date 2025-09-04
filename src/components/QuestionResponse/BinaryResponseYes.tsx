@@ -25,7 +25,7 @@ const BinaryResponseYes = ({
         checked={checked}
         onChange={() => onChange(value)}
         className={[
-          "h-5 w-5 appearance-none rounded-full border-2 border-[#CFD3D9] bg-transparent",
+          "h-6 w-6 appearance-none rounded-full border-2 border-[#CFD3D9] bg-transparent",
           "checked:border-[6px] checked:border-[#005BC4]",
           "hover:bg-transparent",
           "outline-none focus:shadow-none focus:ring-0 focus:outline-none",

@@ -3,25 +3,25 @@ import QuestionTextandDescription from "../QuestionTextandDescription";
 import CenteredStack from "../layout/CenteredStack";
 import { PositionedBlock } from "../layout/PositionedBlock";
 import InputResponseText from "../questionresponse/InputResponseText";
+import ScreenRoot from "../layout/ScreenRoot";
+import { ResponseContainer } from "../layout/ResponseContainer";
 
-const TextScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
+const TextScreen = ({ surveyID, question }: QuestionProps) => {
   return (
-    <div className="border-black-500 relative z-20 mx-auto flex min-h-[700px] w-[98%] flex-col border-2">
+    <ScreenRoot>
       <CenteredStack>
         <PositionedBlock>
           <QuestionTextandDescription surveyID={surveyID} question={question} />
         </PositionedBlock>
-
-        <PositionedBlock>
+        <ResponseContainer>
           <InputResponseText
             inputPlaceholder={"Enter your response..."}
-            submitButtonText={"Submit"}
-            setCurrentQuestionIndex={setCurrentQuestionIndex}
+            submitButtonText={"OK"}
             question={question}
           />
-        </PositionedBlock>
+        </ResponseContainer>
       </CenteredStack>
-    </div>
+    </ScreenRoot>
   );
 };
 

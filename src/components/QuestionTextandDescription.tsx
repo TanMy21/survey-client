@@ -20,7 +20,7 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
   const actualTitleFontSize = isMobile ? titleFontSizeMobile : titleFontSize;
   const actualDescriptionFontSize = isMobile ? descriptionFontSizeMobile : descriptionFontSize;
 
-  const orderFontSize = titleFontSize * 0.6;
+  const orderFontSize = titleFontSize * 0.5;
   const circleSize = orderFontSize * 1.6;
 
   const nonOrderableTypes = ["WELCOME_SCREEN", "INSTRUCTIONS", "EMAIL_CONTACT", "END_SCREEN"];
@@ -34,17 +34,19 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
       <div className="mx-auto flex w-[92%] flex-col items-end justify-center md:w-[98%]">
         <div className="mx-auto flex w-full flex-row items-center justify-center gap-2">
           {!isNonOrderableType && currentDisplayIndex !== null && (
-            <div
-              className="mr-2 flex items-center justify-center rounded-full"
-              style={{
-                width: `${circleSize}px`,
-                height: `${circleSize}px`,
-                backgroundColor: "#0074EB",
-              }}
-            >
-              <p className="font-bold text-white" style={{ fontSize: orderFontSize || 20 }}>
-                {currentDisplayIndex}
-              </p>
+            <div className="flex h-[98%] w-[4%] items-center justify-center">
+              <div
+                className="mt-1 mr-2 flex items-center justify-center rounded-full"
+                style={{
+                  width: `${circleSize}px`,
+                  height: `${circleSize}px`,
+                  backgroundColor: "#0074EB",
+                }}
+              >
+                <p className="font-bold text-white" style={{ fontSize: orderFontSize || 20 }}>
+                  {currentDisplayIndex}
+                </p>
+              </div>
             </div>
           )}
 

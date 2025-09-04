@@ -6,10 +6,14 @@ import { useEffect } from "react";
 import CenteredStack from "../layout/CenteredStack";
 import { PositionedBlock } from "../layout/PositionedBlock";
 import QuestionTextandDescription from "../QuestionTextandDescription";
+import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
+import ScreenRoot from "../layout/ScreenRoot";
+import { ResponseContainer } from "../layout/ResponseContainer";
 
-const WelcomeScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
+const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
   const { questionPreferences } = question || {};
   const { setCanProceed } = useSurveyFlow();
+  const { goNext } = useFlowRuntime();
   const { handleFirstInteraction, handleClick, markSubmission, collectBehaviorData } =
     useBehavior();
 
@@ -23,31 +27,28 @@ const WelcomeScreen = ({ surveyID, question, setCurrentQuestionIndex }: Question
     markSubmission();
     const data = collectBehaviorData();
     console.log("📦 WelcomeScreen behavior data:", data);
-    setCurrentQuestionIndex?.((i) => i + 1);
+    handleFirstInteraction();
+    handleClick();
+    goNext();
   };
 
   return (
-    <div className="border-black-500 relative z-20 mx-auto flex min-h-[700px] w-[98%] flex-col border-2">
+    <ScreenRoot>
       <CenteredStack>
         <PositionedBlock>
           <QuestionTextandDescription surveyID={surveyID} question={question} />
         </PositionedBlock>
-
-        <PositionedBlock>
+        <ResponseContainer>
           <button
-            onClick={() => {
-              handleFirstInteraction();
-              handleClick();
-              handleNext();
-            }}
-            className="flex min-w-[12%] items-center justify-center rounded-4xl bg-[#005BC4] px-3 py-2 text-base font-bold text-white transition duration-200 hover:bg-[#005BC4] md:px-6 md:py-4"
+            onClick={handleNext}
+            className="tall:px-8 tall:py-5 tall:text-2xl flex min-w-[12%] items-center justify-center gap-2 rounded-4xl bg-[#005BC4] px-3 py-2 text-base font-bold text-white transition duration-200 hover:bg-[#005BC4] md:px-6 md:py-4"
           >
             <span className="mr-2">{buttonText}</span>
-            <MoveRight />
+            <MoveRight style={{ marginTop: "6%" }} />
           </button>
-        </PositionedBlock>
+        </ResponseContainer>
       </CenteredStack>
-    </div>
+    </ScreenRoot>
   );
 };
 

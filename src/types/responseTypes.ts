@@ -21,6 +21,11 @@ export interface SingleChoiceListProps {
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
+export interface MultipleChoiceContainerProps {
+  question?: Question;
+  setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
+}
+
 export interface MultipleChoiceListProps extends ResponseListProps {
   selectedOptions: { optionID: string; value: string }[];
   onToggle: (optionID: string, value: string) => void;
@@ -76,6 +81,18 @@ export interface BinaryResponseContainerProps {
   question: Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
   setCanProceed?: (val: boolean) => void;
+}
+
+export interface CustomCheckboxProps {
+  id: string;
+  checked: boolean;
+  onChange: () => void;
+  label?: string;
+}
+
+export interface HoverImagePreviewProps {
+  src: string;
+  alt?: string;
 }
 
 export interface ThreeDResponseContainerProps {

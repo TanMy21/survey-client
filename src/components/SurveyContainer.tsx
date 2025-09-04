@@ -8,13 +8,33 @@ import { LogoLoader } from "./loader/LogoLoader";
 const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
   const { data, isLoading, isError } = useFetchSurvey(surveyID);
 
-  // Build payload only when data is ready
   const payload = useMemo(() => {
     if (!data) return null;
+
+    const base = [...(data.questions ?? [])];
+
+    const consentScreen = {
+      questionID: "consent-screen",
+      type: "CONSENT",
+      order: -2,
+    } as any;
+
+    const welcomeIdx = base.findIndex((q) => q.type === "WELCOME_SCREEN");
+    if (welcomeIdx >= 0) {
+      const welcomeOrder = base[welcomeIdx].order ?? 0;
+      consentScreen.order = welcomeOrder + 0.5;
+      base.push(consentScreen);
+    } else {
+      consentScreen.order = -1e6;
+      base.push(consentScreen);
+    }
+
+    const questionsWithInjectedConsentScreen = base.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
     return {
       surveyID,
-      questions: data.questions, // as-is from backend
-      FlowCondition: data.FlowCondition, // as-is from backend
+      questions: questionsWithInjectedConsentScreen,
+      FlowCondition: data.FlowCondition,
     };
   }, [data, surveyID]);
 
