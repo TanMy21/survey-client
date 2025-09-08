@@ -57,11 +57,11 @@ const MediaOption = ({ option, isSelected, onSelect }: MediaOptionProps) => {
   return (
     <div
       onClick={onSelect}
-      className={`relative flex min-h-[160px] flex-1 cursor-pointer flex-col overflow-hidden rounded-4xl border-2 ${isSelected ? "border-[#005BC4] shadow-[0_0_0_4px_#D2DEFF]" : "border-[#F1F1F1]"} bg-[#F9F9F9] transition-shadow duration-200 hover:border-[#F9F9F9] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:min-h-[200px] xl:min-h-[240px]`}
+      className={`relative flex min-h-[240px] flex-1 cursor-pointer flex-col overflow-hidden rounded-4xl border-2 ${isSelected ? "border-[#005BC4] shadow-[0_0_0_4px_#D2DEFF]" : "border-[#F1F1F1]"} bg-[#F9F9F9] transition-shadow duration-200 hover:border-[#F9F9F9] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:min-h-[200px] xl:min-h-[240px]`}
     >
       {/* ✅ Image Section */}
       <div
-        className="relative flex h-[140px] w-full shrink-0 sm:h-[160px] md:h-[180px] xl:h-[200px]"
+        className="relative flex h-[240px] w-full shrink-0 sm:h-[160px] md:h-[180px] xl:h-[200px]"
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onMouseMove={handleMove}

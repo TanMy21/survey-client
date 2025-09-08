@@ -59,16 +59,16 @@ const RankList = ({ options }: RankListProps) => {
   };
 
   return (
-    <div className="flex w-3/5 origin-bottom flex-col">
+    <div className="flex w-full sm:w-3/5 origin-bottom flex-col">
       <div className="mx-auto flex w-full flex-col items-center justify-center gap-2 px-0 md:w-4/5 md:px-2">
-        <div className="mx-auto flex w-[92%] flex-col items-center p-1 md:w-full">
+        <div className="mx-auto flex w-full flex-col items-center p-1 md:w-full">
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="responses">
               {(provided) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="flex w-[92%] flex-col gap-2 md:w-4/5"
+                  className="flex w-full flex-col gap-2 md:w-4/5"
                 >
                   {localOptions?.map((option, index) => (
                     <Draggable key={option.optionID} draggableId={option.optionID} index={index}>

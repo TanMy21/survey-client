@@ -76,7 +76,7 @@ const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
   });
 
   return (
-    <div className="flex w-[60%] origin-bottom flex-col">
+    <div className="flex w-[100%] origin-bottom flex-col sm:w-[60%]">
       <div
         ref={containerRef}
         tabIndex={0}

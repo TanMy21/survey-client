@@ -11,12 +11,11 @@ const ThreeDModelScreen = ({ surveyID, question, setCurrentQuestionIndex }: Ques
   const showQuestion = question?.Model3D?.showQuestion;
 
   return (
-    <div className="border-black-500 relative z-20 mx-auto flex min-h-[700px] w-[98%] flex-col justify-center items-center
- border-2">
+    <div className="relative z-20 mx-auto flex w-full flex-col items-center justify-center sm:w-[98%] md:min-h-[700px]">
       {/* Question Section */}
-      <div className="flex w-[80%] gap-4 p-2">
+      <div className="w-sm:mt-[-2%] max-sm:scrollbar-hidden max-sm:fade-bottom tabp-s:w-[98%] tabp-m:w-[98%] tabp-l:w-[98%] mt-[2%] flex w-full gap-4 overflow-y-auto overscroll-none p-2 max-sm:max-h-[28vh] max-sm:overflow-y-auto max-sm:overscroll-contain sm:w-[80%]">
         {showQuestion && (
-          <div className="flex h-[98%] w-[96%] p-1">
+          <div className="tabp-s:w-full tabp-m:w-full tabp-l:w-full flex h-[98%] w-full p-1 sm:w-[96%]">
             <QuestionTextandDescription surveyID={surveyID} question={question} />
           </div>
         )}

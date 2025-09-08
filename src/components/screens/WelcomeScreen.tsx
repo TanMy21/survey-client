@@ -41,10 +41,15 @@ const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
         <ResponseContainer>
           <button
             onClick={handleNext}
-            className="tall:px-8 tall:py-5 tall:text-2xl flex min-w-[12%] items-center justify-center gap-2 rounded-4xl bg-[#005BC4] px-3 py-2 text-base font-bold text-white transition duration-200 hover:bg-[#005BC4] md:px-6 md:py-4"
+            className="group flex items-center justify-center gap-2 rounded-full bg-[#005BC4] px-6 py-3 text-lg font-bold text-white transition-all duration-300 ease-in-out hover:bg-[#004aa0] focus:ring-2 focus:ring-[#005BC4] focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none"
           >
-            <span className="mr-2">{buttonText}</span>
-            <MoveRight style={{ marginTop: "6%" }} />
+            <span className="transition-all duration-300 ease-in-out group-hover:mr-1">
+              {buttonText}
+            </span>
+
+            <div className="w-0 overflow-hidden opacity-0 transition-all duration-300 ease-in-out group-hover:w-6 group-hover:opacity-100">
+              <MoveRight className="h-6 w-6" />
+            </div>
           </button>
         </ResponseContainer>
       </CenteredStack>

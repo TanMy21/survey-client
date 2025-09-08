@@ -6,7 +6,7 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
   const isMobile = useIsMobile();
   const { currentDisplayIndex } = useFlowRuntime();
 
-  const { text, order, description, questionPreferences, type } = question || {};
+  const { text, description, questionPreferences, type } = question || {};
 
   const {
     titleFontSizeMobile,
@@ -26,15 +26,12 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
   const nonOrderableTypes = ["WELCOME_SCREEN", "INSTRUCTIONS", "EMAIL_CONTACT", "END_SCREEN"];
   const isNonOrderableType = nonOrderableTypes.includes(type!);
 
-  console.log("order number from be: ", order);
-  console.log("displaye number from flow: ", currentDisplayIndex);
-
   return (
     <div className="flex w-full origin-bottom flex-col">
       <div className="mx-auto flex w-[92%] flex-col items-end justify-center md:w-[98%]">
         <div className="mx-auto flex w-full flex-row items-center justify-center gap-2">
           {!isNonOrderableType && currentDisplayIndex !== null && (
-            <div className="flex h-[98%] w-[4%] items-center justify-center">
+            <div className="flex h-[98%] w-[12%] items-center justify-center sm:w-[4%]">
               <div
                 className="mt-1 mr-2 flex items-center justify-center rounded-full"
                 style={{

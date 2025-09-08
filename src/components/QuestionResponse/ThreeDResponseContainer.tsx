@@ -52,9 +52,9 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
   };
 
   return (
-    <div className="m-auto mt-4 flex h-[80%] w-[32%] gap-4">
+    <div className="m-auto mt-4 flex h-[80%] w-full gap-4 sm:w-[64%]">
       {/* Dislike Button */}
-      <div className="flex h-[96%] w-[48%] justify-center">
+      <div className="flex h-[96%] w-[48%] justify-start sm:justify-center">
         <button
           onClick={clickDislike}
           className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-all duration-150 ease-in-out hover:scale-105 hover:bg-red-600 active:scale-95"
@@ -65,7 +65,7 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
       </div>
 
       {/* Like Button */}
-      <div className="flex h-[96%] w-[48%] justify-center">
+      <div className="flex h-[96%] w-[48%] justify-end sm:justify-center">
         <button
           onClick={clickLike}
           className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-white shadow-md transition-all duration-150 ease-in-out hover:scale-105 hover:bg-green-600 active:scale-95"

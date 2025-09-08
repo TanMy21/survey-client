@@ -75,3 +75,28 @@ export const NON_FLOW_TYPES = new Set([
 export const END_SCREEN_TYPE: string = "END_SCREEN";
 
 export const isQuestionScreen = (t: QuestionType) => !NON_ORDERED_TYPES.has(t);
+
+export interface ScrollNavProps {
+  container: React.RefObject<HTMLElement | null>;
+  goNext: () => void;
+  goPrev: () => void;
+  canGoPrev: boolean;
+  canGoNext: boolean;
+  isEnd: boolean;
+  cooldownMs?: number;
+  wheelThreshold?: number;
+  touchThreshold?: number;
+}
+
+export interface SwipeNavProps {
+  container: React.RefObject<HTMLElement | null>;
+  goNext: () => void;
+  goPrev: () => void;
+  canGoPrev: boolean;
+  canGoNext: boolean;
+  isEnd: boolean;
+  cooldownMs?: number; // minimum ms between navigations
+  swipeThreshold?: number; // min px horizontal distance
+  dirBias?: number; // require |dx| >= dirBias * |dy|
+  mobileQuery?: string; // media query to decide "mobile"
+}

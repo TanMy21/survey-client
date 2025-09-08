@@ -37,7 +37,7 @@ const ThreeDViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDViewProp
       </div>
 
       {/* Action Buttons Section */}
-      <div className="flex h-16 w-[96%]">
+      <div className="flex h-24 w-[96%]">
         <ThreeDResponseContainer
           question={question}
           setCurrentQuestionIndex={setCurrentQuestionIndex}

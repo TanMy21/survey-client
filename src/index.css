@@ -49,7 +49,62 @@ button {
   /* Firefox */
 }
 
+.fade-bottom {
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
 /* tailwind */
+
+/* ---------- RANGES ---------- */
+/* Width */
+@custom-variant w-range (@media (min-width: 360px) and (max-width: 1920px));
+@custom-variant w-below (@media (max-width: 359.98px));
+@custom-variant w-above (@media (min-width: 1920.02px));
+
+/* Height */
+@custom-variant h-range (@media (min-height: 667px) and (max-height: 1366px));
+@custom-variant h-below (@media (max-height: 666.98px));
+@custom-variant h-above (@media (min-height: 1366.02px));
+
+/* ----------  width bands   ---------- */
+
+@custom-variant w-360 (@media (min-width: 360px) and (max-width: 374.98px));
+@custom-variant w-375 (@media (min-width: 375px) and (max-width: 389.98px));
+@custom-variant w-390 (@media (min-width: 390px) and (max-width: 411.98px));
+@custom-variant w-412 (@media (min-width: 412px) and (max-width: 413.98px));
+@custom-variant w-414 (@media (min-width: 414px) and (max-width: 429.98px));
+@custom-variant w-430 (@media (min-width: 430px) and (max-width: 767.98px));
+@custom-variant w-768 (@media (min-width: 768px) and (max-width: 819.98px));
+@custom-variant w-820 (@media (min-width: 820px) and (max-width: 1023.98px));
+@custom-variant w-1024 (@media (min-width: 1024px) and (max-width: 1279.98px));
+@custom-variant w-1280 (@media (min-width: 1280px) and (max-width: 1365.98px));
+@custom-variant w-1366 (@media (min-width: 1366px) and (max-width: 1919.98px));
+@custom-variant w-1920 (@media (min-width: 1920px));
+
+@custom-variant w-sm (@media (min-width:360px) and (max-width:699px));
+@custom-variant w-md (@media (min-width:700px) and (max-width:1023px));
+@custom-variant w-lg (@media (min-width:1024px));
+
+
+
+/* ---------- height bands ---------- */
+
+@custom-variant h-667 (@media (min-height: 667px) and (max-height: 719.98px));
+@custom-variant h-720 (@media (min-height: 720px) and (max-height: 739.98px));
+@custom-variant h-740 (@media (min-height: 740px) and (max-height: 767.98px));
+@custom-variant h-768 (@media (min-height: 768px) and (max-height: 843.98px));
+@custom-variant h-844 (@media (min-height: 844px) and (max-height: 895.98px));
+@custom-variant h-896 (@media (min-height: 896px) and (max-height: 914.98px));
+@custom-variant h-915 (@media (min-height: 915px) and (max-height: 931.98px));
+@custom-variant h-932 (@media (min-height: 932px) and (max-height: 1023.98px));
+@custom-variant h-1024 (@media (min-height: 1024px) and (max-height: 1079.98px));
+@custom-variant h-1080 (@media (min-height: 1080px) and (max-height: 1179.98px));
+@custom-variant h-1180 (@media (min-height: 1180px) and (max-height: 1365.98px));
+@custom-variant h-1366 (@media (min-height: 1366px));
+@custom-variant h-smm (@media (min-height:600px) and (max-height:799px));
+@custom-variant h-sm (@media (min-height:800px) and (max-height:1000px));
+@custom-variant h-lg (@media (min-height:1000px));
 
 
 @custom-variant tall (@media (min-height: 800px));
@@ -60,6 +115,22 @@ button {
   (max-height: 420px) and (min-width: 701px));
 @custom-variant wide (@media (min-width: 701px));
 
+
+/* ---------- Tablets ---------- */
+
+@custom-variant tabp-any (@media (min-width:600px) and (max-width:1023px) and (min-height:900px) and (max-height:1400px));
+
+/* Small tablets (7–8") — older Android, mini class */
+@custom-variant tabp-s (@media (min-width:600px) and (max-width:767px) and (min-height:900px) and (max-height:1199px));
+
+/* Medium tablets — iPad 9/10 gen, 11", many Android */
+@custom-variant tabp-m (@media (min-width:768px) and (max-width:849px) and (min-height:1024px) and (max-height:1299px));
+
+/* Large tablets — iPad Pro 12.9, big Android tabs */
+@custom-variant tabp-l (@media (min-width:850px) and (max-width:1024px) and (min-height:1180px) and (max-height:1400px));
+
+
+
 @utility scrollbar-hidden {
   &::-webkit-scrollbar {
     display: none;
@@ -69,6 +140,28 @@ button {
   /* IE and Edge */
   scrollbar-width: none;
   /* Firefox */
+}
+
+@layer base {
+  @keyframes shrink-bounce {
+    0% {
+      transform: scale(1);
+    }
+
+    33% {
+      transform: scale(0.85);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes draw-check {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
 }
 
 @media (prefers-color-scheme: light) {
@@ -99,7 +192,8 @@ button {
 /* Continuous subtle pulse while auto-submit is pending */
 .ff-pulse-loop {
   animation: ffPulseLoop 900ms ease-in-out infinite;
-  will-change: transform, background-color;
+  will-change: transform,
+  background-color;
 }
 
 @keyframes ffPulseLoop {
@@ -110,7 +204,7 @@ button {
 
   50% {
     transform: scale(1.03);
-    background-color: rgba(0, 91, 196, 0.06);
+
   }
 
   100% {
@@ -131,7 +225,7 @@ button {
 
   50% {
     transform: scale(1.05);
-    background-color: rgba(0, 91, 196, 0.10);
+
   }
 
   100% {
@@ -139,30 +233,8 @@ button {
   }
 }
 
-@keyframes shrink-bounce {
-  0% {
-    transform: scale(1);
-  }
 
-  33% {
-    transform: scale(0.85);
-  }
 
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* Draw the check stroke from 0 to full */
-@keyframes draw-check {
-  0% {
-    stroke-dashoffset: 20;
-  }
-
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
 
 .choice-wrapper,
 .choice-wrapper:focus,

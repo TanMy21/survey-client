@@ -10,12 +10,12 @@ const BinaryResponseYes = ({
   return (
     <div
       className={[
-        "mb-1.5 flex min-h-[72px] w-[84%] flex-row items-center gap-3 rounded-4xl",
+        "mb-1.5 flex min-h-[72px] w-[98%] flex-row items-center gap-3 rounded-4xl sm:w-[84%]",
         "border border-gray-300",
         "bg-[#f8f9fc] p-1 pl-4",
         "transition-colors duration-200",
         "hover:bg-[#f5f7ff]",
-        "md:min-h-[64px] md:w-full",
+        "cursor-pointer md:min-h-[64px] md:w-full",
       ].join(" ")}
     >
       <input
@@ -28,7 +28,7 @@ const BinaryResponseYes = ({
           "h-6 w-6 appearance-none rounded-full border-2 border-[#CFD3D9] bg-transparent",
           "checked:border-[6px] checked:border-[#005BC4]",
           "hover:bg-transparent",
-          "outline-none focus:shadow-none focus:ring-0 focus:outline-none",
+          "cursor-pointer outline-none focus:shadow-none focus:ring-0 focus:outline-none",
           "focus-visible:shadow-none focus-visible:ring-0 focus-visible:outline-none",
         ].join(" ")}
       />
@@ -40,6 +40,6 @@ const BinaryResponseYes = ({
   );
 };
 
-export default BinaryResponseYes;
+const BinaryResponseNo = BinaryResponseYes;
 
-export const BinaryResponseNo = BinaryResponseYes;
+export { BinaryResponseYes, BinaryResponseNo };

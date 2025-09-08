@@ -72,7 +72,7 @@ const InputResponseNumber = ({
   };
 
   return (
-    <div className="flex w-4/5 origin-bottom flex-col">
+    <div className="flex w-full sm:w-[92%] origin-bottom flex-col">
       <div className="mx-auto flex h-[40%] w-[98%] flex-col">
         {/* Input field */}
         <input

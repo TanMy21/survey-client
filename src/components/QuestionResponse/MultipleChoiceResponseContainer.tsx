@@ -76,7 +76,7 @@ const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerPr
   });
 
   return (
-    <div className="flex w-[60%] origin-bottom flex-col">
+    <div className="flex w-[100%] origin-bottom flex-col sm:w-[60%]">
       {/* ★ Pending auto-submit hint & cancel */}
       {isAutoSubmitting && (
         <div

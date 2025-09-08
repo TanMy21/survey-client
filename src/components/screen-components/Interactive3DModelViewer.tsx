@@ -67,10 +67,10 @@ export const Interactive3DModelViewer = ({
 
   return (
     <div
-      className="relative h-full w-full"
+      className="h-smm:h-[40vh] h-sm:h-[50vh] h-lg:h-[60vh] relative w-full"
       style={{
         background,
-        minHeight: 360,
+        minHeight: 200,
       }}
     >
       <Canvas

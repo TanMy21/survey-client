@@ -5,7 +5,7 @@ import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 const InstructionsList = ({ options }: ResponseListProps) => {
   const { goNext } = useFlowRuntime();
   return (
-    <div className="flex w-[90%] origin-bottom flex-col">
+    <div className="flex w-[98%] origin-bottom flex-col sm:w-[90%]">
       <div className="mx-auto flex w-full flex-col items-center justify-center gap-2 px-0 md:w-4/5 md:px-2">
         <div className="mx-auto flex w-[96%] flex-col items-center gap-2 p-1 md:w-full">
           {options?.map((option, index) => (

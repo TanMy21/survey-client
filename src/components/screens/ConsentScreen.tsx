@@ -65,7 +65,7 @@ const ConsentScreen = () => {
 
             <p className="mt-2 text-base text-gray-600 lg:mt-3">
               Before you begin, we’d like your consent to collect certain information to help us
-              improve user experience.
+              improve experience.
             </p>
 
             {/* Collection List */}
@@ -77,7 +77,7 @@ const ConsentScreen = () => {
                     <span className="flex w-6 flex-shrink-0 justify-center pt-0.5 text-lg text-blue-500">
                       {icon}
                     </span>
-                    <span className="text-base">{label}</span>
+                    <span className="mt-1 text-base">{label}</span>
                   </li>
                 ))}
               </ul>

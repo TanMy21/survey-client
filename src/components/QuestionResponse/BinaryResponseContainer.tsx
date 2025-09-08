@@ -6,14 +6,10 @@ import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 import { useCallback, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
-import BinaryResponseYes, { BinaryResponseNo } from "./BinaryResponseYes";
+import { BinaryResponseYes, BinaryResponseNo } from "./BinaryResponseYes";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 
-const BinaryResponseContainer = ({
-  question,
-  setCurrentQuestionIndex,
-  setCanProceed,
-}: BinaryResponseContainerProps) => {
+const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const { questionID, questionPreferences } = question;
   const [error, setError] = useState<string | null>(null);
@@ -44,17 +40,9 @@ const BinaryResponseContainer = ({
     const data = collectBehaviorData();
     console.log("📦 BinaryResponse behavior data:", data);
     console.log("Selected response:", selectedValue);
-    setCanProceed?.(true);
+
     onSubmitAnswer(selectedValue);
-  }, [
-    collectBehaviorData,
-    isRequired,
-    selectedValue,
-    setCanProceed,
-    setCurrentQuestionIndex,
-    markSubmission,
-    onSubmitAnswer,
-  ]);
+  }, [collectBehaviorData, isRequired, selectedValue, markSubmission, onSubmitAnswer]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
@@ -98,7 +86,7 @@ const BinaryResponseContainer = ({
   const fmtSeconds = (ms: number) => (ms / 1000).toFixed(1);
 
   return (
-    <div className="mx-auto flex h-full w-3/5 flex-col items-center justify-center gap-2 p-2">
+    <div className="mx-auto flex h-full w-full flex-col items-center justify-center gap-2 p-2 sm:w-4/5">
       {/* Pending auto-submit hint & cancel */}
       {isAutoSubmitting && (
         <div
@@ -125,7 +113,7 @@ const BinaryResponseContainer = ({
         aria-label="Binary response container"
         className="flex h-full w-[98%] flex-col gap-2 md:w-4/5"
       >
-        <div className="mx-auto flex h-full w-[80%] flex-col gap-2">
+        <div className="mx-auto flex h-full w-[98%] flex-col gap-2 sm:w-[80%]">
           {/* YES */}
           <div
             ref={yesRef}

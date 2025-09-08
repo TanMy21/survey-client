@@ -12,9 +12,9 @@ const ThreeDMobileViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDVi
   }, [url]);
 
   return (
-    <div className="mx-auto flex h-full w-[98%] flex-col gap-4">
+    <div className="tabp-l:w-full mx-auto flex h-full w-[98%] flex-col gap-4">
       {/* Action Buttons */}
-      <div className="flex h-[60px] w-[98%]">
+      <div className="flex h-[80px] w-[98%]">
         <ThreeDResponseContainer
           question={question}
           setCurrentQuestionIndex={setCurrentQuestionIndex}
@@ -22,7 +22,7 @@ const ThreeDMobileViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDVi
       </div>
 
       {/* 3D Viewer */}
-      <div className="flex h-[35vh] w-full">
+      <div className="flex h-[40vh] w-full">
         {/* {ready ? ( */}
         <Interactive3DModelViewer
           key={viewerUrl}

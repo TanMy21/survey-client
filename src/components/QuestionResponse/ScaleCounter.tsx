@@ -51,11 +51,11 @@ const ScaleCounter = ({ question, value, setValue }: SliderProps) => {
           aria-label="Decrement"
           className="text-gray-700 disabled:cursor-not-allowed disabled:opacity-30"
         >
-          <ChevronLeft size={24} />
+          <ChevronLeft size={36} />
         </button>
 
         {/* Animated number */}
-        <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden">
+        <div className="relative flex h-48 w-36 items-center justify-center overflow-hidden">
           <AnimatePresence initial={false} custom={direction} mode="wait">
             <motion.div
               key={value}
@@ -68,7 +68,7 @@ const ScaleCounter = ({ question, value, setValue }: SliderProps) => {
                 y: { type: "spring", stiffness: 300, damping: 30 },
                 opacity: { duration: 0.2 },
               }}
-              className="absolute text-4xl font-bold"
+              className="absolute text-8xl font-bold text-black"
             >
               {value}
             </motion.div>
@@ -82,7 +82,7 @@ const ScaleCounter = ({ question, value, setValue }: SliderProps) => {
           aria-label="Increment"
           className="text-gray-700 disabled:cursor-not-allowed disabled:opacity-30"
         >
-          <ChevronRight size={24} />
+          <ChevronRight size={36} />
         </button>
       </div>
     </div>

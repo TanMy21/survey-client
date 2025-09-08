@@ -95,7 +95,7 @@ const InputResponseText = ({
   }, []);
 
   return (
-    <div className="flex w-4/5 origin-bottom flex-col">
+    <div className="flex w-full origin-bottom flex-col sm:w-[92%]">
       <div className="mx-auto flex h-[60%] w-[100%] flex-col">
         {/* Input field  */}
         <textarea

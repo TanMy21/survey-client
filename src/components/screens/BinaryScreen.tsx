@@ -6,7 +6,7 @@ import BinaryResponseContainer from "../questionresponse/BinaryResponseContainer
 import ScreenRoot from "../layout/ScreenRoot";
 import { ResponseContainer } from "../layout/ResponseContainer";
 
-const BinaryScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
+const BinaryScreen = ({ surveyID, question }: QuestionProps) => {
   return (
     <ScreenRoot>
       <CenteredStack>
@@ -14,10 +14,7 @@ const BinaryScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionP
           <QuestionTextandDescription surveyID={surveyID} question={question} />
         </PositionedBlock>
         <ResponseContainer>
-          <BinaryResponseContainer
-            question={question!}
-            setCurrentQuestionIndex={setCurrentQuestionIndex}
-          />
+          <BinaryResponseContainer question={question!} />
         </ResponseContainer>
       </CenteredStack>
     </ScreenRoot>

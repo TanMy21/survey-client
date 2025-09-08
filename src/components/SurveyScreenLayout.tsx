@@ -8,14 +8,51 @@ import { useMemo, useRef } from "react";
 import { NON_FLOW_TYPES } from "@/types/flowTypes";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
 import SurveyNavigatorCompact from "./SurveyNavigatorCompact";
+import { useScrollNav } from "@/hooks/useScrollNav";
+import { useSwipeNav } from "@/hooks/useSwipeNav";
 
 const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
-  const { currentQuestion, currentQuestionID, currentDisplayIndex, visitedStack, flowEligible } =
-    useFlowRuntime();
+  const {
+    currentQuestion,
+    currentQuestionID,
+    currentDisplayIndex,
+    visitedStack,
+    flowEligible,
+    goNext,
+    onPrev,
+    canGoPrev,
+  } = useFlowRuntime();
   const { canProceed } = useSurveyFlow();
+  const isEnd = currentQuestion.type === "END_SCREEN";
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const visitedRef = useRef<string[]>([]);
   const backtrackCountMapRef = useRef<Map<string, number>>(new Map());
+
+  useScrollNav({
+    container: scrollRef,
+    goNext,
+    goPrev: onPrev,
+    canGoPrev,
+    canGoNext: canProceed,
+    isEnd,
+    cooldownMs: 600,
+    wheelThreshold: 100,
+    touchThreshold: 48,
+  });
+
+  useSwipeNav({
+    container: scrollRef,
+    goNext,
+    goPrev: onPrev,
+    canGoPrev,
+    canGoNext: canProceed,
+    isEnd,
+    cooldownMs: 500,
+    swipeThreshold: 56,
+    dirBias: 1.6,
+    mobileQuery: "(pointer:coarse)",
+  });
 
   // useEffect(() => {
   //   if (surveyID) quizSessionStarted(surveyID);
@@ -80,7 +117,11 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
       {/* Spacer div to prevent overlap due to fixed progress bar */}
       <div className="h-1" />
       <div className="flex min-h-screen w-full flex-col" style={backgroundStyle}>
-        <div className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 border-green-500">
+        <div
+          ref={scrollRef}
+          style={{ touchAction: "pan-y" }}
+          className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 border-green-500"
+        >
           <SlideMotion direction={"right"} keyProp={currentQuestionID}>
             <BehaviorTrackerProvider
               questionID={currentQuestionID}
