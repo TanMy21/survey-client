@@ -38,7 +38,7 @@ const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
         <PositionedBlock>
           <QuestionTextandDescription surveyID={surveyID} question={question} />
         </PositionedBlock>
-        <ResponseContainer>
+        <ResponseContainer className="md:mt-[-4%]">
           <button
             onClick={handleNext}
             className="group flex items-center justify-center gap-2 rounded-full bg-[#005BC4] px-6 py-3 text-lg font-bold text-white transition-all duration-300 ease-in-out hover:bg-[#004aa0] focus:ring-2 focus:ring-[#005BC4] focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none"

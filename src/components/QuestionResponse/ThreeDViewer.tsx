@@ -24,7 +24,7 @@ const ThreeDViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDViewProp
     <div className="flex h-full w-full flex-col items-center gap-4">
       {/* 3D Model Section */}
       <div className="flex max-h-[800px] w-[75%]">
-        <div className="m-auto flex h-[100%] w-[80%]">
+        <div className="m-auto flex h-[100%] w-[80%]" data-ignore-scrollnav>
           {viewerUrl && (
             <Interactive3DModelViewer
               questionID={question.questionID}

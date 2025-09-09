@@ -4,12 +4,14 @@ import QuestionRenderer from "./QuestionRenderer";
 import { BacktrackLogger } from "./BacktrackLogger";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { NON_FLOW_TYPES } from "@/types/flowTypes";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
 import SurveyNavigatorCompact from "./SurveyNavigatorCompact";
 import { useScrollNav } from "@/hooks/useScrollNav";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
+import { useHaptics } from "@/utils/utils";
+import { AnimatePresence, motion } from "motion/react";
 
 const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
   const {
@@ -28,6 +30,8 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
 
   const visitedRef = useRef<string[]>([]);
   const backtrackCountMapRef = useRef<Map<string, number>>(new Map());
+  const [navPulse, setNavPulse] = useState<"next" | "prev" | null>(null);
+  const { vibrate } = useHaptics();
 
   useScrollNav({
     container: scrollRef,
@@ -39,12 +43,27 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
     cooldownMs: 600,
     wheelThreshold: 100,
     touchThreshold: 48,
+    onNavigate: (dir) => {
+      setNavPulse(dir);
+      vibrate(8);
+      setTimeout(() => setNavPulse(null), 720);
+    },
   });
 
   useSwipeNav({
     container: scrollRef,
-    goNext,
-    goPrev: onPrev,
+    goNext: () => {
+      goNext();
+      setNavPulse("next");
+      vibrate(8);
+      setTimeout(() => setNavPulse(null), 720);
+    },
+    goPrev: () => {
+      onPrev();
+      setNavPulse("prev");
+      vibrate(8);
+      setTimeout(() => setNavPulse(null), 720);
+    },
     canGoPrev,
     canGoNext: canProceed,
     isEnd,
@@ -106,22 +125,39 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
-      {/* Full-width progress bar at top */}
       <div className="fixed top-0 left-0 z-50 h-1 w-full bg-gray-200">
         <div
           className="h-full bg-blue-500 transition-all duration-300"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
-
-      {/* Spacer div to prevent overlap due to fixed progress bar */}
+      {/* some gap */}
       <div className="h-1" />
+
       <div className="flex min-h-screen w-full flex-col" style={backgroundStyle}>
         <div
           ref={scrollRef}
           style={{ touchAction: "pan-y" }}
-          className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 border-green-500"
+          className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto pb-24 sm:pb-20"
         >
+          {/* <div className="pointer-events-none fixed top-[64px] left-1/2 z-[55] -translate-x-1/2">
+            <AnimatePresence>
+              {navPulse && (
+                <motion.div
+                  key={navPulse}
+                  initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                  transition={{ duration: 0.18 }}
+                  aria-live="polite"
+                  className="rounded-full bg-black/70 px-3 py-1.5 text-sm text-white shadow-lg backdrop-blur-sm"
+                >
+                  {navPulse === "next" ? "Next question" : "Previous question"}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div> */}
+
           <SlideMotion direction={"right"} keyProp={currentQuestionID}>
             <BehaviorTrackerProvider
               questionID={currentQuestionID}
@@ -137,9 +173,9 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
             </BehaviorTrackerProvider>
           </SlideMotion>
         </div>
-
-        <SurveyNavigatorCompact disableNext={!canProceed} />
       </div>
+
+      <SurveyNavigatorCompact disableNext={!canProceed} navPulse={navPulse} />
     </div>
   );
 };

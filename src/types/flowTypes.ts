@@ -86,6 +86,7 @@ export interface ScrollNavProps {
   cooldownMs?: number;
   wheelThreshold?: number;
   touchThreshold?: number;
+   onNavigate?: (dir: "next" | "prev") => void;
 }
 
 export interface SwipeNavProps {

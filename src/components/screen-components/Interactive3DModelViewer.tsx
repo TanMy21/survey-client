@@ -68,6 +68,7 @@ export const Interactive3DModelViewer = ({
   return (
     <div
       className="h-smm:h-[40vh] h-sm:h-[50vh] h-lg:h-[60vh] relative w-full"
+      data-ignore-scrollnav
       style={{
         background,
         minHeight: 200,

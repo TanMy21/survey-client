@@ -112,6 +112,12 @@ export interface QuestionTextandDescriptionProps {
   question?: Question;
 }
 
+export interface QuestionNumberProps {
+  currentDisplayIndex: number;
+  circleSize?: number;
+  orderFontSize?: number;
+}
+
 export interface MultipleChoiceFormData {
   selectedChoices: {
     [key: string]: boolean;

@@ -60,7 +60,7 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
           className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-all duration-150 ease-in-out hover:scale-105 hover:bg-red-600 active:scale-95"
           aria-label="delete"
         >
-          <X className="h-6 w-6 font-bold" />
+          <X className="h-6 w-6 font-bold md:h-8 md:w-8" />
         </button>
       </div>
 
@@ -71,7 +71,7 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
           className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-white shadow-md transition-all duration-150 ease-in-out hover:scale-105 hover:bg-green-600 active:scale-95"
           aria-label="like"
         >
-          <Heart className="h-5 w-5" />
+          <Heart className="h-5 w-5 font-bold md:h-8 md:w-8" />
         </button>
       </div>
 

@@ -11,6 +11,7 @@ export function useScrollNav({
   cooldownMs = 600,
   wheelThreshold = 100,
   touchThreshold = 48,
+  onNavigate,
 }: ScrollNavProps) {
   const accumRef = useRef(0);
   const lastFiredRef = useRef(0);
@@ -24,8 +25,13 @@ export function useScrollNav({
     const onCooldown = () => now() - lastFiredRef.current < cooldownMs;
     const fire = (dir: "next" | "prev") => {
       lastFiredRef.current = now();
-      if (dir === "next") goNext();
-      else goPrev();
+      if (dir === "next") {
+        goNext();
+      } else {
+        goPrev();
+      }
+
+      onNavigate?.(dir);
     };
 
     const isInputLike = (target: EventTarget | null) => {
@@ -108,5 +114,6 @@ export function useScrollNav({
     cooldownMs,
     wheelThreshold,
     touchThreshold,
+    onNavigate,
   ]);
 }

@@ -37,4 +37,5 @@ export type FlowContextType = {
 
 export interface SurveyNavigatorCompactProps {
   disableNext: boolean;
+  navPulse?: "next" | "prev" | null;
 }

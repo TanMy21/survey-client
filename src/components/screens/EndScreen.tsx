@@ -24,7 +24,7 @@ const EndScreen = ({ surveyID, question }: QuestionProps) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-center text-6xl font-bold text-[#005BC4] sm:text-2xl"
           >
             <QuestionTextandDescription surveyID={surveyID} question={question} />

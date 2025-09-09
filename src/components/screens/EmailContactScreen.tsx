@@ -13,7 +13,7 @@ const EmailContactScreen = ({ surveyID, question }: QuestionProps) => {
         <PositionedBlock>
           <QuestionTextandDescription surveyID={surveyID} question={question} />
         </PositionedBlock>
-        <ResponseContainer>
+        <ResponseContainer className="md:mt-[-4%]">
           <InputResponse
             inputPlaceholder={"Enter your email..."}
             submitButtonText={"OK"}

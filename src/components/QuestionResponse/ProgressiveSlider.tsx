@@ -72,7 +72,7 @@ const ProgressiveSlider = ({ question, value, setValue }: SliderProps) => {
             backgroundColor: mark.value <= value ? "#3777FE" : "#F0F4F8",
             boxShadow: value === mark.value ? "0 0 0 4px #D2DEFF" : "none",
           }}
-          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-200"
+          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full transition-all duration-200"
         />
       );
 
@@ -80,7 +80,7 @@ const ProgressiveSlider = ({ question, value, setValue }: SliderProps) => {
         <div
           key={`label-${mark.value}`}
           style={{ left: `${percent}%` }}
-          className={`absolute -translate-x-1/2 text-center text-xl whitespace-nowrap transition-all duration-200 ${
+          className={`absolute -translate-x-1/2 cursor-pointer text-center text-xl whitespace-nowrap transition-all duration-200 ${
             value === mark.value ? "font-bold text-blue-600" : "text-gray-500"
           }`}
         >
@@ -108,7 +108,7 @@ const ProgressiveSlider = ({ question, value, setValue }: SliderProps) => {
               background: getSegmentBackground(i, value, marks.length - 1, marks),
               borderRadius: `${segmentThickness / 2}px`,
             }}
-            className="absolute top-1/2 -translate-y-1/2"
+            className="absolute top-1/2 -translate-y-1/2 cursor-pointer"
           />
         );
       }
@@ -121,7 +121,7 @@ const ProgressiveSlider = ({ question, value, setValue }: SliderProps) => {
     <div className="w-full px-2 py-4">
       <div className="relative mb-3 h-10">
         {/* Track container with segments and ticks */}
-        <div className="pointer-events-none absolute top-1/2 left-0 w-full -translate-y-1/2">
+        <div className="pointer-events-none absolute top-1/2 left-0 w-full -translate-y-1/2 cursor-pointer">
           {sliderElements.segments}
           {sliderElements.visibleTicks}
         </div>
@@ -134,7 +134,7 @@ const ProgressiveSlider = ({ question, value, setValue }: SliderProps) => {
           max={max}
           step={1}
           onChange={handleSliderChange}
-          className="relative z-10 w-full appearance-none bg-transparent focus:outline-none"
+          className="relative z-10 w-full cursor-pointer appearance-none bg-transparent focus:outline-none"
           style={{
             height: "40px",
             pointerEvents: "auto",
@@ -159,7 +159,7 @@ const ProgressiveSlider = ({ question, value, setValue }: SliderProps) => {
       </div>
 
       {/* Labels */}
-      <div className="relative h-5">{sliderElements.labels}</div>
+      <div className="relative h-5 cursor-pointer">{sliderElements.labels}</div>
     </div>
   );
 };
