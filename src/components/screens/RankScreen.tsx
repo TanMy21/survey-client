@@ -1,8 +1,7 @@
 import type { QuestionProps } from "@/types/questionTypes";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import RankList from "../questionresponse/RankList";
+import RankList from "../QuestionResponse/RankList";
 import CenteredStack from "../layout/CenteredStack";
-import { PositionedBlock } from "../layout/PositionedBlock";
 import ScreenRoot from "../layout/ScreenRoot";
 import { ResponseContainer } from "../layout/ResponseContainer";
 
@@ -12,13 +11,11 @@ const RankScreen = ({ surveyID, question }: QuestionProps) => {
   return (
     <ScreenRoot>
       <CenteredStack>
-        <PositionedBlock>
-          <QuestionTextandDescription surveyID={surveyID} question={question} />
-        </PositionedBlock>
-        <ResponseContainer>
-          <RankList options={options!} />
-        </ResponseContainer>
+        <QuestionTextandDescription surveyID={surveyID} question={question} />
       </CenteredStack>
+      <ResponseContainer>
+        <RankList options={options!} />
+      </ResponseContainer>
     </ScreenRoot>
   );
 };

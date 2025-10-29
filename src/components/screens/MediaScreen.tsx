@@ -1,9 +1,8 @@
 import type { QuestionProps } from "@/types/questionTypes";
 import QuestionTextandDescription from "../QuestionTextandDescription";
-import MediaOptionsContainer from "../questionresponse/MediaOptionsContainer";
+import MediaOptionsContainer from "../QuestionResponse/MediaOptionsContainer";
 import ScreenRoot from "../layout/ScreenRoot";
 import CenteredStack from "../layout/CenteredStack";
-import { PositionedBlock } from "../layout/PositionedBlock";
 import { ResponseContainer } from "../layout/ResponseContainer";
 
 const MediaScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
@@ -13,18 +12,17 @@ const MediaScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionPr
   return (
     <ScreenRoot>
       <CenteredStack>
-        <PositionedBlock>
-          <QuestionTextandDescription surveyID={surveyID} question={question} />
-        </PositionedBlock>
-        <ResponseContainer>
-          <MediaOptionsContainer
-            options={options!}
-            multiSelect={multiSelect}
-            setCurrentQuestionIndex={setCurrentQuestionIndex}
-            question={question}
-          />
-        </ResponseContainer>
+        <QuestionTextandDescription surveyID={surveyID} question={question} />
       </CenteredStack>
+
+      <ResponseContainer>
+        <MediaOptionsContainer
+          options={options!}
+          multiSelect={multiSelect}
+          setCurrentQuestionIndex={setCurrentQuestionIndex}
+          question={question}
+        />
+      </ResponseContainer>
     </ScreenRoot>
   );
 };

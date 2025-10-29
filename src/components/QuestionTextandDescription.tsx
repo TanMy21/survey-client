@@ -3,6 +3,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import type { QuestionTextandDescriptionProps } from "@/types/questionTypes";
 import QuestionNumberCircle from "./QuestionNumberCircle";
 import QuestionNumberChip from "./QuestionNumberChip";
+import { htmlToPlainText } from "@/utils/utils";
 
 const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProps) => {
   const isMobile = useIsMobile();
@@ -30,8 +31,12 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
 
   return (
     <div className="flex w-full origin-bottom flex-col">
-      <div className="mx-auto flex w-[92%] flex-col items-end justify-center md:w-[98%]">
-        <div className="mx-auto flex w-full flex-col items-center justify-center gap-2 md:flex-row">
+      <div
+        className={`mx-auto flex w-[92%] flex-col justify-center md:w-[98%] ${
+          isNonOrderableType ? "items-center" : "items-center"
+        }`}
+      >
+        <div className="mx-auto flex w-full flex-col items-center justify-center gap-2 border-2 border-green-500 md:flex-row">
           {!isNonOrderableType &&
             currentDisplayIndex !== null &&
             (isMobile ? (
@@ -44,9 +49,13 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
               />
             ))}
 
-          <div className="flex flex-row items-center justify-start">
+          <div
+            className={`flex w-full flex-row items-center ${
+              isNonOrderableType ? "justify-center" : "justify-start"
+            }`}
+          >
             <p
-              className="w-full max-w-[80ch] text-start leading-[1.4] font-normal break-words whitespace-normal"
+              className={`w-full max-w-[80ch] leading-[1.4] font-normal break-words ${isNonOrderableType ? "text-center whitespace-nowrap" : "text-start whitespace-normal"}`}
               style={{
                 fontSize: `${actualTitleFontSize}px`,
                 color: titleFontColor || "black",
@@ -57,7 +66,7 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
                 hyphens: "auto",
               }}
             >
-              {text}
+              {htmlToPlainText(text)}
             </p>
           </div>
         </div>

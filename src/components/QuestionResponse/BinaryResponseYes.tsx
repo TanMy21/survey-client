@@ -10,7 +10,7 @@ const BinaryResponseYes = ({
   return (
     <div
       className={[
-        "mb-1.5 flex min-h-[72px] w-[98%] flex-row items-center gap-3 rounded-4xl sm:w-[84%]",
+        "mb-1.5 flex min-h-[72px] w-[98%] flex-row items-center gap-3 rounded-2xl sm:w-[84%]",
         "border border-gray-300",
         "bg-[#f8f9fc] p-1 pl-4",
         "transition-colors duration-200",

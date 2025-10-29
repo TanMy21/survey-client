@@ -11,7 +11,7 @@ import SurveyNavigatorCompact from "./SurveyNavigatorCompact";
 import { useScrollNav } from "@/hooks/useScrollNav";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
 import { useHaptics } from "@/utils/utils";
-import { AnimatePresence, motion } from "motion/react";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
   const {
@@ -27,7 +27,7 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
   const { canProceed } = useSurveyFlow();
   const isEnd = currentQuestion.type === "END_SCREEN";
   const scrollRef = useRef<HTMLDivElement>(null);
-
+  const isMobile = useIsMobile();
   const visitedRef = useRef<string[]>([]);
   const backtrackCountMapRef = useRef<Map<string, number>>(new Map());
   const [navPulse, setNavPulse] = useState<"next" | "prev" | null>(null);
@@ -131,33 +131,15 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
           style={{ width: `${progressPercent}%` }}
         />
       </div>
-      {/* some gap */}
+      {/* gap */}
       <div className="h-1" />
 
       <div className="flex min-h-screen w-full flex-col" style={backgroundStyle}>
         <div
           ref={scrollRef}
-          style={{ touchAction: "pan-y" }}
-          className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto pb-24 sm:pb-20"
+          style={{ touchAction: "pan-y", padding: isMobile ? "1px" : "2px" }}
+          className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 border-amber-500 pb-24 sm:p-1 sm:pb-20"
         >
-          {/* <div className="pointer-events-none fixed top-[64px] left-1/2 z-[55] -translate-x-1/2">
-            <AnimatePresence>
-              {navPulse && (
-                <motion.div
-                  key={navPulse}
-                  initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                  transition={{ duration: 0.18 }}
-                  aria-live="polite"
-                  className="rounded-full bg-black/70 px-3 py-1.5 text-sm text-white shadow-lg backdrop-blur-sm"
-                >
-                  {navPulse === "next" ? "Next question" : "Previous question"}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div> */}
-
           <SlideMotion direction={"right"} keyProp={currentQuestionID}>
             <BehaviorTrackerProvider
               questionID={currentQuestionID}

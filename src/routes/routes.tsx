@@ -3,7 +3,7 @@ import { createBrowserRouter } from "react-router";
 
 const router = createBrowserRouter([
   {
-    path: "/s/go/:shareID",
+    path: "/go/:shareID",
     element: <Survey /> /*errorElement: <ErrorPage /> */,
   },
 ]);

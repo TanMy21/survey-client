@@ -9,3 +9,12 @@ export const useHaptics = () => {
   };
   return { vibrate };
 };
+
+export function htmlToPlainText(html?: string | null): string {
+  if (!html) return "";
+  const div = document.createElement("div");
+  div.innerHTML = html;
+
+  const text = div.textContent || "";
+  return text.replace(/\u00A0/g, " ");
+}

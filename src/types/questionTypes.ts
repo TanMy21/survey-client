@@ -79,6 +79,12 @@ export interface Question {
   maxOptions: number;
   options: OptionType[];
   Model3D: Model3D;
+  questionImage?: boolean;
+  questionImageUrl?: string;
+  questionImageAltTxt?: string;
+  questionImagePublicId?: string;
+  questionImageWidth?: number;
+  questionImageHeight?: number;
   questionPreferences: QuestionPreferences;
   required: boolean;
 }
@@ -110,6 +116,14 @@ export interface QuestionType {
 export interface QuestionTextandDescriptionProps {
   surveyID?: string;
   question?: Question;
+}
+
+export interface QuestionImageContainerProps {
+  questionImageWidth?: number;
+  questionImageHeight?: number;
+  questionImageUrl?: string;
+  questionImageAltText?: string;
+  questionImage?: boolean;
 }
 
 export interface QuestionNumberProps {

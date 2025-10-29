@@ -2,8 +2,7 @@ import { useSurveyFlow } from "@/context/useSurveyFlow";
 import type { QuestionProps } from "@/types/questionTypes";
 import QuestionTextandDescription from "../QuestionTextandDescription";
 import CenteredStack from "../layout/CenteredStack";
-import { PositionedBlock } from "../layout/PositionedBlock";
-import InstructionsList from "../questionresponse/InstructionsList";
+import InstructionsList from "../QuestionResponse/InstructionsList";
 import ScreenRoot from "../layout/ScreenRoot";
 import { ResponseContainer } from "../layout/ResponseContainer";
 
@@ -15,13 +14,11 @@ const InstructionScreen = ({ surveyID, question }: QuestionProps) => {
   return (
     <ScreenRoot>
       <CenteredStack>
-        <PositionedBlock>
-          <QuestionTextandDescription surveyID={surveyID} question={question} />
-        </PositionedBlock>
-        <ResponseContainer>
-          <InstructionsList options={options!} />
-        </ResponseContainer>
+        <QuestionTextandDescription surveyID={surveyID} question={question} />
       </CenteredStack>
+      <ResponseContainer>
+        <InstructionsList options={options!} />
+      </ResponseContainer>
     </ScreenRoot>
   );
 };
