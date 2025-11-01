@@ -10,7 +10,8 @@ export interface FlowCondition {
 }
 
 export interface SurveyPayload {
-  surveyID: string;
+  surveyID?: string;
+  shareID?: string;
   questions: Question[];
   FlowCondition: FlowCondition[];
 }

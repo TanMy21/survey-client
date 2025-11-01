@@ -27,7 +27,8 @@ export interface ISurvey {
 }
 
 export interface SurveyContainerProps {
-  surveyID: string;
+  surveyID?: string;
+  shareID?: string;
 }
 
 export type FlowContextType = {

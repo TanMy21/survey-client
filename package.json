@@ -30,6 +30,7 @@
     "react-router": "^7.7.0",
     "tailwindcss": "^4.1.11",
     "three": "^0.179.1",
+    "uuid": "^13.0.0",
     "zod": "^4.0.8"
   },
   "devDependencies": {

@@ -2,11 +2,18 @@ import { FlowRuntimeProvider } from "@/context/FlowRuntimeProvider";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
 import SurveyScreenLayout from "./SurveyScreenLayout";
 import { useFetchSurvey } from "@/hooks/useSurvey";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { LogoLoader } from "./loader/LogoLoader";
+import { useCreateSession } from "@/hooks/useSession";
+import { useSession } from "@/context/useSessionContext";
+import { getOrCreateDeviceId } from "@/utils/deviceID";
+import { buildParticipantMeta } from "@/utils/fingerprint";
 
-const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
-  const { data, isLoading, isError } = useFetchSurvey(surveyID);
+const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
+  const { data, isLoading, isError } = useFetchSurvey(shareID!);
+  const { mutateAsync: createSession } = useCreateSession();
+  const { setSession } = useSession();
+  const createSessionOnceRef = useRef(false);
 
   const payload = useMemo(() => {
     if (!data) return null;
@@ -32,11 +39,27 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
     const questionsWithInjectedConsentScreen = base.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     return {
-      surveyID,
+      shareID,
       questions: questionsWithInjectedConsentScreen,
       FlowCondition: data.FlowCondition,
     };
-  }, [data, surveyID]);
+  }, [data, shareID]);
+
+  useEffect(() => {
+    if (!payload || isLoading || isError || createSessionOnceRef.current) return;
+
+    (async () => {
+      try {
+        const deviceID = getOrCreateDeviceId();
+        const meta = buildParticipantMeta();
+        const session = await createSession({ shareID: shareID!, deviceID, meta });
+        setSession(session);  
+        createSessionOnceRef.current = true; // only after success
+      } catch (e) {
+        console.error("Failed to create/get session", e);         
+      }
+    })();
+  }, [payload, isLoading, isError, shareID, createSession, setSession]);
 
   if (isLoading) {
     return (
@@ -56,7 +79,7 @@ const SurveyContainer = ({ surveyID }: SurveyContainerProps) => {
 
   return (
     <FlowRuntimeProvider payload={payload!}>
-      <SurveyScreenLayout surveyID={surveyID} />
+      <SurveyScreenLayout surveyID={shareID} />
     </FlowRuntimeProvider>
   );
 };

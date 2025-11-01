@@ -1,17 +1,17 @@
 import type { SessionArgs } from "@/types/sessionTypes";
 
-export const createSession = async ({ surveyID, participantID }: SessionArgs) => {
+export const createSession = async ({ shareID, deviceID, meta }: SessionArgs) => {
   try {
     const sessionCreated = await fetch(`${import.meta.env.VITE_BASE_URL}/ses/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ surveyID, participantID }),
+      body: JSON.stringify({ shareID, deviceID, meta }),
     });
 
     if (sessionCreated) {
-      return true;
+      return sessionCreated.json();
     } else {
       throw new Error("Failed to create session");
     }
