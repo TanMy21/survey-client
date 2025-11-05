@@ -8,18 +8,25 @@ import { InputError } from "../alert/ResponseErrorAlert";
 import MediaOption from "./MediaOption";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
 
 const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
   const isMobile = useIsMobile();
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<{ optionID: string; value: string }[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const optionRefMap = useRef<Record<string, HTMLDivElement | null>>({});
   const lastChangedIDRef = useRef<string | null>(null);
+  const submitRef = useRef<() => void | Promise<void>>(() => {});
   const { handleFirstInteraction, handleClick, markSubmission, collectBehaviorData } =
     useBehavior();
+
+  const stableSubmit = useCallback(() => submitRef.current(), []);
 
   const toggleSelect = useCallback(
     (optionID: string) => {
@@ -43,7 +50,7 @@ const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
     [options, handleClick, handleFirstInteraction, error]
   );
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (isRequired && selectedOptions.length === 0) {
       setError("Your response is required for this question");
       return;
@@ -57,8 +64,17 @@ const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
     const selectedValues = selectedOptions.map((o) => o.value);
     console.log("Selected Media Options:", selectedValues);
 
+    await mutateAsync({
+      questionID: question?.questionID!,
+      qType: question?.type!,
+      optionID: null,
+      response: selectedValues,
+      deviceID,
+      behavior: behaviorData,
+    });
+
     onSubmitAnswer(selectedValues);
-  }, [isRequired, selectedOptions, markSubmission, collectBehaviorData, onSubmitAnswer]);
+  }, [isRequired, selectedOptions, mutateAsync, markSubmission, collectBehaviorData, onSubmitAnswer]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
@@ -76,9 +92,10 @@ const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
     active: selectedOptions.length > 0,
     delayMs: 6000,
     feedbackMs: 180,
-    onSubmit: handleSubmit,
+    onSubmit: stableSubmit,
     getPulseTargets,
     vibrate: true,
+    deps: [selectedOptions],
   });
 
   const selectedSet = useMemo(() => {
@@ -93,6 +110,10 @@ const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
     },
     []
   );
+
+  useEffect(() => {
+    submitRef.current = handleSubmit;
+  }, [handleSubmit]);
 
   return (
     <div className="grid w-full gap-2 px-1 [@media(min-width:1200px)]:w-[120%]">

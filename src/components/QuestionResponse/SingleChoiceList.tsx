@@ -7,11 +7,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import SingleChoiceListItem from "./SingleChoiceListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
 
 const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedOptionID, setSelectedOptionID] = useState<string | null>(null);
@@ -26,7 +30,7 @@ const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
     collectBehaviorData,
   } = useBehavior();
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     const optionValue = options?.find((opt) => opt.optionID === selectedOptionID)?.value;
 
     if (isRequired && !optionValue) {
@@ -34,13 +38,24 @@ const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
       return;
     }
 
+    if (!question?.questionID || !deviceID || !selectedOptionID || !optionValue) return;
+
     markSubmission();
-    const data = collectBehaviorData();
-    console.log("📦 SingleChoiceList behavior data:", data);
+    const behavior = collectBehaviorData();
+    console.log("📦 SingleChoiceList behavior data:", behavior);
     console.log("Selected option value:", optionValue);
 
+    await mutateAsync({
+      questionID: question.questionID,
+      qType: question.type,
+      optionID: selectedOptionID,
+      response: optionValue,
+      deviceID,
+      behavior,
+    });
+
     onSubmitAnswer(optionValue!);
-  }, [options, selectedOptionID, isRequired, markSubmission, collectBehaviorData]);
+  }, [options, selectedOptionID, isRequired, markSubmission,mutateAsync, collectBehaviorData]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 

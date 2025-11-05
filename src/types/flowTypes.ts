@@ -16,7 +16,11 @@ export interface SurveyPayload {
   FlowCondition: FlowCondition[];
 }
 
-export type AnswerPrimitive = string | number | string[] | null;
+export type AnswerPrimitive = string | number | string[] | boolean | number[] | null;
+
+export type AnswerValue = string | number | boolean | string[] | number[] | null;
+
+export type RuleValue = string | number | boolean | (string | number | boolean)[];
 
 export interface FlowEvaluators {
   [questionType: string]: {
@@ -47,6 +51,7 @@ export interface UseFlowControllerApi {
   onSubmitAnswer: (answer: AnswerPrimitive) => void;
   onPrev: () => void;
   goNext: () => void;
+  registerBeforeNext: (fn: () => void) => void;
   getDisplayIndex: (qid: string) => number | null;
   canGoPrev: boolean;
   isTerminal: boolean;

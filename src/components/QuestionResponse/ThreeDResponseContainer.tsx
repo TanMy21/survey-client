@@ -5,12 +5,17 @@ import { Heart, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
+import { useSubmitResponse } from "@/hooks/useSurvey";
+import { useDeviceId } from "@/hooks/useDeviceID";
 
 const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const { questionID, type } = question;
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
 
   const {
     handleFirstInteraction,
@@ -20,26 +25,48 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
     collectBehaviorData,
   } = useBehavior();
 
-  const handleSubmit = useCallback(() => {
-    if (isRequired && selectedValue === null) {
-      setError("Your response is required for this question");
-      return;
-    }
-    markSubmission();
-    const data = collectBehaviorData();
-    const three = (window as any).__r3f_collect__?.();
-    console.log("📦 Three D Model behavior data:", three);
-    console.log("📦 Three D Response behavior data:", data);
-    console.log("Selected response:", selectedValue);
-    onSubmitAnswer(selectedValue);
-  }, [collectBehaviorData, isRequired, selectedValue, markSubmission]);
+  const handleSubmit = useCallback(
+    async (value: "LIKE" | "DISLIKE") => {
+      if (isRequired && value == null) return;
+      if (!deviceID || !questionID) return;
+
+      markSubmission();
+
+      const data = collectBehaviorData();
+      const three = (window as any).__r3f_collect__?.();
+      console.log("📦 Three D Model behavior data:", three);
+      console.log("📦 Three D Response behavior data:", data);
+      console.log("Selected response:", value);
+
+      await mutateAsync({
+        deviceID,
+        questionID,
+        optionID: null,
+        qType: type,
+        response: value,
+        behavior: data,
+      });
+
+      onSubmitAnswer(value);
+    },
+    [
+      collectBehaviorData,
+      deviceID,
+      questionID,
+      type,
+      isRequired,
+      mutateAsync,
+      markSubmission,
+      onSubmitAnswer,
+    ]
+  );
 
   const clickLike = () => {
     handleFirstInteraction();
     handleClick();
     handleOptionChange();
     setSelectedValue("LIKE");
-    handleSubmit();
+    void handleSubmit("LIKE");
     setError(null);
   };
   const clickDislike = () => {
@@ -47,7 +74,7 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
     handleClick();
     handleOptionChange();
     setSelectedValue("DISLIKE");
-    handleSubmit();
+    void handleSubmit("DISLIKE");
     setError(null);
   };
 

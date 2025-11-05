@@ -153,7 +153,8 @@ export interface UseAutoSubmitPulseOptions {
   feedbackMs?: number;
   onSubmit: () => void;
   getPulseTargets: GetPulseTargets;
-  vibrate?: boolean;
+  vibrate?: boolean; 
+  deps?: any[];
 }
 export interface SetInitialViewParams {
   camera: THREE.PerspectiveCamera;

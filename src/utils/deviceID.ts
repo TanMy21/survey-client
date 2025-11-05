@@ -5,7 +5,7 @@
  * - Used to identify a participant device for public surveys
  */
 
-const LS_KEY = "ff_cid";
+export const LS_DID_KEY = "ff_cid";
 
 /** Read cookie by name */
 function getCookie(name: string) {
@@ -26,7 +26,7 @@ function setCookie(name: string, value: string, days = 3650) {
  * If none exists, a new one is generated and saved.
  */
 export function getOrCreateDeviceId(): string {
-  let id = localStorage.getItem(LS_KEY) || getCookie(LS_KEY);
+  let id = localStorage.getItem(LS_DID_KEY) || getCookie(LS_DID_KEY);
 
   // generate if missing
   if (!id) {
@@ -35,12 +35,12 @@ export function getOrCreateDeviceId(): string {
         ? crypto.randomUUID()
         : Math.random().toString(36).substring(2) + Date.now().toString(36);
 
-    localStorage.setItem(LS_KEY, id);
-    setCookie(LS_KEY, id);
+    localStorage.setItem(LS_DID_KEY, id);
+    setCookie(LS_DID_KEY, id);
   } else {
     // ensure both stores are populated (sync)
-    localStorage.setItem(LS_KEY, id);
-    setCookie(LS_KEY, id);
+    localStorage.setItem(LS_DID_KEY, id);
+    setCookie(LS_DID_KEY, id);
   }
 
   return id;

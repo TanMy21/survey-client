@@ -138,32 +138,108 @@ export function useFlowController(payload: SurveyPayload): UseFlowControllerApi 
   //   [state.displayIndexMap]
   // );
 
-  const goNext = useCallback(() => {
-    setState((s) => {
-      const idx = s.navIndexById[s.currentQuestionID];
-      const nextNode = idx != null ? s.navAll[idx + 1] : undefined;
-      const nextQID = nextNode?.questionID ?? terminalTargetQuestionID(s) ?? s.currentQuestionID;
-      if (!nextQID || nextQID === s.currentQuestionID) return s;
-      return pushForward(s, nextQID);
-    });
+
+
+    const beforeNextRef = useRef<Array<() => Promise<void> | void>>([]);
+  const isAdvancingRef = useRef(false);
+
+  const registerBeforeNext = useCallback((fn: () => Promise<void> | void) => {
+    beforeNextRef.current.push(fn);
+    return () => {
+      beforeNextRef.current = beforeNextRef.current.filter(f => f !== fn);
+    };
   }, []);
+
+
+
+  // CHANGE: add a shared "advanceTo" that ALWAYS runs beforeNext hooks
+const advanceTo = useCallback(
+  async (computeNextQID: (s: FlowRuntimeState) => string | null) => {
+    if (isAdvancingRef.current) return;
+    isAdvancingRef.current = true;
+    try {
+      for (const fn of beforeNextRef.current) await fn(); // CHANGE: run interceptors
+      setState((s) => {
+        const nextQID = computeNextQID(s) ?? s.currentQuestionID;
+        if (!nextQID || nextQID === s.currentQuestionID) return s;
+        return pushForward(s, nextQID);
+      });
+    } finally {
+      isAdvancingRef.current = false;
+    }
+  },
+  [setState]
+);
+
+// CHANGE: make goNext use advanceTo
+const goNext = useCallback(() => {
+  return advanceTo((s) => {
+    const idx = s.navIndexById[s.currentQuestionID];
+    const nextNode = idx != null ? s.navAll[idx + 1] : undefined;
+    return nextNode?.questionID ?? terminalTargetQuestionID(s);
+  });
+}, [advanceTo]);
+
+
+  // const goNext = useCallback(async() => {
+
+  //   if (isAdvancingRef.current) return;        // prevent double-advance
+  //   isAdvancingRef.current = true;
+  //  try {
+  //     // --- NEW: run pre-hooks (flush behavior, etc.) ---
+  //     for (const fn of beforeNextRef.current) {
+  //       // each may be sync or async
+  //       await fn();
+  //     }
+  //     // -------------------------------------------------
+
+  //     // your existing state transition
+  //     setState((s) => {
+  //       const idx = s.navIndexById[s.currentQuestionID];
+  //       const nextNode = idx != null ? s.navAll[idx + 1] : undefined;
+  //       const nextQID = nextNode?.questionID ?? terminalTargetQuestionID(s) ?? s.currentQuestionID;
+  //       if (!nextQID || nextQID === s.currentQuestionID) return s;
+  //       return pushForward(s, nextQID);
+  //     });
+  //   } finally {
+  //     isAdvancingRef.current = false;
+  //   }
+  // }, [setState]);
+
+
+
+
 
   const currentQObj = currentQuestion(state);
   const isTerminal =
     terminalTargetQuestionID(state) === state.currentQuestionID ||
     naturalNextQuestionID(state, state.currentQuestionID) === null;
 
+  // const onSubmitAnswer = useCallback(
+  //   (answer: AnswerPrimitive) => {
+  //     setState((s) => {
+  //       const q = s.flowEligible[s.indexByQuestionID[s.currentQuestionID]];
+  //       const nextQID = evaluateNextQuestionID(s, q, answer) ?? s.currentQuestionID;
+  //       if (!nextQID || nextQID === s.currentQuestionID) return s;
+  //       return pushForward(s, nextQID);
+  //     });
+  //   },
+  //   [setState]
+  // );
+
   const onSubmitAnswer = useCallback(
-    (answer: AnswerPrimitive) => {
-      setState((s) => {
-        const q = s.flowEligible[s.indexByQuestionID[s.currentQuestionID]];
-        const nextQID = evaluateNextQuestionID(s, q, answer) ?? s.currentQuestionID;
-        if (!nextQID || nextQID === s.currentQuestionID) return s;
-        return pushForward(s, nextQID);
-      });
-    },
-    [setState]
-  );
+  (answer: AnswerPrimitive) => {
+    return advanceTo((s) => {
+      const qIdx = s.indexByQuestionID[s.currentQuestionID];
+      if (qIdx == null) return null;
+      const q = s.flowEligible[qIdx];
+      return evaluateNextQuestionID(s, q, answer);  // CHANGE: now array-aware
+    });
+  },
+  [advanceTo]
+);
+
+
 
   const onPrev = useCallback(() => {
     setState((s) => {
@@ -202,7 +278,7 @@ export function useFlowController(payload: SurveyPayload): UseFlowControllerApi 
     currentDisplayIndex,
     onSubmitAnswer,
     onPrev,
-    goNext,
+    goNext, registerBeforeNext,
     getDisplayIndex: () => null,
     canGoPrev: state.cursor > 0,
     isTerminal,

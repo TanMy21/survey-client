@@ -5,10 +5,15 @@ import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-p
 import { useState } from "react";
 import RankListItem from "./RankListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
 
-const RankList = ({ options }: RankListProps) => {
+const RankList = ({ options, question }: RankListProps) => {
   const [localOptions, setLocalOptions] = useState<OptionType[]>(options);
+  const [error, setError] = useState<string | null>(null);
   const { onSubmitAnswer } = useFlowRuntime();
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const {
     handleFirstInteraction,
     handleClick,
@@ -16,7 +21,7 @@ const RankList = ({ options }: RankListProps) => {
     markSubmission,
     collectBehaviorData,
   } = useBehavior();
-
+  
   const handleDragEnd = async (result: DropResult) => {
     const { source, destination } = result;
     if (!destination || source.index === destination.index) return;
@@ -43,23 +48,40 @@ const RankList = ({ options }: RankListProps) => {
     //   .catch((err) => console.error("Order update error:", err));
   };
 
-  const handleSubmit = () => {
-    const rankedData = localOptions.map(({ optionID, text, order }) => ({
-      optionID,
-      value: text,
-      order,
+  const handleSubmit = async () => {
+    console.log("Submitting ranked options:", localOptions);
+    const rankedData = localOptions.map((o, idx) => ({
+      optionID: o.optionID,
+      value: o.text ?? o.value,
+      rank: idx + 1,
     }));
 
+    // if (!question?.questionID || !deviceID) return;
+
     markSubmission();
-    const data = collectBehaviorData();
-    console.log("📦 RankScreen behavior data:", data);
+    const behavior = collectBehaviorData();
+    console.log("📦 RankScreen behavior data:", behavior);
     console.log("User Ranked Options:", rankedData);
     const rankings = rankedData.map((o) => o.value);
-    onSubmitAnswer(rankings);
+
+    try {
+      await mutateAsync({
+        questionID: question?.questionID!,
+        qType: question?.type!,
+        optionID: null,
+        response: rankedData,
+        deviceID,
+        behavior,
+      });
+      onSubmitAnswer(rankings);
+    } catch (e) {
+      console.error("[RankList] submit failed:", e);
+      setError("Failed to submit ranking. Please try again.");
+    }
   };
 
   return (
-    <div className="flex w-full sm:w-3/5 origin-bottom flex-col">
+    <div className="flex w-full origin-bottom flex-col sm:w-3/5">
       <div className="mx-auto flex w-full flex-col items-center justify-center gap-2 px-0 md:w-4/5 md:px-2">
         <div className="mx-auto flex w-full flex-col items-center p-1 md:w-full">
           <DragDropContext onDragEnd={handleDragEnd}>

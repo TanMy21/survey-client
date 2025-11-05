@@ -6,6 +6,8 @@ import { numberResponseSchema } from "@/utils/validationSchema";
 import { useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
 
 const InputResponseNumber = ({
   inputPlaceholder,
@@ -16,6 +18,8 @@ const InputResponseNumber = ({
   const [number, setNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { onSubmitAnswer } = useFlowRuntime();
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const { handleFirstInteraction, handleTyping, handlePaste, markSubmission, collectBehaviorData } =
     useBehavior();
 
@@ -29,7 +33,7 @@ const InputResponseNumber = ({
     handlePaste();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const trimmed = number.trim();
     const result = numberResponseSchema.safeParse({ number: trimmed });
 
@@ -38,16 +42,29 @@ const InputResponseNumber = ({
       return;
     }
 
+    if (!question?.questionID || !deviceID) return;
+
     if (!result.success) {
       setError(result.error.format().number?._errors[0] ?? "Invalid input");
     } else {
       setError(null);
 
       markSubmission();
-      const data = collectBehaviorData();
-      console.log("📦 Number input behavior data:", data);
+      const behavior = collectBehaviorData();
+      console.log("📦 Number input behavior data:", behavior);
       console.log("Input submitted:", number);
+
+      await mutateAsync({
+        questionID: question.questionID,
+        qType: question.type,
+        optionID: null,
+        response: number,
+        deviceID,
+        behavior,
+      });
+
       onSubmitAnswer(number);
+      setNumber("");
     }
   };
 
@@ -72,7 +89,7 @@ const InputResponseNumber = ({
   };
 
   return (
-    <div className="flex w-full sm:w-[92%] origin-bottom flex-col">
+    <div className="flex w-full origin-bottom flex-col sm:w-[92%]">
       <div className="mx-auto flex h-[40%] w-[98%] flex-col">
         {/* Input field */}
         <input

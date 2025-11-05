@@ -7,16 +7,23 @@ import type { MultipleChoiceContainerProps } from "@/types/responseTypes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import MultipleChoiceList from "./MultipleChoiceList";
 import { InputError } from "../alert/ResponseErrorAlert";
+import { useSubmitResponse } from "@/hooks/useSurvey";
+import { useDeviceId } from "@/hooks/useDeviceID";
 
 const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const [selectedOptions, setSelectedOptions] = useState<{ optionID: string; value: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const optionRefMap = useRef<Record<string, HTMLDivElement | null>>({});
+  const submitRef = useRef<() => void | Promise<void>>(() => {});
   const lastChangedIDRef = useRef<string | null>(null);
+
+  const stableSubmit = useCallback(() => submitRef.current(), []);
 
   const {
     handleFirstInteraction,
@@ -41,17 +48,27 @@ const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerPr
     });
   };
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (isRequired && selectedOptions.length === 0) {
       setError("Your response is required for this question");
       return;
     }
 
     markSubmission();
-    const data = collectBehaviorData();
-    console.log("📦 MultipleChoiceScreen behavior data:", data);
+    const behaviorData = collectBehaviorData();
+    console.log("📦 MultipleChoiceScreen behavior data:", behaviorData);
     console.log("Selected Options:", selectedOptions);
     const selectedValues = selectedOptions.map((o) => o.value);
+
+    await mutateAsync({
+      questionID: question?.questionID!,
+      qType: question?.type!,
+      optionID: null,
+      response: selectedValues,
+      deviceID,
+      behavior: behaviorData,
+    });
+
     onSubmitAnswer(selectedValues);
   }, [isRequired, selectedOptions, markSubmission, collectBehaviorData, onSubmitAnswer]);
 
@@ -70,10 +87,15 @@ const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerPr
     active: selectedOptions.length > 0,
     delayMs: 4000,
     feedbackMs: 180,
-    onSubmit: handleSubmit,
+    onSubmit: stableSubmit,
     getPulseTargets,
     vibrate: true,
+    deps: [selectedOptions],
   });
+
+  useEffect(() => {
+    submitRef.current = handleSubmit;
+  }, [handleSubmit]);
 
   return (
     <div className="flex w-[100%] origin-bottom flex-col sm:w-[60%]">

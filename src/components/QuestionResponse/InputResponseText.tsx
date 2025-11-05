@@ -5,6 +5,8 @@ import { textResponseSchema } from "@/utils/validationSchema";
 import { useEffect, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
 
 const InputResponseText = ({
   inputPlaceholder,
@@ -14,6 +16,8 @@ const InputResponseText = ({
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const { onSubmitAnswer } = useFlowRuntime();
 
   const {
@@ -26,7 +30,7 @@ const InputResponseText = ({
     collectBehaviorData,
   } = useBehavior();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const trimmed = text.trim();
     const result = textResponseSchema.safeParse({ text: trimmed });
 
@@ -35,6 +39,8 @@ const InputResponseText = ({
       return;
     }
 
+    if (!question?.questionID || !deviceID) return;
+
     if (!result.success) {
       const errorMessage = result.error.format().text?._errors?.[0] ?? "Invalid input";
       setError(errorMessage);
@@ -42,9 +48,18 @@ const InputResponseText = ({
       setError(null);
       handleClick();
       markSubmission();
-      const data = collectBehaviorData();
-      console.log("📦 TextScreen behavior data:", data);
+      const behavior = collectBehaviorData();
+      console.log("📦 TextScreen behavior data:", behavior);
       console.log("Submitted response:", text);
+      await mutateAsync({
+        questionID: question.questionID,
+        qType: question.type,
+        optionID: null,
+        response: text,
+        deviceID,
+        behavior,
+      });
+
       onSubmitAnswer(text);
       setText("");
     }

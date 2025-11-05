@@ -1,7 +1,9 @@
 import { collectionItems } from "@/constants/collectionItems";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
+import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
+import { useRecordConsent } from "@/hooks/useSurvey";
 import { useEffect, useRef, useState } from "react";
 
 const ConsentScreen = () => {
@@ -11,12 +13,26 @@ const ConsentScreen = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   setCanProceed(false);
 
-  const handleSubmit = () => {
-    if (!agreed) return;
+  const deviceID = useDeviceId();
+  const { mutate, isPending } = useRecordConsent();
 
-    console.log("User consented to data collection.");
-    setCanProceed(true);
-    goNext();
+  const handleSubmit = () => {
+    if (!agreed || !deviceID) return;
+
+    const consentedAtClient = new Date().toISOString();
+    mutate(
+      {
+        deviceID,
+        consentGiven: true,
+        consentTimestamp: consentedAtClient,
+      },
+      {
+        onSuccess: () => {
+          setCanProceed(true);
+          goNext();
+        },
+      }
+    );
   };
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);

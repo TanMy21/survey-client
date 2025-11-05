@@ -6,12 +6,16 @@ import { useState } from "react";
 import ProgressiveSlider from "./ProgressiveSlider";
 import ScaleCounter from "./ScaleCounter";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
 
 const RangeResponse = ({ question }: RangeResponseProps) => {
   const isMobile = useIsMobile();
   const { minValue, maxValue } = question.questionPreferences?.uiConfig || {};
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
   const [selectedValue, setSelectedValue] = useState(Math.ceil((minValue + maxValue) / 2));
 
@@ -30,16 +34,26 @@ const RangeResponse = ({ question }: RangeResponseProps) => {
     setSelectedValue(value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isRequired && selectedValue === null) {
       setError("Your response is required for this question");
       return;
     }
 
     markSubmission();
-    const data = collectBehaviorData();
-    console.log("📦 RangeScreen behavior data:", data);
+    const behavior = collectBehaviorData();
+    console.log("📦 RangeScreen behavior data:", behavior);
     console.log("Submitted Range Value:", selectedValue);
+
+    await mutateAsync({
+      questionID: question.questionID,
+      qType: question.type,
+      optionID: null,
+      response: selectedValue,
+      deviceID,
+      behavior,
+    });
+
     onSubmitAnswer(selectedValue);
   };
 

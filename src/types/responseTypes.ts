@@ -3,11 +3,14 @@ import type { Question } from "./questionTypes";
 
 export interface ResponseData {
   surveyID?: string;
+  deviceID: string;
   questionID: string;
   qType: string | null;
   optionID: string | null;
-  response: string | number | number[] | null;
+  response: string | string[] | number | number[] | null | Record<string, unknown>              
+          | Array<Record<string, unknown>>  ;
   participantID?: string | null;
+  behavior?: any;
 }
 
 export interface ResponseListProps {
@@ -149,3 +152,50 @@ export interface ThreeDViewProps {
   showQuestion?: boolean;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
+
+
+export type RecordConsentPayload = {
+  deviceID: string;              
+  consentGiven: boolean;             
+  consentTimestamp?: string;    
+};
+
+export type RecordConsentResponse = {
+  deviceID: string;
+  consentGiven: boolean;
+  consentTimestamp: string | null;      
+};
+
+export type EmailResponsePayload = {
+  deviceID: string;          
+  questionID: string;          
+  email: string;   
+  behavior?: any;     
+ };
+
+export type EmailResponseResult = {
+  id: string;
+  questionId: string;
+  storedAt: string;            
+};
+
+type Register =
+  | ((fn: () => void | Promise<void>) => void)
+  | ((fn: () => void | Promise<void>) => () => void);
+
+export type BehaviorArgs = {
+  registerBeforeNext:Register;
+  collectBehaviorData: () => unknown;
+  questionID: string;
+  deviceID: string;
+};
+
+
+export type SubmitResponsePayload = {
+  questionID: string;            
+  qType: string; 
+  value: unknown;               
+  deviceID?: string;            
+  behavior?: unknown;           
+};
+

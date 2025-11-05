@@ -8,6 +8,8 @@ import { useCallback, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { BinaryResponseYes, BinaryResponseNo } from "./BinaryResponseYes";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
 
 const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
@@ -15,10 +17,12 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "Yes";
   const buttonTextNo = questionPreferences.uiConfig?.buttonTextNo || "No";
 
-  const autoSubmitDelayMs = 2500;
+  const autoSubmitDelayMs = 2000;
 
   const yesRef = useRef<HTMLDivElement | null>(null);
   const noRef = useRef<HTMLDivElement | null>(null);
@@ -31,18 +35,30 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
     collectBehaviorData,
   } = useBehavior();
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (isRequired && selectedValue === null) {
       setError("Your response is required for this question");
       return;
     }
+
+    if (!deviceID || !questionID || !selectedValue) return;
+
     markSubmission();
     const data = collectBehaviorData();
     console.log("📦 BinaryResponse behavior data:", data);
     console.log("Selected response:", selectedValue);
 
+    await mutateAsync({
+      deviceID,
+      questionID,
+      optionID: null,
+      qType: question.type,
+      response: selectedValue,
+      behavior: data,
+    });
+
     onSubmitAnswer(selectedValue);
-  }, [collectBehaviorData, isRequired, selectedValue, markSubmission, onSubmitAnswer]);
+  }, [collectBehaviorData, mutateAsync, isRequired, selectedValue, markSubmission, onSubmitAnswer]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 

@@ -8,13 +8,23 @@ import QuestionTextandDescription from "../QuestionTextandDescription";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import ScreenRoot from "../layout/ScreenRoot";
 import { ResponseContainer } from "../layout/ResponseContainer";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useBehaviorFlush } from "@/api/responseApi";
 
 const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
   const { questionPreferences } = question || {};
   const { setCanProceed } = useSurveyFlow();
-  const { goNext } = useFlowRuntime();
+  const { goNext, registerBeforeNext } = useFlowRuntime();
+  const deviceID = useDeviceId();
   const { handleFirstInteraction, handleClick, markSubmission, collectBehaviorData } =
     useBehavior();
+
+  const { flushOnce } = useBehaviorFlush({
+    registerBeforeNext,
+    collectBehaviorData,
+    questionID: question!.questionID,
+    deviceID,
+  });
 
   useEffect(() => {
     setCanProceed(true);
@@ -22,13 +32,14 @@ const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
 
   const buttonText = questionPreferences?.uiConfig?.buttonText || "Next";
 
-  const handleNext = () => {
+  const handleNext = async () => {
     markSubmission();
     const data = collectBehaviorData();
     console.log("📦 WelcomeScreen behavior data:", data);
     handleFirstInteraction();
     handleClick();
-    goNext();
+    await flushOnce();
+    await goNext();
   };
 
   return (

@@ -1,12 +1,28 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 
 import { useIsMobile } from "@/hooks/useIsMobile";
 import type { AnalyticsBridgeApi } from "@/types/analyticsTypes";
 import type { Interactive3DModelViewerProps } from "@/types/questionTypes";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, useProgress } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import Scene from "./Scene";
+import Model3dLoader from "../loader/Model3dLoader";
+
+function LoaderOverlay() {
+  const { active, progress, item } = useProgress();
+  if (!active) return null;
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/70">
+      {/* Spinner */}
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-gray-600" />
+      <div className="text-sm font-medium text-gray-700">
+        Loading 3D model… {Math.round(progress)}%
+      </div>
+      {item && <div className="text-xs text-gray-500">{item}</div>}
+    </div>
+  );
+}
 
 export const Interactive3DModelViewer = ({
   src,
@@ -74,6 +90,8 @@ export const Interactive3DModelViewer = ({
         minHeight: 200,
       }}
     >
+      <LoaderOverlay />
+
       <Canvas
         dpr={isMobile ? [1, 1.25] : [1, 1.5]}
         // shadows
@@ -87,33 +105,35 @@ export const Interactive3DModelViewer = ({
         style={{ position: "absolute", inset: 0 }}
         camera={{ fov: 50, near: 0.05, far: 1000, position: [1.2, 1.1, 1.3] }}
       >
-        <Scene
-          isMobile={isMobile}
-          validSrc={validSrc}
-          questionID={questionID!}
-          hdrEnvUrl={hdrEnvUrl}
-          background={background}
-          exposure={exposure}
-          ambientIntensity={ambientIntensity}
-          hemiIntensity={hemiIntensity}
-          envResolution={envResolution}
-          autoRotate={autoRotate}
-          autoRotateSpeed={autoRotateSpeed}
-          minDistance={minDistance}
-          maxDistance={maxDistance}
-          maxPolarAngle={maxPolarAngle}
-          initialView={initialView}
-          frontIsNegZ={frontIsNegZ}
-          onAttachControls={onAttachControls}
-          onMeshOver={onMeshOver}
-          onMeshOut={onMeshOut}
-          onMeshClick={onMeshClick}
-          onFit={onFit}
-          controlsRef={controlsRef}
-          analyticsRef={analyticsRef}
-          setModelRoot={setModelRoot}
-          modelRoot={modelRoot}
-        />
+        <Suspense fallback={<Model3dLoader />}>
+          <Scene
+            isMobile={isMobile}
+            validSrc={validSrc}
+            questionID={questionID!}
+            hdrEnvUrl={hdrEnvUrl}
+            background={background}
+            exposure={exposure}
+            ambientIntensity={ambientIntensity}
+            hemiIntensity={hemiIntensity}
+            envResolution={envResolution}
+            autoRotate={autoRotate}
+            autoRotateSpeed={autoRotateSpeed}
+            minDistance={minDistance}
+            maxDistance={maxDistance}
+            maxPolarAngle={maxPolarAngle}
+            initialView={initialView}
+            frontIsNegZ={frontIsNegZ}
+            onAttachControls={onAttachControls}
+            onMeshOver={onMeshOver}
+            onMeshOut={onMeshOut}
+            onMeshClick={onMeshClick}
+            onFit={onFit}
+            controlsRef={controlsRef}
+            analyticsRef={analyticsRef}
+            setModelRoot={setModelRoot}
+            modelRoot={modelRoot}
+          />
+        </Suspense>
       </Canvas>
     </div>
   );

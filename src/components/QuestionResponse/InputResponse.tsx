@@ -6,12 +6,16 @@ import { elementSchema } from "@/utils/validationSchema";
 import { useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitEmailResponse } from "@/hooks/useSurvey";
 
 const InputResponse = ({ inputPlaceholder, submitButtonText, question }: InputResponseProps) => {
   const [emailContact, setEmailContact] = useState("");
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
+  const { mutate, isPending } = useSubmitEmailResponse();
   const { goNext } = useFlowRuntime();
+  const deviceID = useDeviceId();
 
   const {
     handleFirstInteraction,
@@ -40,7 +44,22 @@ const InputResponse = ({ inputPlaceholder, submitButtonText, question }: InputRe
 
       console.log("📦 EmailContactScreen behavior data:", behavior);
       console.log("Input submitted:", result);
-      goNext();
+      mutate(
+        {
+          deviceID,
+          questionID: question?.questionID || "",
+          email: result.data.emailContact,
+          behavior,
+        },
+        {
+          onSuccess: () => {
+            goNext();
+          },
+          onError: (err) => {
+            setError(err.message || "Failed to submit. Please try again.");
+          },
+        }
+      );
     }
   };
 

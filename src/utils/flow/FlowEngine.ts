@@ -4,8 +4,10 @@ import {
   END_SCREEN_TYPE,
   NON_FLOW_TYPES,
   type AnswerPrimitive,
+  type AnswerValue,
   type FlowCondition,
   type FlowRuntimeState,
+  type RuleValue,
 } from "@/types/flowTypes";
 
 export const sortByOrder = (xs: Question[]) =>
@@ -82,23 +84,84 @@ export function naturalNextQuestionID(
   return null;
 }
 
+// CHANGE: helpers
+const isArr = (v: unknown): v is (string | number | boolean)[] => Array.isArray(v);
+const toArray = (v: AnswerValue): (string | number | boolean)[] =>
+  v == null ? [] : isArr(v) ? v : [v];
+
+// CHANGE: generic comparators used by all question types
+const anyMatch = (a: (string | number | boolean)[], b: RuleValue) => {
+  const rb = isArr(b) ? b : [b];
+  return a.some((v) => rb.includes(v));
+};
+const allMatch = (a: (string | number | boolean)[], b: RuleValue) => {
+  const rb = isArr(b) ? b : [b];
+  return rb.every((v) => a.includes(v));
+};
+
+// CHANGE: common evaluators (extend per type if needed)
+type EvalFn = (answer: AnswerValue, ruleVal: RuleValue) => boolean;
+export const COMMON_EVALUATORS: Record<string, EvalFn> = {
+  EQUALS: (answer, ruleVal) => anyMatch(toArray(answer), ruleVal),
+  NOT_EQUALS: (answer, ruleVal) => !anyMatch(toArray(answer), ruleVal),
+
+  INCLUDES_ANY: (answer, ruleVal) => anyMatch(toArray(answer), ruleVal), // multi-select
+  INCLUDES_ALL: (answer, ruleVal) => allMatch(toArray(answer), ruleVal),
+  NOT_INCLUDES: (answer, ruleVal) => !anyMatch(toArray(answer), ruleVal),
+
+  GT: (answer, ruleVal) => {
+    const [v] = toArray(answer);
+    const n = typeof v === "number" ? v : Number(v);
+    const r0 = isArr(ruleVal) ? ruleVal[0] : ruleVal;
+    const r = typeof r0 === "number" ? r0 : Number(r0);
+    return Number.isFinite(n) && Number.isFinite(r) && n > r;
+  },
+  GTE: (a, r) => COMMON_EVALUATORS.GT(a, r) || COMMON_EVALUATORS.EQ_NUM(a, r),
+  LT: (answer, ruleVal) => {
+    const [v] = toArray(answer);
+    const n = typeof v === "number" ? v : Number(v);
+    const r0 = isArr(ruleVal) ? ruleVal[0] : ruleVal;
+    const r = typeof r0 === "number" ? r0 : Number(r0);
+    return Number.isFinite(n) && Number.isFinite(r) && n < r;
+  },
+  LTE: (a, r) => COMMON_EVALUATORS.LT(a, r) || COMMON_EVALUATORS.EQ_NUM(a, r),
+  EQ_NUM: (answer, ruleVal) => {
+    const [v] = toArray(answer);
+    const n = typeof v === "number" ? v : Number(v);
+    const r0 = isArr(ruleVal) ? ruleVal[0] : ruleVal;
+    const r = typeof r0 === "number" ? r0 : Number(r0);
+    return Number.isFinite(n) && Number.isFinite(r) && n === r;
+  },
+};
+
+// CHANGE: allow per-type overrides/extends if you already have a map
+const EVALUATORS_BY_TYPE: Record<string, Record<string, EvalFn>> = {
+  DEFAULT: COMMON_EVALUATORS,
+  // MULTIPLE_CHOICE: { ...COMMON_EVALUATORS, ...custom },
+  // RADIO: { ...COMMON_EVALUATORS },
+  // etc...
+};
+
+
+
+
 export function evaluateNextQuestionID(
   state: FlowRuntimeState,
   question: Question,
   answer: AnswerPrimitive
 ): string | null {
   const rules = state.conditionsByQuestionID[question.questionID] ?? [];
-  const evaluators = EVALUATORS[question.type] || {};
+  const evaluators = EVALUATORS_BY_TYPE[question.type] || EVALUATORS_BY_TYPE.DEFAULT;
+
   for (const rule of rules) {
     const fn = evaluators[rule.conditionType];
     if (typeof fn === "function") {
-      const ok = fn(answer, rule.conditionValue);
+      const ok = fn(answer, rule.conditionValue as RuleValue); // CHANGE: supports arrays
       if (ok) {
         return rule.goto_questionID ?? terminalTargetQuestionID(state);
       }
     }
   }
-
   return naturalNextQuestionID(state, question.questionID);
 }
 
