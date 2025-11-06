@@ -1,4 +1,4 @@
-import type { BehaviorArgs, EmailResponsePayload, EmailResponseResult, RecordConsentPayload, RecordConsentResponse, ResponseData } from "@/types/responseTypes";
+import type { BehaviorArgs, EmailResponsePayload, EmailResponseResult, RecordConsentPayload, RecordConsentResponse, ResponseData, SubmitResponseSkippedPayload } from "@/types/responseTypes";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 
@@ -125,7 +125,6 @@ export function useBehaviorFlush({
     return unregister;
   }, [registerBeforeNext, collectBehaviorData, mutateAsync, questionID, deviceID]);
 
-  // (optional) a manual flush you can call in button handler if you want
   return {
     flushOnce: async () => {
       if (sentRef.current) return;
@@ -138,4 +137,17 @@ export function useBehaviorFlush({
       sentRef.current = true;
     },
   };
+}
+
+export async function postResponseSkipped(body: SubmitResponseSkippedPayload) {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/q/skip`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Failed to submit response");
+  }
+  return res.json();
 }

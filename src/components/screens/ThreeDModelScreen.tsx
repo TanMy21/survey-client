@@ -1,7 +1,7 @@
 import { useIsMobile } from "@/hooks/useIsMobile";
 import type { QuestionProps } from "@/types/questionTypes";
-import ThreeDMobileViewer from "../questionresponse/ThreeDMobileViewer";
-import ThreeDViewer from "../questionresponse/ThreeDViewer";
+import ThreeDMobileViewer from "../QuestionResponse/ThreeDMobileViewer";
+import ThreeDViewer from "../QuestionResponse/ThreeDViewer";
 import QuestionTextandDescription from "../QuestionTextandDescription";
 
 const ThreeDModelScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {

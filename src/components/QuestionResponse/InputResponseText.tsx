@@ -7,6 +7,7 @@ import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const InputResponseText = ({
   inputPlaceholder,
@@ -17,6 +18,7 @@ const InputResponseText = ({
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
   const deviceID = useDeviceId();
+  const { setResponse } = useResponseRegistry();
   const { mutateAsync, isPending } = useSubmitResponse();
   const { onSubmitAnswer } = useFlowRuntime();
 
@@ -60,6 +62,8 @@ const InputResponseText = ({
         behavior,
       });
 
+
+      setResponse(question.questionID, true);
       onSubmitAnswer(text);
       setText("");
     }

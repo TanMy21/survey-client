@@ -4,8 +4,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 
 const SurveyNavigatorCompact = ({ disableNext, navPulse }: SurveyNavigatorCompactProps) => {
-  const { currentQuestion, canGoPrev, onPrev, goNext } = useFlowRuntime();
+  const { currentQuestion, canGoPrev, onPrev, goNext, isLastQuestion } = useFlowRuntime();
   const isEnd = currentQuestion.type === "END_SCREEN";
+  const hideNext = isLastQuestion && !isEnd;
 
   const pulseVariant = {
     rest: { scale: 1, boxShadow: "0 0 0px rgba(37,99,235,0)" },
@@ -30,7 +31,7 @@ const SurveyNavigatorCompact = ({ disableNext, navPulse }: SurveyNavigatorCompac
             </motion.button>
           )}
 
-          {!isEnd && (
+          {!isEnd && !hideNext && (
             <motion.button
               className="h-11 w-11 rounded-full p-2 text-gray-700 transition hover:text-black disabled:opacity-40"
               disabled={disableNext}

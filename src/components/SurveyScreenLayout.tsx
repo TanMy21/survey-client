@@ -12,6 +12,7 @@ import { useScrollNav } from "@/hooks/useScrollNav";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
 import { useHaptics } from "@/utils/utils";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import SkipOnAdvanceBridge from "./SkipOnAdvancedBridge";
 
 const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
   const {
@@ -146,6 +147,7 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
               questionType={currentQuestion.type}
               backtrackCountMapRef={backtrackCountMapRef}
             >
+              <SkipOnAdvanceBridge />
               <BacktrackLogger questionID={currentQuestionID} visitedRef={visitedRef} />
               <QuestionRenderer
                 question={currentQuestion}

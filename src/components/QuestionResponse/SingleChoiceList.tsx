@@ -9,11 +9,13 @@ import SingleChoiceListItem from "./SingleChoiceListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
+  const { setResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
@@ -54,8 +56,11 @@ const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
       behavior,
     });
 
+    setError(null);
+    setResponse(question.questionID, true);
+
     onSubmitAnswer(optionValue!);
-  }, [options, selectedOptionID, isRequired, markSubmission,mutateAsync, collectBehaviorData]);
+  }, [options, selectedOptionID, isRequired, markSubmission, mutateAsync, collectBehaviorData]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 

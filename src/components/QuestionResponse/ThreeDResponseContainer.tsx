@@ -7,6 +7,7 @@ import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useDeviceId } from "@/hooks/useDeviceID";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
@@ -14,6 +15,7 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
+  const { setResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
 
@@ -46,6 +48,8 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
         response: value,
         behavior: data,
       });
+
+      setResponse(questionID, true);
 
       onSubmitAnswer(value);
     },

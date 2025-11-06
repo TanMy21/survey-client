@@ -8,6 +8,7 @@ import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const InputResponseNumber = ({
   inputPlaceholder,
@@ -22,6 +23,7 @@ const InputResponseNumber = ({
   const { mutateAsync, isPending } = useSubmitResponse();
   const { handleFirstInteraction, handleTyping, handlePaste, markSubmission, collectBehaviorData } =
     useBehavior();
+  const { setResponse } = useResponseRegistry();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -62,6 +64,8 @@ const InputResponseNumber = ({
         deviceID,
         behavior,
       });
+
+      setResponse(question.questionID, true);
 
       onSubmitAnswer(number);
       setNumber("");

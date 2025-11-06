@@ -8,6 +8,7 @@ import ScaleCounter from "./ScaleCounter";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const RangeResponse = ({ question }: RangeResponseProps) => {
   const isMobile = useIsMobile();
@@ -18,6 +19,7 @@ const RangeResponse = ({ question }: RangeResponseProps) => {
   const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
   const [selectedValue, setSelectedValue] = useState(Math.ceil((minValue + maxValue) / 2));
+  const { setResponse } = useResponseRegistry();
 
   const {
     handleFirstInteraction,
@@ -53,6 +55,8 @@ const RangeResponse = ({ question }: RangeResponseProps) => {
       deviceID,
       behavior,
     });
+
+    setResponse(question.questionID, true);
 
     onSubmitAnswer(selectedValue);
   };

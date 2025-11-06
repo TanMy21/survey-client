@@ -57,6 +57,7 @@ export interface UseFlowControllerApi {
   isTerminal: boolean;
   visitedStack: string[];
   flowEligible: Question[];
+  isLastQuestion: boolean;
 }
 
 export interface NextDecision {

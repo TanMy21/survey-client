@@ -11,6 +11,7 @@ export interface ResponseData {
           | Array<Record<string, unknown>>  ;
   participantID?: string | null;
   behavior?: any;
+  skipped?: boolean;
 }
 
 export interface ResponseListProps {
@@ -199,3 +200,19 @@ export type SubmitResponsePayload = {
   behavior?: unknown;           
 };
 
+export type  ResponseRegistry = {
+  isResponse: (qid: string) => boolean;
+  setResponse: (qid: string, v: boolean) => void;
+};
+
+export type ResponseRegistryProviderProps = React.PropsWithChildren<{   
+  initial?: Record<string, boolean>;
+}>;
+
+export type SubmitResponseSkippedPayload = {
+  questionID: string;
+  questionType: string;
+  deviceID: string;
+  skipped: boolean;
+  behavior?: unknown;
+}

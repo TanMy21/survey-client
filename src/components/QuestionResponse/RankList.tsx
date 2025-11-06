@@ -7,11 +7,13 @@ import RankListItem from "./RankListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const RankList = ({ options, question }: RankListProps) => {
   const [localOptions, setLocalOptions] = useState<OptionType[]>(options);
   const [error, setError] = useState<string | null>(null);
   const { onSubmitAnswer } = useFlowRuntime();
+  const { setResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
   const {
@@ -21,7 +23,7 @@ const RankList = ({ options, question }: RankListProps) => {
     markSubmission,
     collectBehaviorData,
   } = useBehavior();
-  
+
   const handleDragEnd = async (result: DropResult) => {
     const { source, destination } = result;
     if (!destination || source.index === destination.index) return;
@@ -73,6 +75,8 @@ const RankList = ({ options, question }: RankListProps) => {
         deviceID,
         behavior,
       });
+
+      setResponse(question?.questionID!, true);
       onSubmitAnswer(rankings);
     } catch (e) {
       console.error("[RankList] submit failed:", e);

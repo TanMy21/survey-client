@@ -4,12 +4,13 @@ import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { BinaryResponseYes, BinaryResponseNo } from "./BinaryResponseYes";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
@@ -17,6 +18,7 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
+  const { setResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
   const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "Yes";
@@ -100,6 +102,10 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
   };
 
   const fmtSeconds = (ms: number) => (ms / 1000).toFixed(1);
+
+  useEffect(() => {
+    setResponse(question.questionID, selectedValue !== null);
+  }, [selectedValue, question.questionID, setResponse]);
 
   return (
     <div className="mx-auto flex h-full w-full flex-col items-center justify-center gap-2 p-2 sm:w-4/5">
@@ -197,3 +203,6 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
 };
 
 export default BinaryResponseContainer;
+function useAnswerRegistry(): { setAnswered: any } {
+  throw new Error("Function not implemented.");
+}

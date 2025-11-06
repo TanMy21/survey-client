@@ -139,7 +139,7 @@ export function useFlowController(payload: SurveyPayload): UseFlowControllerApi 
   // );
 
 
-
+const isLastQuestion = state.currentQuestionID === state.lastQuestionID;
     const beforeNextRef = useRef<Array<() => Promise<void> | void>>([]);
   const isAdvancingRef = useRef(false);
 
@@ -283,6 +283,6 @@ const goNext = useCallback(() => {
     canGoPrev: state.cursor > 0,
     isTerminal,
     visitedStack: state.history.slice(0, state.cursor + 1),
-    flowEligible: state.flowEligible,
+    flowEligible: state.flowEligible,isLastQuestion,
   };
 }

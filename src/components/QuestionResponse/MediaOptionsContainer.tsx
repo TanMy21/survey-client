@@ -10,6 +10,7 @@ import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
   const isMobile = useIsMobile();
@@ -25,6 +26,8 @@ const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
   const submitRef = useRef<() => void | Promise<void>>(() => {});
   const { handleFirstInteraction, handleClick, markSubmission, collectBehaviorData } =
     useBehavior();
+
+  const { setResponse } = useResponseRegistry();
 
   const stableSubmit = useCallback(() => submitRef.current(), []);
 
@@ -73,8 +76,17 @@ const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
       behavior: behaviorData,
     });
 
+    setResponse(question?.questionID!, true);
+
     onSubmitAnswer(selectedValues);
-  }, [isRequired, selectedOptions, mutateAsync, markSubmission, collectBehaviorData, onSubmitAnswer]);
+  }, [
+    isRequired,
+    selectedOptions,
+    mutateAsync,
+    markSubmission,
+    collectBehaviorData,
+    onSubmitAnswer,
+  ]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 

@@ -9,12 +9,14 @@ import MultipleChoiceList from "./MultipleChoiceList";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useDeviceId } from "@/hooks/useDeviceID";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
+  const { setResponse } = useResponseRegistry();
   const { mutateAsync, isPending } = useSubmitResponse();
   const [selectedOptions, setSelectedOptions] = useState<{ optionID: string; value: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +70,8 @@ const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerPr
       deviceID,
       behavior: behaviorData,
     });
+
+    setResponse(question?.questionID!, true);
 
     onSubmitAnswer(selectedValues);
   }, [isRequired, selectedOptions, markSubmission, collectBehaviorData, onSubmitAnswer]);

@@ -1,7 +1,7 @@
-import { postResponse, recordConsent, submitEmailResponse } from "@/api/responseApi";
+import { postResponse, postResponseSkipped, recordConsent, submitEmailResponse } from "@/api/responseApi";
 import { fetchSurvey } from "@/api/surveyApi";
-import type { EmailResponsePayload, EmailResponseResult, RecordConsentPayload, RecordConsentResponse  } from "@/types/responseTypes";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import type { EmailResponsePayload, EmailResponseResult, RecordConsentPayload, RecordConsentResponse, SubmitResponseSkippedPayload  } from "@/types/responseTypes";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 export const useFetchSurvey = (shareID: string) => {
@@ -27,5 +27,18 @@ export function useRecordConsent() {
 export function useSubmitEmailResponse() {
   return useMutation<EmailResponseResult, Error, EmailResponsePayload>({
     mutationFn: submitEmailResponse,
+  });
+}
+
+
+export function useSubmitResponseSkipped() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["submit-response-skipped"],
+    mutationFn: (payload: SubmitResponseSkippedPayload) => postResponseSkipped(payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["survey-progress"] });
+    },
   });
 }

@@ -8,6 +8,7 @@ import { useCreateSession } from "@/hooks/useSession";
 import { useSession } from "@/context/useSessionContext";
 import { getOrCreateDeviceId } from "@/utils/deviceID";
 import { buildParticipantMeta } from "@/utils/fingerprint";
+import { ResponseRegistryProvider } from "@/context/ResponseRegistry";
 
 const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
   const { data, isLoading, isError } = useFetchSurvey(shareID!);
@@ -53,10 +54,10 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
         const deviceID = getOrCreateDeviceId();
         const meta = buildParticipantMeta();
         const session = await createSession({ shareID: shareID!, deviceID, meta });
-        setSession(session);  
+        setSession(session);
         createSessionOnceRef.current = true; // only after success
       } catch (e) {
-        console.error("Failed to create/get session", e);         
+        console.error("Failed to create/get session", e);
       }
     })();
   }, [payload, isLoading, isError, shareID, createSession, setSession]);
@@ -79,7 +80,9 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
 
   return (
     <FlowRuntimeProvider payload={payload!}>
-      <SurveyScreenLayout surveyID={shareID} />
+      <ResponseRegistryProvider>
+        <SurveyScreenLayout surveyID={shareID} />
+      </ResponseRegistryProvider>
     </FlowRuntimeProvider>
   );
 };
