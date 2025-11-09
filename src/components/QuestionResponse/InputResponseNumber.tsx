@@ -21,14 +21,27 @@ const InputResponseNumber = ({
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
-  const { handleFirstInteraction, handleTyping, handlePaste, markSubmission, collectBehaviorData } =
+  const { handleFirstInteraction, handleClick, handleTyping, handlePaste, markSubmission, collectBehaviorData } =
     useBehavior();
   const { setResponse } = useResponseRegistry();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    handleTyping(newValue);
-    setNumber(newValue);
+    const value = e.target.value;
+
+    
+    const native = e.nativeEvent as InputEvent | undefined;
+    const inputType = native?.inputType;
+
+    if (inputType === "deleteContentBackward") {
+      handleTyping("Backspace");  
+    } else {
+      const lastChar = value.slice(-1);
+      if (lastChar) {
+        handleTyping(lastChar);  
+      }
+    }
+
+    setNumber(value);
   };
 
   const handlePasteEvent = () => {
@@ -36,40 +49,55 @@ const InputResponseNumber = ({
   };
 
   const handleSubmit = async () => {
-    const trimmed = number.trim();
+ const trimmed = number.trim();
     const result = numberResponseSchema.safeParse({ number: trimmed });
 
-    if (isRequired && !result.success) {
+    
+    if (isRequired && trimmed === "") {
       setError("Your response is required for this question");
       return;
     }
 
-    if (!question?.questionID || !deviceID) return;
-
+     
     if (!result.success) {
       setError(result.error.format().number?._errors[0] ?? "Invalid input");
-    } else {
-      setError(null);
-
-      markSubmission();
-      const behavior = collectBehaviorData();
-      console.log("📦 Number input behavior data:", behavior);
-      console.log("Input submitted:", number);
-
-      await mutateAsync({
-        questionID: question.questionID,
-        qType: question.type,
-        optionID: null,
-        response: number,
-        deviceID,
-        behavior,
-      });
-
-      setResponse(question.questionID, true);
-
-      onSubmitAnswer(number);
-      setNumber("");
+      return;
     }
+
+     
+    if (!question?.questionID || !deviceID) {
+      setError("Missing identifiers. Please reload and try again.");
+      return;
+    }
+
+    setError(null);
+
+     
+    handleFirstInteraction();  
+    handleClick();  
+    markSubmission();
+
+    
+    const behavior = collectBehaviorData();
+    console.log("📦 Number input behavior data:", behavior);
+    console.log("Input submitted:", trimmed);
+
+    
+    await mutateAsync({
+      questionID: question.questionID,
+      qType: question.type,
+      optionID: null,
+      response: trimmed,
+      deviceID,
+      behavior,
+    });
+
+    
+    setResponse(question.questionID, true);
+     
+    onSubmitAnswer(trimmed);
+    
+    setNumber("");
   };
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);

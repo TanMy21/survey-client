@@ -68,7 +68,9 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
   const clickLike = () => {
     handleFirstInteraction();
     handleClick();
-    handleOptionChange();
+    if (selectedValue !== "LIKE") {
+      handleOptionChange();
+    }
     setSelectedValue("LIKE");
     void handleSubmit("LIKE");
     setError(null);
@@ -76,7 +78,9 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
   const clickDislike = () => {
     handleFirstInteraction();
     handleClick();
-    handleOptionChange();
+    if (selectedValue !== "DISLIKE") {
+      handleOptionChange();
+    }
     setSelectedValue("DISLIKE");
     void handleSubmit("DISLIKE");
     setError(null);

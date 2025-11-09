@@ -70,7 +70,7 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
     return [];
   }, [selectedValue]);
 
-  const { isAutoSubmitting, etaMs, cancel } = useAutoSubmitPulse({
+  useAutoSubmitPulse({
     active: selectedValue !== null,
     delayMs: autoSubmitDelayMs,
     feedbackMs: 180,
@@ -83,14 +83,18 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
     handleFirstInteraction();
     handleClick();
     handleOptionChange();
-    setSelectedValue("YES");
+    if (selectedValue !== "YES") {
+      handleOptionChange();
+    }
     setError(null);
   };
   const selectNo = () => {
     handleFirstInteraction();
     handleClick();
     handleOptionChange();
-    setSelectedValue("NO");
+    if (selectedValue !== "NO") {
+      handleOptionChange();
+    }
     setError(null);
   };
 
@@ -101,33 +105,12 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
     }
   };
 
-  const fmtSeconds = (ms: number) => (ms / 1000).toFixed(1);
-
   useEffect(() => {
     setResponse(question.questionID, selectedValue !== null);
   }, [selectedValue, question.questionID, setResponse]);
 
   return (
     <div className="mx-auto flex h-full w-full flex-col items-center justify-center gap-2 p-2 sm:w-4/5">
-      {/* Pending auto-submit hint & cancel */}
-      {isAutoSubmitting && (
-        <div
-          className="mt-2 mb-2 flex items-center justify-between rounded-lg bg-yellow-400 px-3 py-2 text-xl font-bold text-gray-600"
-          aria-live="polite"
-        >
-          <span>
-            Submitting in <strong>{fmtSeconds(etaMs)}s</strong>… change your choice or{" "}
-            <button
-              type="button"
-              onClick={cancel}
-              className="underline underline-offset-2 hover:opacity-80"
-            >
-              cancel
-            </button>
-          </span>
-        </div>
-      )}
-
       <div
         role="group"
         tabIndex={0}
@@ -203,6 +186,3 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
 };
 
 export default BinaryResponseContainer;
-function useAnswerRegistry(): { setAnswered: any } {
-  throw new Error("Function not implemented.");
-}

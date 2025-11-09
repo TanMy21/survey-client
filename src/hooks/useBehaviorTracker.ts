@@ -28,6 +28,7 @@ export const useBehaviorTracker = (
   // Tracking
   const scrollEventsRef = useRef<{ scrollY: number; scrollPct: number; timestamp: number }[]>([]);
   const hoverDurationsRef = useRef<Record<string, number> | null>(null);
+  const hasBacktrackIncrementedRef = useRef(false);
   const dwellPointsRef = useRef<{ x: number; y: number; duration: number }[] | null>(null);
   const movementPathRef = useRef<{ x: number; y: number; timestamp: number }[] | null>(null);
   const movementTracksRef = useRef<
@@ -70,8 +71,12 @@ export const useBehaviorTracker = (
   };
 
   const handleBacktrack = () => {
-    const current = backtrackCountMapRef.current.get(questionID) || 0;
-    backtrackCountMapRef.current.set(questionID, current + 1);
+    if (hasBacktrackIncrementedRef.current) return;  
+    const map = backtrackCountMapRef.current;
+    if (!map) return;  
+    const current = map.get(questionID) || 0;
+    map.set(questionID, current + 1);
+    hasBacktrackIncrementedRef.current = true;
   };
 
   const handleInputMethodSwitch = () => {

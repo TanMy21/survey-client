@@ -42,6 +42,9 @@ const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
 
     if (!question?.questionID || !deviceID || !selectedOptionID || !optionValue) return;
 
+    handleFirstInteraction();
+    handleClick();
+
     markSubmission();
     const behavior = collectBehaviorData();
     console.log("📦 SingleChoiceList behavior data:", behavior);
@@ -72,6 +75,7 @@ const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
     }
     handleClick();
     setSelectedOptionID(optionID);
+    if (error) setError(null);
   };
 
   useEffect(() => {
@@ -86,9 +90,9 @@ const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
     return [optionRefs.current[index]];
   }, [selectedOptionID, options]);
 
-  const { isAutoSubmitting, etaMs, cancel } = useAutoSubmitPulse({
+  useAutoSubmitPulse({
     active: !!selectedOptionID,
-    delayMs: 4000,
+    delayMs: 2000,
     feedbackMs: 180,
     onSubmit: handleSubmit,
     getPulseTargets,
@@ -126,25 +130,6 @@ const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
         <div className="mx-auto flex h-[12%] w-[98%] flex-col items-center justify-start xl:top-[50%]">
           {error && <InputError error={error} />}
         </div>
-
-        {/* ★ Pending auto-submit hint & cancel */}
-        {isAutoSubmitting && (
-          <div
-            className="mt-2 flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700"
-            aria-live="polite"
-          >
-            <span>
-              Submitting in <strong>{(etaMs / 1000).toFixed(1)}s</strong>… change your choice or{" "}
-              <button
-                type="button"
-                onClick={cancel}
-                className="underline underline-offset-2 hover:opacity-80"
-              >
-                cancel
-              </button>
-            </span>
-          </div>
-        )}
 
         <div className="mt-2 flex w-[112%] justify-end pr-6">
           <button

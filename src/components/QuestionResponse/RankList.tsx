@@ -48,35 +48,43 @@ const RankList = ({ options, question }: RankListProps) => {
     //   .unwrap()
     //   .then()
     //   .catch((err) => console.error("Order update error:", err));
+    if (error) setError(null);
   };
 
   const handleSubmit = async () => {
-    console.log("Submitting ranked options:", localOptions);
     const rankedData = localOptions.map((o, idx) => ({
       optionID: o.optionID,
       value: o.text ?? o.value,
       rank: idx + 1,
     }));
 
-    // if (!question?.questionID || !deviceID) return;
+    const rankings = rankedData.map((o) => o.value);
 
+    if (!question?.questionID || !question?.type || !deviceID) {
+      setError("Missing identifiers. Please reload and try again.");
+      return;
+    }
+
+    handleFirstInteraction();
+    handleClick();
     markSubmission();
+
     const behavior = collectBehaviorData();
     console.log("📦 RankScreen behavior data:", behavior);
     console.log("User Ranked Options:", rankedData);
-    const rankings = rankedData.map((o) => o.value);
 
     try {
       await mutateAsync({
-        questionID: question?.questionID!,
-        qType: question?.type!,
+        questionID: question.questionID,
+        qType: question.type,
         optionID: null,
         response: rankedData,
         deviceID,
         behavior,
       });
 
-      setResponse(question?.questionID!, true);
+      setResponse(question.questionID, true);
+
       onSubmitAnswer(rankings);
     } catch (e) {
       console.error("[RankList] submit failed:", e);

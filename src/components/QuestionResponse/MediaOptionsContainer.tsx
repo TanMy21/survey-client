@@ -59,6 +59,9 @@ const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
       return;
     }
 
+    handleFirstInteraction();
+    handleClick();
+
     markSubmission();
 
     const behaviorData = collectBehaviorData();
@@ -99,7 +102,6 @@ const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
     return id ? [optionRefMap.current[id]] : [];
   }, [selectedOptions]);
 
-  // const { isAutoSubmitting, etaMs, cancel } =
   useAutoSubmitPulse({
     active: selectedOptions.length > 0,
     delayMs: 6000,

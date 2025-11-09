@@ -37,30 +37,41 @@ const InputResponse = ({ inputPlaceholder, submitButtonText, question }: InputRe
 
     if (!result.success) {
       setError(result.error.format().emailContact?._errors[0] ?? "Invalid input");
-    } else {
-      setError(null);
-      markSubmission();
-      const behavior = collectBehaviorData();
-
-      console.log("📦 EmailContactScreen behavior data:", behavior);
-      console.log("Input submitted:", result);
-      mutate(
-        {
-          deviceID,
-          questionID: question?.questionID || "",
-          email: result.data.emailContact,
-          behavior,
-        },
-        {
-          onSuccess: () => {
-            goNext();
-          },
-          onError: (err) => {
-            setError(err.message || "Failed to submit. Please try again.");
-          },
-        }
-      );
+      return;
     }
+
+    if (!deviceID || !question?.questionID) {
+      setError("Missing identifiers. Please reload and try again.");
+      return;
+    }
+
+    setError(null);
+
+    handleFirstInteraction();
+    handleClick();
+    markSubmission();
+
+    const behavior = collectBehaviorData();
+
+    console.log("📦 EmailContactScreen behavior data:", behavior);
+    console.log("Input submitted:", result);
+
+    mutate(
+      {
+        deviceID,
+        questionID: question.questionID,
+        email: result.data.emailContact,
+        behavior,
+      },
+      {
+        onSuccess: () => {
+          goNext();
+        },
+        onError: (err) => {
+          setError(err.message || "Failed to submit. Please try again.");
+        },
+      }
+    );
   };
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
@@ -83,6 +94,24 @@ const InputResponse = ({ inputPlaceholder, submitButtonText, question }: InputRe
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    const native = e.nativeEvent as InputEvent | undefined;
+    const inputType = native?.inputType;
+
+    if (inputType === "deleteContentBackward") {
+      handleTyping("Backspace");
+    } else {
+      const lastChar = value.slice(-1);
+      if (lastChar) {
+        handleTyping(lastChar);
+      }
+    }
+
+    setEmailContact(value);
+  };
+
   return (
     <div className="flex w-4/5 origin-bottom flex-col">
       <div className="mx-auto flex h-[60%] w-[100%] flex-col">
@@ -96,10 +125,7 @@ const InputResponse = ({ inputPlaceholder, submitButtonText, question }: InputRe
           onClick={handleClick}
           onFocus={handleFirstInteraction}
           onPaste={handlePaste}
-          onChange={(e) => {
-            setEmailContact(e.target.value);
-            handleTyping(e.target.value);
-          }}
+          onChange={handleChange}
           className={`lg:w-4/5lg:text-3xl mx-auto block h-12 w-full border-0 border-b border-gray-300 px-3 text-base text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none sm:h-14 sm:w-4/5 sm:text-lg md:h-16 md:w-3/5 md:text-2xl lg:h-20`}
         />
 

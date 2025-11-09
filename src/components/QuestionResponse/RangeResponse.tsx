@@ -32,17 +32,31 @@ const RangeResponse = ({ question }: RangeResponseProps) => {
   const handleSliderChange = (value: number) => {
     handleFirstInteraction();
     handleClick();
-    handleOptionChange();
-    setSelectedValue(value);
+    setSelectedValue((prev) => {
+      if (prev !== value) {
+        handleOptionChange();
+      }
+      return value;
+    });
+
+    if (error) setError(null);
   };
 
   const handleSubmit = async () => {
-    if (isRequired && selectedValue === null) {
+    if (isRequired && (selectedValue === null || Number.isNaN(selectedValue))) {
       setError("Your response is required for this question");
       return;
     }
 
+    if (!deviceID || !question?.questionID || !question?.type) {
+      setError("Missing identifiers. Please reload and try again.");
+      return;
+    }
+
+    handleFirstInteraction();
+    handleClick();
     markSubmission();
+
     const behavior = collectBehaviorData();
     console.log("📦 RangeScreen behavior data:", behavior);
     console.log("Submitted Range Value:", selectedValue);

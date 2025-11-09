@@ -33,13 +33,13 @@ const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
   const buttonText = questionPreferences?.uiConfig?.buttonText || "Next";
 
   const handleNext = async () => {
+    handleFirstInteraction();
+    handleClick();
     markSubmission();
     const data = collectBehaviorData();
     console.log("📦 WelcomeScreen behavior data:", data);
-    handleFirstInteraction();
-    handleClick();
     await flushOnce();
-    await goNext();
+    goNext();
   };
 
   return (

@@ -38,16 +38,21 @@ const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerPr
   const handleOptionToggle = (optionID: string, value: string) => {
     handleFirstInteraction();
     handleOptionChange();
-    handleClick();
-
     setSelectedOptions((prev) => {
       const exists = prev.find((o) => o.optionID === optionID);
       const next = exists
         ? prev.filter((o) => o.optionID !== optionID)
         : [...prev, { optionID, value }];
+
+      if ((exists && next.length !== prev.length) || (!exists && next.length !== prev.length)) {
+        handleOptionChange();
+      }
+
       lastChangedIDRef.current = optionID;
       return next;
     });
+
+    if (error) setError(null);
   };
 
   const handleSubmit = useCallback(async () => {
@@ -56,25 +61,47 @@ const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerPr
       return;
     }
 
+    if (!deviceID || !question?.questionID || !question?.type) {
+      setError("Missing identifiers. Please reload and try again.");
+      return;
+    }
+
+    handleFirstInteraction();
+    handleClick();
     markSubmission();
+
     const behaviorData = collectBehaviorData();
     console.log("📦 MultipleChoiceScreen behavior data:", behaviorData);
     console.log("Selected Options:", selectedOptions);
+
     const selectedValues = selectedOptions.map((o) => o.value);
 
     await mutateAsync({
-      questionID: question?.questionID!,
-      qType: question?.type!,
+      questionID: question.questionID,
+      qType: question.type,
       optionID: null,
       response: selectedValues,
       deviceID,
       behavior: behaviorData,
     });
 
-    setResponse(question?.questionID!, true);
+    setResponse(question.questionID, selectedOptions.length > 0);
 
     onSubmitAnswer(selectedValues);
-  }, [isRequired, selectedOptions, markSubmission, collectBehaviorData, onSubmitAnswer]);
+  }, [
+    isRequired,
+    selectedOptions,
+    deviceID,
+    question?.questionID,
+    question?.type,
+    handleFirstInteraction,
+    handleClick,
+    markSubmission,
+    collectBehaviorData,
+    mutateAsync,
+    setResponse,
+    onSubmitAnswer,
+  ]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
@@ -87,7 +114,7 @@ const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerPr
     return id ? [optionRefMap.current[id]] : [];
   }, [selectedOptions]);
 
-  const { isAutoSubmitting, etaMs, cancel } = useAutoSubmitPulse({
+  useAutoSubmitPulse({
     active: selectedOptions.length > 0,
     delayMs: 4000,
     feedbackMs: 180,
@@ -103,23 +130,6 @@ const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerPr
 
   return (
     <div className="flex w-[100%] origin-bottom flex-col sm:w-[60%]">
-      {/* ★ Pending auto-submit hint & cancel */}
-      {isAutoSubmitting && (
-        <div
-          className="absolute top-[42%] left-1/2 z-10 -translate-x-1/2 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700 shadow"
-          aria-live="polite"
-        >
-          Submitting in <strong>{(etaMs / 1000).toFixed(1)}s</strong>… change your choices or{" "}
-          <button
-            type="button"
-            onClick={cancel}
-            className="underline underline-offset-2 hover:opacity-80"
-          >
-            cancel
-          </button>
-        </div>
-      )}
-
       <div
         ref={containerRef}
         tabIndex={0}
