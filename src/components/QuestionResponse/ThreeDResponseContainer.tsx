@@ -9,7 +9,7 @@ import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 
-const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => {
+const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainerProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const { questionID, type } = question;
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +41,7 @@ const ThreeDResponseContainer = ({ question }: ThreeDResponseContainerProps) => 
       console.log("Selected response:", value);
 
       await mutateAsync({
+        surveyID,
         deviceID,
         questionID,
         optionID: null,

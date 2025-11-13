@@ -20,6 +20,7 @@ const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
     useBehavior();
 
   const { flushOnce } = useBehaviorFlush({
+    surveyID,
     registerBeforeNext,
     collectBehaviorData,
     questionID: question!.questionID,

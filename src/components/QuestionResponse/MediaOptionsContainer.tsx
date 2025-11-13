@@ -12,7 +12,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 
-const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
+const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProps) => {
   const isMobile = useIsMobile();
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
@@ -77,6 +77,7 @@ const MediaOptionsContainer = ({ options, question }: MediaOptionsProps) => {
       response: selectedValues,
       deviceID,
       behavior: behaviorData,
+      surveyID,
     });
 
     setResponse(question?.questionID!, true);

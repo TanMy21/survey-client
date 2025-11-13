@@ -8,7 +8,7 @@ import { SKIPPABLE_TYPES, UUID_RE } from "@/utils/questionConfig";
 import { useEffect, useMemo } from "react";
  
 
-export function useSkipOnAdvance() {
+export function useSkipOnAdvance(surveyID: string) {
   const { registerBeforeNext, currentQuestion, currentQuestionID } = useFlowRuntime();
   const { isResponse, setResponse } = useResponseRegistry();
   const { collectBehaviorData } = useBehavior();
@@ -37,6 +37,7 @@ export function useSkipOnAdvance() {
         deviceID,
         questionID: currentQuestionID,     
         questionType: currentQuestion.type,    
+        surveyID,
         skipped: true,
         behavior: collectBehaviorData(),
       });
@@ -53,6 +54,7 @@ export function useSkipOnAdvance() {
     setResponse,
     postSkip,
     deviceID,
+    surveyID,
     currentQuestionID,
     collectBehaviorData,
     currentQuestion,

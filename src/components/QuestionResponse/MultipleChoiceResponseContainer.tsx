@@ -11,7 +11,7 @@ import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 
-const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerProps) => {
+const MultipleChoiceResponseContainer = ({surveyID, question }: MultipleChoiceContainerProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
@@ -83,6 +83,7 @@ const MultipleChoiceResponseContainer = ({ question }: MultipleChoiceContainerPr
       response: selectedValues,
       deviceID,
       behavior: behaviorData,
+      surveyID,
     });
 
     setResponse(question.questionID, selectedOptions.length > 0);

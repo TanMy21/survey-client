@@ -14,7 +14,7 @@ const RankScreen = ({ surveyID, question }: QuestionProps) => {
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </CenteredStack>
       <ResponseContainer>
-        <RankList options={options!} question={question}/>
+        <RankList options={options!} question={question} surveyID={surveyID!}/>
       </ResponseContainer>
     </ScreenRoot>
   );

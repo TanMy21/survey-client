@@ -13,6 +13,7 @@ const InputResponseText = ({
   inputPlaceholder,
   submitButtonText,
   question,
+  surveyID,
 }: InputResponseProps) => {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +55,7 @@ const InputResponseText = ({
       console.log("📦 TextScreen behavior data:", behavior);
       console.log("Submitted response:", text);
       await mutateAsync({
+        surveyID,
         questionID: question.questionID,
         qType: question.type,
         optionID: null,

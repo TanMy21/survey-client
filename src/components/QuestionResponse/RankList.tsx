@@ -9,7 +9,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 
-const RankList = ({ options, question }: RankListProps) => {
+const RankList = ({ surveyID, options, question }: RankListProps) => {
   const [localOptions, setLocalOptions] = useState<OptionType[]>(options);
   const [error, setError] = useState<string | null>(null);
   const { onSubmitAnswer } = useFlowRuntime();
@@ -75,6 +75,7 @@ const RankList = ({ options, question }: RankListProps) => {
 
     try {
       await mutateAsync({
+        surveyID,
         questionID: question.questionID,
         qType: question.type,
         optionID: null,

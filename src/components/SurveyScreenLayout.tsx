@@ -14,7 +14,7 @@ import { useHaptics } from "@/utils/utils";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import SkipOnAdvanceBridge from "./SkipOnAdvancedBridge";
 
-const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
+const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
   const {
     currentQuestion,
     currentQuestionID,
@@ -147,11 +147,11 @@ const SurveyScreenLayout = ({ surveyID }: SurveyContainerProps) => {
               questionType={currentQuestion.type}
               backtrackCountMapRef={backtrackCountMapRef}
             >
-              <SkipOnAdvanceBridge />
+              <SkipOnAdvanceBridge surveyID={surveyID!} />
               <BacktrackLogger questionID={currentQuestionID} visitedRef={visitedRef} />
               <QuestionRenderer
                 question={currentQuestion}
-                surveyID={surveyID}
+                surveyID={shareID}
                 currentIndex={currentDisplayIndex!}
               />
             </BehaviorTrackerProvider>

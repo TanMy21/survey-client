@@ -4,24 +4,32 @@ import { useSurveyFlow } from "@/context/useSurveyFlow";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 import { useRecordConsent } from "@/hooks/useSurvey";
+import type { QuestionProps } from "@/types/questionTypes";
 import { useEffect, useRef, useState } from "react";
 
-const ConsentScreen = () => {
+const ConsentScreen = ({ surveyID }: QuestionProps) => {
   const { setCanProceed } = useSurveyFlow();
   const [agreed, setAgreed] = useState(false);
   const { goNext } = useFlowRuntime();
   const containerRef = useRef<HTMLDivElement>(null);
-  setCanProceed(false);
 
   const deviceID = useDeviceId();
   const { mutate, isPending } = useRecordConsent();
+
+  useEffect(() => {
+    setCanProceed(false);
+  }, [setCanProceed]);
 
   const handleSubmit = () => {
     if (!agreed || !deviceID) return;
 
     const consentedAtClient = new Date().toISOString();
+
+    console.log("Recording consent at:", deviceID);
+
     mutate(
       {
+        surveyID,
         deviceID,
         consentGiven: true,
         consentTimestamp: consentedAtClient,

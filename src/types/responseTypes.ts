@@ -21,11 +21,13 @@ export interface ResponseListProps {
 }
 
 export interface SingleChoiceListProps {
+  surveyID: string;
   question?: Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
 export interface MultipleChoiceContainerProps {
+  surveyID: string;
   question?: Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
@@ -54,6 +56,7 @@ export interface MultipleChoiceListItemProps extends ResponseListItemProps {
 }
 
 export interface RangeResponseProps {
+  surveyID?: string;
   question: Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
@@ -64,6 +67,7 @@ export interface RankListItemProps {
 }
 
 export interface InputResponseProps {
+  surveyID?: string;
   inputPlaceholder: string;
   submitButtonText: string;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
@@ -82,6 +86,7 @@ export interface BinaryResponseProps {
 }
 
 export interface BinaryResponseContainerProps {
+  surveyID: string;
   question: Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
   setCanProceed?: (val: boolean) => void;
@@ -100,12 +105,14 @@ export interface HoverImagePreviewProps {
 }
 
 export interface ThreeDResponseContainerProps {
+  surveyID: string;
   question: Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
   setCanProceed?: (val: boolean) => void;
 }
 
 export interface RankListProps {
+  surveyID: string;
   options: OptionType[];
   disabled?: boolean;
   question?: Question;
@@ -130,6 +137,7 @@ export interface StaticSliderConfig {
 }
 
 export interface MediaOptionsProps {
+  surveyID: string;
   options: OptionType[];
   multiSelect?: boolean;
   question?: Question;
@@ -148,6 +156,7 @@ export interface SliderProps extends RangeResponseProps {
 }
 
 export interface ThreeDViewProps {
+  surveyID: string;
   url: string;
   question: Question;
   showQuestion?: boolean;
@@ -156,6 +165,7 @@ export interface ThreeDViewProps {
 
 
 export type RecordConsentPayload = {
+  surveyID?: string;
   deviceID: string;              
   consentGiven: boolean;             
   consentTimestamp?: string;    
@@ -168,6 +178,7 @@ export type RecordConsentResponse = {
 };
 
 export type EmailResponsePayload = {
+  surveyID?: string;
   deviceID: string;          
   questionID: string;          
   email: string;   
@@ -185,6 +196,7 @@ type Register =
   | ((fn: () => void | Promise<void>) => () => void);
 
 export type BehaviorArgs = {
+  surveyID?: string;
   registerBeforeNext:Register;
   collectBehaviorData: () => unknown;
   questionID: string;
@@ -210,6 +222,7 @@ export type ResponseRegistryProviderProps = React.PropsWithChildren<{
 }>;
 
 export type SubmitResponseSkippedPayload = {
+  surveyID: string;
   questionID: string;
   questionType: string;
   deviceID: string;

@@ -14,6 +14,7 @@ const InputResponseNumber = ({
   inputPlaceholder,
   submitButtonText,
   question,
+  surveyID,
 }: InputResponseProps) => {
   const isRequired = useQuestionRequired(question);
   const [number, setNumber] = useState("");
@@ -84,6 +85,7 @@ const InputResponseNumber = ({
 
     
     await mutateAsync({
+      surveyID,
       questionID: question.questionID,
       qType: question.type,
       optionID: null,

@@ -9,6 +9,7 @@ import { useSession } from "@/context/useSessionContext";
 import { getOrCreateDeviceId } from "@/utils/deviceID";
 import { buildParticipantMeta } from "@/utils/fingerprint";
 import { ResponseRegistryProvider } from "@/context/ResponseRegistry";
+import { injectConsentAfterWelcome } from "@/utils/utils";
 
 const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
   const { data, isLoading, isError } = useFetchSurvey(shareID!);
@@ -16,35 +17,11 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
   const { setSession } = useSession();
   const createSessionOnceRef = useRef(false);
 
-  const payload = useMemo(() => {
-    if (!data) return null;
-
-    const base = [...(data.questions ?? [])];
-
-    const consentScreen = {
-      questionID: "consent-screen",
-      type: "CONSENT",
-      order: -2,
-    } as any;
-
-    const welcomeIdx = base.findIndex((q) => q.type === "WELCOME_SCREEN");
-    if (welcomeIdx >= 0) {
-      const welcomeOrder = base[welcomeIdx].order ?? 0;
-      consentScreen.order = welcomeOrder + 0.5;
-      base.push(consentScreen);
-    } else {
-      consentScreen.order = -1e6;
-      base.push(consentScreen);
-    }
-
-    const questionsWithInjectedConsentScreen = base.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-
-    return {
-      shareID,
-      questions: questionsWithInjectedConsentScreen,
-      FlowCondition: data.FlowCondition,
-    };
-  }, [data, shareID]);
+ const payload = useMemo(() => {
+  if (!data) return null;
+  const questions = injectConsentAfterWelcome(data.questions ?? []);
+  return { shareID, questions, FlowCondition: data.FlowCondition };
+}, [data, shareID]);
 
   useEffect(() => {
     if (!payload || isLoading || isError || createSessionOnceRef.current) return;
@@ -61,6 +38,8 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
       }
     })();
   }, [payload, isLoading, isError, shareID, createSession, setSession]);
+
+  console.log("survey: ", payload);
 
   if (isLoading) {
     return (
@@ -81,7 +60,7 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
   return (
     <FlowRuntimeProvider payload={payload!}>
       <ResponseRegistryProvider>
-        <SurveyScreenLayout surveyID={shareID} />
+        <SurveyScreenLayout surveyID={data.surveyID} shareID={shareID} />
       </ResponseRegistryProvider>
     </FlowRuntimeProvider>
   );

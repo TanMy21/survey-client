@@ -10,7 +10,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 
-const RangeResponse = ({ question }: RangeResponseProps) => {
+const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const isMobile = useIsMobile();
   const { minValue, maxValue } = question.questionPreferences?.uiConfig || {};
   const isRequired = useQuestionRequired(question);
@@ -68,6 +68,7 @@ const RangeResponse = ({ question }: RangeResponseProps) => {
       response: selectedValue,
       deviceID,
       behavior,
+      surveyID,
     });
 
     setResponse(question.questionID, true);

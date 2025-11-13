@@ -12,7 +12,7 @@ const BinaryScreen = ({ surveyID, question }: QuestionProps) => {
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </CenteredStack>
       <ResponseContainer>
-        <BinaryResponseContainer question={question!} />
+        <BinaryResponseContainer question={question!} surveyID={surveyID!}/>
       </ResponseContainer>
     </ScreenRoot>
   );

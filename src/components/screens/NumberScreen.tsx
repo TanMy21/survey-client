@@ -13,6 +13,7 @@ const NumberScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionP
       </CenteredStack>
       <ResponseContainer>
         <InputResponseNumber
+          surveyID={surveyID!}
           inputPlaceholder={"Enter your response..."}
           submitButtonText={"OK"}
           setCurrentQuestionIndex={setCurrentQuestionIndex}

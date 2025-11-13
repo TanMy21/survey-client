@@ -22,12 +22,14 @@ const ThreeDModelScreen = ({ surveyID, question, setCurrentQuestionIndex }: Ques
       </div>
       {isMobile ? (
         <ThreeDMobileViewer
+          surveyID={surveyID!}
           url={url!}
           question={question!}
           setCurrentQuestionIndex={setCurrentQuestionIndex}
         />
       ) : (
         <ThreeDViewer
+          surveyID={surveyID!}
           url={url!}
           question={question!}
           setCurrentQuestionIndex={setCurrentQuestionIndex}

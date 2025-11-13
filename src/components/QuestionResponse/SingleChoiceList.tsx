@@ -11,7 +11,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 
-const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
+const SingleChoiceList = ({surveyID, question }: SingleChoiceListProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
@@ -51,6 +51,7 @@ const SingleChoiceList = ({ question }: SingleChoiceListProps) => {
     console.log("Selected option value:", optionValue);
 
     await mutateAsync({
+      surveyID,
       questionID: question.questionID,
       qType: question.type,
       optionID: selectedOptionID,

@@ -14,7 +14,7 @@ const MultipleChoiceScreen = ({ surveyID, question }: QuestionProps) => {
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </CenteredStack>
       <ResponseContainer>
-        <MultipleChoiceResponseContainer question={question} />
+        <MultipleChoiceResponseContainer question={question} surveyID={surveyID!}/>
       </ResponseContainer>
     </ScreenRoot>
   );

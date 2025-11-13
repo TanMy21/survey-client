@@ -12,7 +12,7 @@ const RangeScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionPr
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </CenteredStack>
       <ResponseContainer>
-        <RangeResponse question={question!} setCurrentQuestionIndex={setCurrentQuestionIndex} />
+        <RangeResponse question={question!} setCurrentQuestionIndex={setCurrentQuestionIndex}  surveyID={surveyID!}/>
       </ResponseContainer>
     </ScreenRoot>
   );

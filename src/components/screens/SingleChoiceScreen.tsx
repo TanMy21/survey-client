@@ -13,7 +13,7 @@ const SingleChoiceScreen = ({ surveyID, question }: QuestionProps) => {
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </CenteredStack>
       <ResponseContainer>
-        <SingleChoiceList question={question} />
+        <SingleChoiceList question={question} surveyID={surveyID!}/>
       </ResponseContainer>
     </ScreenRoot>
   );

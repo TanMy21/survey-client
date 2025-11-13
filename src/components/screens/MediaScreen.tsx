@@ -17,6 +17,7 @@ const MediaScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionPr
 
       <ResponseContainer>
         <MediaOptionsContainer
+          surveyID={surveyID!}
           options={options!}
           multiSelect={multiSelect}
           setCurrentQuestionIndex={setCurrentQuestionIndex}

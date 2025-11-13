@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Interactive3DModelViewer } from "../screen-components/Interactive3DModelViewer";
 import ThreeDResponseContainer from "./ThreeDResponseContainer";
 
-const ThreeDMobileViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDViewProps) => {
+const ThreeDMobileViewer = ({ surveyID, url, question, setCurrentQuestionIndex }: ThreeDViewProps) => {
   const [viewerUrl, setViewerUrl] = useState<string | null>(url ?? null);
   const ready = !!viewerUrl;
 
@@ -16,6 +16,7 @@ const ThreeDMobileViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDVi
       {/* Action Buttons */}
       <div className="flex h-[80px] w-[98%]">
         <ThreeDResponseContainer
+          surveyID={surveyID}
           question={question}
           setCurrentQuestionIndex={setCurrentQuestionIndex}
         />

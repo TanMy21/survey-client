@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Interactive3DModelViewer } from "../screen-components/Interactive3DModelViewer";
 import ThreeDResponseContainer from "./ThreeDResponseContainer";
 
-const ThreeDViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDViewProps) => {
+const ThreeDViewer = ({ surveyID,url, question, setCurrentQuestionIndex }: ThreeDViewProps) => {
   const [viewerUrl, setViewerUrl] = useState<string | null>(url ?? null);
   const { handleInputMethodSwitch } = useBehavior();
 
@@ -39,6 +39,7 @@ const ThreeDViewer = ({ url, question, setCurrentQuestionIndex }: ThreeDViewProp
       {/* Action Buttons Section */}
       <div className="flex h-24 w-[96%]">
         <ThreeDResponseContainer
+          surveyID={surveyID}
           question={question}
           setCurrentQuestionIndex={setCurrentQuestionIndex}
         />

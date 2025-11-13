@@ -33,6 +33,7 @@ const TextScreen = ({ surveyID, question }: QuestionProps) => {
       </CenteredStack>
       <ResponseContainer>
         <InputResponseText
+          surveyID={surveyID!}
           inputPlaceholder={"Enter your response..."}
           submitButtonText={"OK"}
           question={question}

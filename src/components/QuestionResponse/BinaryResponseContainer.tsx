@@ -12,7 +12,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 
-const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => {
+const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainerProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const { questionID, questionPreferences } = question;
   const [error, setError] = useState<string | null>(null);
@@ -21,8 +21,8 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
   const { setResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
-  const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "Yes";
-  const buttonTextNo = questionPreferences.uiConfig?.buttonTextNo || "No";
+  const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "YES";
+  const buttonTextNo = questionPreferences.uiConfig?.buttonTextNo || "NO";
 
   const autoSubmitDelayMs = 2000;
 
@@ -51,6 +51,7 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
     console.log("Selected response:", selectedValue);
 
     await mutateAsync({
+      surveyID,
       deviceID,
       questionID,
       optionID: null,
@@ -65,8 +66,8 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
   const getPulseTargets = useCallback(() => {
-    if (selectedValue === "YES") return [yesRef.current];
-    if (selectedValue === "NO") return [noRef.current];
+    if (selectedValue === buttonTextYes) return [yesRef.current];
+    if (selectedValue === buttonTextNo) return [noRef.current];
     return [];
   }, [selectedValue]);
 
@@ -83,18 +84,20 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
     handleFirstInteraction();
     handleClick();
     handleOptionChange();
-    if (selectedValue !== "YES") {
+    if (selectedValue !== buttonTextYes) {
       handleOptionChange();
     }
+    setSelectedValue(buttonTextYes);
     setError(null);
   };
   const selectNo = () => {
     handleFirstInteraction();
     handleClick();
     handleOptionChange();
-    if (selectedValue !== "NO") {
+    if (selectedValue !== buttonTextNo) {
       handleOptionChange();
     }
+    setSelectedValue(buttonTextNo);
     setError(null);
   };
 
@@ -123,7 +126,7 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
           <div
             ref={yesRef}
             role="radio"
-            aria-checked={selectedValue === "YES"}
+            aria-checked={selectedValue === buttonTextYes}
             tabIndex={0}
             onClick={selectYes}
             onKeyDown={onOptionKeyDown(selectYes)}
@@ -143,8 +146,8 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
               questionID={questionID}
               responseOptionText={buttonTextYes}
               index={0}
-              value="YES"
-              checked={selectedValue === "YES"}
+              value={buttonTextYes}
+              checked={selectedValue === buttonTextYes}
               onChange={selectYes}
             />
           </div>
@@ -153,7 +156,7 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
           <div
             ref={noRef}
             role="radio"
-            aria-checked={selectedValue === "NO"}
+            aria-checked={selectedValue === buttonTextNo}
             tabIndex={1}
             onClick={selectNo}
             onKeyDown={onOptionKeyDown(selectNo)}
@@ -163,8 +166,8 @@ const BinaryResponseContainer = ({ question }: BinaryResponseContainerProps) => 
               questionID={questionID}
               responseOptionText={buttonTextNo}
               index={1}
-              value="NO"
-              checked={selectedValue === "NO"}
+              value={buttonTextNo}
+              checked={selectedValue === buttonTextNo}
               onChange={selectNo}
             />
           </div>

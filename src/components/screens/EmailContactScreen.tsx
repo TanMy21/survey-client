@@ -16,6 +16,7 @@ const EmailContactScreen = ({ surveyID, question }: QuestionProps) => {
           inputPlaceholder={"Enter your email..."}
           submitButtonText={"OK"}
           question={question}
+          surveyID={surveyID}
         />
       </ResponseContainer>
     </ScreenRoot>

@@ -9,6 +9,7 @@ export const postResponse = async ({
   response,
   deviceID,
   behavior,
+  surveyID,
 }: ResponseData) => {
   try {
     const data = {
@@ -18,6 +19,7 @@ export const postResponse = async ({
       response,
       deviceID,
       behavior,
+      surveyID,
     };
 
     const responseCreated = await fetch(`${import.meta.env.VITE_BASE_URL}/q/res`, {
@@ -42,8 +44,7 @@ export const postResponse = async ({
 
 
 export const recordConsent = async({
-  deviceID,
-  ...body
+ surveyID, deviceID, consentGiven, consentTimestamp
 }: RecordConsentPayload): Promise<RecordConsentResponse> => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}/q/res/consent`, {
     method: "POST",
@@ -51,7 +52,7 @@ export const recordConsent = async({
       "Content-Type": "application/json",
       "Idempotency-Key": `${deviceID}-consent`,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ surveyID, deviceID, consentGiven, consentTimestamp }),
     credentials: "include",
   });
 
@@ -62,7 +63,7 @@ export const recordConsent = async({
   return res.json();
 }
 
-export const submitEmailResponse = async ({
+export const submitEmailResponse = async ({ surveyID,
  deviceID, questionID, email, behavior
 }: EmailResponsePayload): Promise<EmailResponseResult> => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}/q/res/email`, {
@@ -73,7 +74,7 @@ export const submitEmailResponse = async ({
     },
     credentials: "include",
     body: JSON.stringify({
-     deviceID, questionID, email, behavior
+     surveyID, deviceID, questionID, email, behavior
     }),
   });
 
@@ -86,6 +87,7 @@ export const submitEmailResponse = async ({
 
 
 async function postBehavior(payload: {
+  surveyID?:string;
   deviceID: string;
   questionID: string;
   behavior: unknown;
@@ -106,6 +108,7 @@ export function useBehaviorFlush({
   collectBehaviorData,
   questionID,
   deviceID,
+  surveyID,
 }: BehaviorArgs) {
   const sentRef = useRef(false);
   const { mutateAsync } = useMutation({ mutationFn: postBehavior });
@@ -116,6 +119,7 @@ export function useBehaviorFlush({
       if (sentRef.current) return;
       const behavior = collectBehaviorData();
       await mutateAsync({
+        surveyID,
         deviceID,
         questionID,  
         behavior, 
@@ -130,6 +134,7 @@ export function useBehaviorFlush({
       if (sentRef.current) return;
       const behavior = collectBehaviorData();
       await mutateAsync({
+        surveyID,
         questionID,
         deviceID,
         behavior, 
