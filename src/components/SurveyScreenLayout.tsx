@@ -4,7 +4,7 @@ import QuestionRenderer from "./QuestionRenderer";
 import { BacktrackLogger } from "./BacktrackLogger";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { NON_FLOW_TYPES } from "@/types/flowTypes";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
 import SurveyNavigatorCompact from "./SurveyNavigatorCompact";
@@ -25,8 +25,11 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
     onPrev,
     canGoPrev,
   } = useFlowRuntime();
+  const runtime = useFlowRuntime();
   const { canProceed } = useSurveyFlow();
   const isEnd = currentQuestion.type === "END_SCREEN";
+  const isConsentScreen = currentQuestion.type === "CONSENT";
+  const canScrollNext = !isConsentScreen && canProceed;
   const scrollRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const visitedRef = useRef<string[]>([]);
@@ -34,12 +37,22 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
   const [navPulse, setNavPulse] = useState<"next" | "prev" | null>(null);
   const { vibrate } = useHaptics();
 
+
+  const guardedGoNext = useCallback(() => {
+  runtime.goNext();
+}, [runtime]);
+
+// COMMENT: ALWAYS up-to-date goPrev
+const guardedGoPrev = useCallback(() => {
+  runtime.onPrev();
+}, [runtime]);
+
   useScrollNav({
     container: scrollRef,
-    goNext,
-    goPrev: onPrev,
+    goNext:guardedGoNext,
+    goPrev: guardedGoPrev,
     canGoPrev,
-    canGoNext: canProceed,
+    canGoNext: canScrollNext,
     isEnd,
     cooldownMs: 600,
     wheelThreshold: 100,
@@ -54,25 +67,27 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
   useSwipeNav({
     container: scrollRef,
     goNext: () => {
-      goNext();
+      guardedGoNext();                  
       setNavPulse("next");
       vibrate(8);
       setTimeout(() => setNavPulse(null), 720);
     },
     goPrev: () => {
-      onPrev();
+      guardedGoPrev();                  
       setNavPulse("prev");
       vibrate(8);
       setTimeout(() => setNavPulse(null), 720);
     },
     canGoPrev,
-    canGoNext: canProceed,
+    canGoNext: canScrollNext,
     isEnd,
     cooldownMs: 500,
     swipeThreshold: 56,
     dirBias: 1.6,
     mobileQuery: "(pointer:coarse)",
   });
+
+
 
   // useEffect(() => {
   //   if (surveyID) quizSessionStarted(surveyID);

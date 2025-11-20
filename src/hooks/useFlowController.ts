@@ -25,7 +25,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 export function useFlowController(payload: SurveyPayload): UseFlowControllerApi {
   const flowEligible = useMemo(() => buildFlowEligible(payload.questions), [payload.questions]);
   const indexMap = useMemo(() => indexByQuestionID(flowEligible), [flowEligible]);
-
+  const consentQuestionID = payload.questions.find(
+  q => q.type === "CONSENT"
+)?.questionID || null;
+  
+  
   // B) NEW: full list for free nav (includes everything, ordered by .order)
   const navAll = useMemo(
     () => [...payload.questions].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
@@ -174,6 +178,21 @@ const advanceTo = useCallback(
 // CHANGE: make goNext use advanceTo
 const goNext = useCallback(() => {
   return advanceTo((s) => {
+
+   const consentNode = s.navAll.find(q => q.type === "CONSENT");
+    if (consentNode) {
+      const currentNode = s.navAll.find((q) => q.questionID === s.currentQuestionID);
+
+      // COMMENT: Only enforce if both nodes have a defined order.
+      if (
+        currentNode?.order != null &&
+        consentNode.order != null &&
+        currentNode.order < consentNode.order // COMMENT: "before consent" in sequence
+      ) {
+        return consentNode.questionID; // COMMENT: FORCE navigation to consent
+      }
+    }
+
     const idx = s.navIndexById[s.currentQuestionID];
     const nextNode = idx != null ? s.navAll[idx + 1] : undefined;
     return nextNode?.questionID ?? terminalTargetQuestionID(s);
