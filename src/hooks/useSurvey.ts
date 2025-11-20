@@ -4,11 +4,17 @@ import type { EmailResponsePayload, EmailResponseResult, RecordConsentPayload, R
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
-export const useFetchSurvey = (shareID: string) => {
+
+export const useFetchSurvey = (
+  shareID: string,
+  deviceID: string,
+  options?: { enabled?: boolean }
+) => {
   return useQuery({
     queryKey: ["survey", shareID],
-    queryFn: () => fetchSurvey(shareID),
-    staleTime: 5 * 60 * 1000, // 5 mins
+    queryFn: () => fetchSurvey(shareID, deviceID),
+    staleTime: 5 * 60 * 1000,
+    enabled: options?.enabled ?? true,   
   });
 };
 

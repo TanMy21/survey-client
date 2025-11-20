@@ -28,7 +28,7 @@ export function injectConsentAfterWelcome(questions: any[]): any[] {
   const consentNode = {
     questionID: "consent-screen", // Comment: deterministic ID for mapping
     type: "CONSENT",
-    order: undefined, // Comment: order not relied upon anymore
+    order: -2, // Comment: order not relied upon anymore
   } as any;
 
   // Comment: Find welcome and insert right after it by index

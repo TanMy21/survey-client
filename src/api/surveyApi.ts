@@ -1,6 +1,6 @@
-export const fetchSurvey = async (shareID: string) => {
+export const fetchSurvey = async (shareID: string, deviceID:string) => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/ses/${shareID}`);
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/ses/${shareID}?deviceID=${deviceID}`);
 
     if (!response.ok) {
       throw new Error("Network error");
