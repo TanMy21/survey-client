@@ -144,6 +144,13 @@ export interface MediaOptionsProps {
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
+export interface HydrateOptions<T> {
+  question: { questionID: string };
+  mapPersisted?: (persisted: any) => T;    
+  defaultValue?: T;                       
+}
+
+
 export interface MediaOptionProps {
   option: OptionType;
   isSelected?: boolean;
@@ -212,14 +219,29 @@ export type SubmitResponsePayload = {
   behavior?: unknown;           
 };
 
+export type PersistedResponseMap = Record<
+  string,
+  {
+    value: any;        
+    optionID: string | null;  
+  }
+>;
+
 export type  ResponseRegistry = {
   isResponse: (qid: string) => boolean;
   setResponse: (qid: string, v: boolean) => void;
+  persistedResponses: PersistedResponseMap;
 };
 
-export type ResponseRegistryProviderProps = React.PropsWithChildren<{   
-  initial?: Record<string, boolean>;
-}>;
+export interface ResponseRegistryProviderProps {
+  children: React.ReactNode;
+  initial?: Record<string, boolean>;    
+  persistedResponses?: Array<{
+    relatedQuestionID: string;
+    response: any;
+    relatedOptionID: string | null;
+  }>;                                  
+}
 
 export type SubmitResponseSkippedPayload = {
   surveyID: string;

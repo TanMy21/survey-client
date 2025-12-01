@@ -1,24 +1,21 @@
 import type { BinaryResponseContainerProps } from "@/types/responseTypes";
-
 import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { BinaryResponseYes, BinaryResponseNo } from "./BinaryResponseYes";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
-import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 
 const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainerProps) => {
-  const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const { questionID, questionPreferences } = question;
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
-  const { setResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
   const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "YES";
@@ -36,6 +33,16 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     markSubmission,
     collectBehaviorData,
   } = useBehavior();
+
+  const {
+    value: selectedValue,
+    setValue: setSelectedValue,
+    hydrated,
+    clearHydration,
+  } = useHydratedResponse<string>({
+    question,
+    mapPersisted: (p) => p.value, 
+  });
 
   const handleSubmit = useCallback(async () => {
     if (isRequired && selectedValue === null) {
@@ -61,7 +68,15 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     });
 
     onSubmitAnswer(selectedValue);
-  }, [collectBehaviorData, mutateAsync, isRequired, selectedValue, markSubmission, onSubmitAnswer]);
+  }, [
+    collectBehaviorData,
+    mutateAsync,
+    hydrated,
+    isRequired,
+    selectedValue,
+    markSubmission,
+    onSubmitAnswer,
+  ]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
@@ -72,7 +87,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
   }, [selectedValue]);
 
   useAutoSubmitPulse({
-    active: selectedValue !== null,
+    active: selectedValue !== null && !hydrated,
     delayMs: autoSubmitDelayMs,
     feedbackMs: 180,
     onSubmit: handleSubmit,
@@ -88,6 +103,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
       handleOptionChange();
     }
     setSelectedValue(buttonTextYes);
+    clearHydration();
     setError(null);
   };
   const selectNo = () => {
@@ -98,6 +114,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
       handleOptionChange();
     }
     setSelectedValue(buttonTextNo);
+    clearHydration();
     setError(null);
   };
 
@@ -107,10 +124,6 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
       onSelect();
     }
   };
-
-  useEffect(() => {
-    setResponse(question.questionID, selectedValue !== null);
-  }, [selectedValue, question.questionID, setResponse]);
 
   return (
     <div className="mx-auto flex h-full w-full flex-col items-center justify-center gap-2 p-2 sm:w-4/5">

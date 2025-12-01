@@ -9,18 +9,32 @@ import SingleChoiceListItem from "./SingleChoiceListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
-import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 
-const SingleChoiceList = ({surveyID, question }: SingleChoiceListProps) => {
+const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
   const { options } = question || {};
+  const {
+    value: selectedOptionID,
+    setValue: setSelectedOptionID,
+    hydrated,
+    clearHydration,
+  } = useHydratedResponse<string | null>({
+    question: question!,
+    defaultValue: null,
+    mapPersisted: (p) => {
+      if (p.optionID) return p.optionID;
+
+      // map to optionID
+      const match = options?.find((opt) => opt.value === p.value);
+      return match ? match.optionID : null;
+    },
+  });
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
-  const { setResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [selectedOptionID, setSelectedOptionID] = useState<string | null>(null);
   const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const {
@@ -61,9 +75,7 @@ const SingleChoiceList = ({surveyID, question }: SingleChoiceListProps) => {
     });
 
     setError(null);
-    setResponse(question.questionID, true);
-
-    onSubmitAnswer(optionValue!);
+    onSubmitAnswer(optionValue);
   }, [options, selectedOptionID, isRequired, markSubmission, mutateAsync, collectBehaviorData]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
@@ -76,6 +88,7 @@ const SingleChoiceList = ({surveyID, question }: SingleChoiceListProps) => {
     }
     handleClick();
     setSelectedOptionID(optionID);
+    clearHydration();
     if (error) setError(null);
   };
 
@@ -92,7 +105,7 @@ const SingleChoiceList = ({surveyID, question }: SingleChoiceListProps) => {
   }, [selectedOptionID, options]);
 
   useAutoSubmitPulse({
-    active: !!selectedOptionID,
+    active: !!selectedOptionID && !hydrated,
     delayMs: 2000,
     feedbackMs: 180,
     onSubmit: handleSubmit,

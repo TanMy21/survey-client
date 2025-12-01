@@ -10,7 +10,7 @@ import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
-import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 
 const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProps) => {
   const isMobile = useIsMobile();
@@ -18,16 +18,34 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
+  const { handleFirstInteraction, handleClick, markSubmission, collectBehaviorData } =
+    useBehavior();
+
+  const {
+    value: selectedOptions,
+    setValue: setSelectedOptions,
+    hydrated,
+    clearHydration,
+  } = useHydratedResponse<{ optionID: string; value: string }[]>({
+    question: question!,
+    defaultValue: [],
+    mapPersisted: (p) => {
+      if (!Array.isArray(p.value)) return [];
+
+      return options
+        .filter((opt) => p.value.includes(opt.value))
+        .map((opt) => ({
+          optionID: opt.optionID,
+          value: opt.value,
+        }));
+    },
+  });
+
   const [error, setError] = useState<string | null>(null);
-  const [selectedOptions, setSelectedOptions] = useState<{ optionID: string; value: string }[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const optionRefMap = useRef<Record<string, HTMLDivElement | null>>({});
   const lastChangedIDRef = useRef<string | null>(null);
   const submitRef = useRef<() => void | Promise<void>>(() => {});
-  const { handleFirstInteraction, handleClick, markSubmission, collectBehaviorData } =
-    useBehavior();
-
-  const { setResponse } = useResponseRegistry();
 
   const stableSubmit = useCallback(() => submitRef.current(), []);
 
@@ -35,26 +53,29 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
     (optionID: string) => {
       handleFirstInteraction();
       handleClick();
+
       const opt = options.find((o) => o.optionID === optionID);
       const optionValue = opt?.value ?? opt?.text ?? optionID;
 
       setSelectedOptions((prev) => {
-        const exists = prev.find((o) => o.optionID === optionID);
+        const list = prev ?? [];
+
+        const exists = list.find((o) => o.optionID === optionID);
+
         const next = exists
-          ? prev.filter((o) => o.optionID !== optionID)
-          : [...prev, { optionID, value: optionValue }];
+          ? list.filter((o) => o.optionID !== optionID)
+          : [...list, { optionID, value: optionValue }];
 
         lastChangedIDRef.current = optionID;
-        return next;
+        return next; 
       });
 
       if (error) setError(null);
     },
     [options, handleClick, handleFirstInteraction, error]
   );
-
   const handleSubmit = useCallback(async () => {
-    if (isRequired && selectedOptions.length === 0) {
+    if (isRequired && selectedOptions?.length === 0) {
       setError("Your response is required for this question");
       return;
     }
@@ -67,26 +88,25 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
     const behaviorData = collectBehaviorData();
     console.log("📦 MediaScreen behavior data:", behaviorData);
 
-    const selectedValues = selectedOptions.map((o) => o.value);
+    const selectedValues = selectedOptions?.map((o) => o.value);
     console.log("Selected Media Options:", selectedValues);
 
     await mutateAsync({
       questionID: question?.questionID!,
       qType: question?.type!,
       optionID: null,
-      response: selectedValues,
+      response: selectedValues!,
       deviceID,
       behavior: behaviorData,
       surveyID,
     });
 
-    setResponse(question?.questionID!, true);
-
-    onSubmitAnswer(selectedValues);
+    onSubmitAnswer(selectedValues!);
   }, [
     isRequired,
     selectedOptions,
     mutateAsync,
+    hydrated,
     markSubmission,
     collectBehaviorData,
     onSubmitAnswer,
@@ -104,7 +124,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
   }, [selectedOptions]);
 
   useAutoSubmitPulse({
-    active: selectedOptions.length > 0,
+    active: selectedOptions?.length! > 0 && !hydrated,
     delayMs: 6000,
     feedbackMs: 180,
     onSubmit: stableSubmit,
@@ -115,7 +135,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
 
   const selectedSet = useMemo(() => {
     const s = new Set<string>();
-    for (const o of selectedOptions) s.add(o.optionID);
+    for (const o of selectedOptions!) s.add(o.optionID);
     return s;
   }, [selectedOptions]);
 

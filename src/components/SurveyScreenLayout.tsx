@@ -21,8 +21,6 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
     currentDisplayIndex,
     visitedStack,
     flowEligible,
-    goNext,
-    onPrev,
     canGoPrev,
   } = useFlowRuntime();
   const runtime = useFlowRuntime();
@@ -37,19 +35,18 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
   const [navPulse, setNavPulse] = useState<"next" | "prev" | null>(null);
   const { vibrate } = useHaptics();
 
-
   const guardedGoNext = useCallback(() => {
-  runtime.goNext();
-}, [runtime]);
+    runtime.goNext();
+  }, [runtime]);
 
-// COMMENT: ALWAYS up-to-date goPrev
-const guardedGoPrev = useCallback(() => {
-  runtime.onPrev();
-}, [runtime]);
+ 
+  const guardedGoPrev = useCallback(() => {
+    runtime.onPrev();
+  }, [runtime]);
 
   useScrollNav({
     container: scrollRef,
-    goNext:guardedGoNext,
+    goNext: guardedGoNext,
     goPrev: guardedGoPrev,
     canGoPrev,
     canGoNext: canScrollNext,
@@ -67,13 +64,13 @@ const guardedGoPrev = useCallback(() => {
   useSwipeNav({
     container: scrollRef,
     goNext: () => {
-      guardedGoNext();                  
+      guardedGoNext();
       setNavPulse("next");
       vibrate(8);
       setTimeout(() => setNavPulse(null), 720);
     },
     goPrev: () => {
-      guardedGoPrev();                  
+      guardedGoPrev();
       setNavPulse("prev");
       vibrate(8);
       setTimeout(() => setNavPulse(null), 720);
@@ -86,8 +83,6 @@ const guardedGoPrev = useCallback(() => {
     dirBias: 1.6,
     mobileQuery: "(pointer:coarse)",
   });
-
-
 
   // useEffect(() => {
   //   if (surveyID) quizSessionStarted(surveyID);

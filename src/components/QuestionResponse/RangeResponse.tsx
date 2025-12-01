@@ -8,7 +8,7 @@ import ScaleCounter from "./ScaleCounter";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
-import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 
 const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const isMobile = useIsMobile();
@@ -18,8 +18,6 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
-  const [selectedValue, setSelectedValue] = useState(Math.ceil((minValue + maxValue) / 2));
-  const { setResponse } = useResponseRegistry();
 
   const {
     handleFirstInteraction,
@@ -28,6 +26,22 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
     markSubmission,
     collectBehaviorData,
   } = useBehavior();
+
+  const {
+    value: selectedValue,
+    setValue: setSelectedValue,
+    hydrated,
+    clearHydration,
+  } = useHydratedResponse<number>({
+    question,
+    defaultValue: Math.ceil((minValue + maxValue) / 2),
+    mapPersisted: (p) => {
+      const fallback = Math.ceil((minValue + maxValue) / 2);
+      const parsed = Number(p.value);
+
+      return p.value == null || Number.isNaN(parsed) ? fallback : parsed;
+    },
+  });
 
   const handleSliderChange = (value: number) => {
     handleFirstInteraction();
@@ -39,6 +53,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
       return value;
     });
 
+    if (hydrated) clearHydration();
     if (error) setError(null);
   };
 
@@ -71,19 +86,17 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
       surveyID,
     });
 
-    setResponse(question.questionID, true);
-
     onSubmitAnswer(selectedValue);
   };
 
   return (
     <div className="w-4/5 p-2 sm:p-3 md:p-4 xl:p-6">
       {isMobile ? (
-        <ScaleCounter question={question} value={selectedValue} setValue={handleSliderChange} />
+        <ScaleCounter question={question} value={selectedValue!} setValue={handleSliderChange} />
       ) : (
         <ProgressiveSlider
           question={question}
-          value={selectedValue}
+          value={selectedValue!}
           setValue={handleSliderChange}
         />
       )}

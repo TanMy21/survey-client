@@ -9,22 +9,20 @@ import MultipleChoiceList from "./MultipleChoiceList";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useDeviceId } from "@/hooks/useDeviceID";
-import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import type { OptionType } from "@/types/optionTypes";
 
-const MultipleChoiceResponseContainer = ({surveyID, question }: MultipleChoiceContainerProps) => {
+const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceContainerProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { setResponse } = useResponseRegistry();
   const { mutateAsync, isPending } = useSubmitResponse();
-  const [selectedOptions, setSelectedOptions] = useState<{ optionID: string; value: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const optionRefMap = useRef<Record<string, HTMLDivElement | null>>({});
   const submitRef = useRef<() => void | Promise<void>>(() => {});
   const lastChangedIDRef = useRef<string | null>(null);
-
   const stableSubmit = useCallback(() => submitRef.current(), []);
 
   const {
@@ -35,28 +33,57 @@ const MultipleChoiceResponseContainer = ({surveyID, question }: MultipleChoiceCo
     collectBehaviorData,
   } = useBehavior();
 
-  const handleOptionToggle = (optionID: string, value: string) => {
-    handleFirstInteraction();
-    handleOptionChange();
-    setSelectedOptions((prev) => {
-      const exists = prev.find((o) => o.optionID === optionID);
-      const next = exists
-        ? prev.filter((o) => o.optionID !== optionID)
-        : [...prev, { optionID, value }];
+  const {
+    value: selectedOptions,
+    setValue: setSelectedOptions,
+    hydrated,
+    clearHydration,
+  } = useHydratedResponse<{ optionID: string; value: string }[]>({
+    question: question!,
+    defaultValue: [],
+    mapPersisted: (p) => {
+      if (!Array.isArray(p.value)) return [];
+      return (options ?? [])
+        .filter((opt: OptionType) => p.value.includes(opt.value))
+        .map((opt: OptionType) => ({
+          optionID: opt.optionID,
+          value: opt.value,
+        }));
+    },
+  });
 
-      if ((exists && next.length !== prev.length) || (!exists && next.length !== prev.length)) {
+  const handleOptionToggle = useCallback(
+    (optionID: string) => {
+      handleFirstInteraction();
+
+      const opt = options?.find((o) => o.optionID === optionID);
+      const value = opt?.value ?? opt?.text ?? optionID;
+
+      setSelectedOptions((prev) => {
+        const list = prev ?? [];
+        const exists = list.find((o) => o.optionID === optionID);
+
+        const next = exists
+          ? list.filter((o) => o.optionID !== optionID)
+          : [...list, { optionID, value }];
+
+        lastChangedIDRef.current = optionID;
+
+        if (hydrated) clearHydration();
+
         handleOptionChange();
-      }
+        handleClick();
 
-      lastChangedIDRef.current = optionID;
-      return next;
-    });
+        return next;
+      });
 
-    if (error) setError(null);
-  };
+      if (error) setError(null);
+    },
+    [selectedOptions, options, hydrated]
+  );
 
   const handleSubmit = useCallback(async () => {
-    if (isRequired && selectedOptions.length === 0) {
+    if (isRequired && selectedOptions?.length === 0) {
       setError("Your response is required for this question");
       return;
     }
@@ -74,21 +101,19 @@ const MultipleChoiceResponseContainer = ({surveyID, question }: MultipleChoiceCo
     console.log("📦 MultipleChoiceScreen behavior data:", behaviorData);
     console.log("Selected Options:", selectedOptions);
 
-    const selectedValues = selectedOptions.map((o) => o.value);
+    const selectedValues = selectedOptions?.map((o) => o.value);
 
     await mutateAsync({
       questionID: question.questionID,
       qType: question.type,
       optionID: null,
-      response: selectedValues,
+      response: selectedValues!,
       deviceID,
       behavior: behaviorData,
       surveyID,
     });
 
-    setResponse(question.questionID, selectedOptions.length > 0);
-
-    onSubmitAnswer(selectedValues);
+    onSubmitAnswer(selectedValues!);
   }, [
     isRequired,
     selectedOptions,
@@ -97,10 +122,10 @@ const MultipleChoiceResponseContainer = ({surveyID, question }: MultipleChoiceCo
     question?.type,
     handleFirstInteraction,
     handleClick,
+    hydrated,
     markSubmission,
     collectBehaviorData,
     mutateAsync,
-    setResponse,
     onSubmitAnswer,
   ]);
 
@@ -116,7 +141,7 @@ const MultipleChoiceResponseContainer = ({surveyID, question }: MultipleChoiceCo
   }, [selectedOptions]);
 
   useAutoSubmitPulse({
-    active: selectedOptions.length > 0,
+    active: selectedOptions?.length! > 0 && !hydrated,
     delayMs: 4000,
     feedbackMs: 180,
     onSubmit: stableSubmit,
@@ -140,7 +165,7 @@ const MultipleChoiceResponseContainer = ({surveyID, question }: MultipleChoiceCo
         <div className="mx-auto flex h-[98%] w-full flex-col items-center justify-start xl:top-[50%]">
           <MultipleChoiceList
             options={options!}
-            selectedOptions={selectedOptions}
+            selectedOptions={selectedOptions!}
             onToggle={handleOptionToggle}
             registerOptionRef={(optionID, el) => {
               optionRefMap.current[optionID] = el;

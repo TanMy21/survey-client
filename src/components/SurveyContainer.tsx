@@ -2,7 +2,7 @@ import { FlowRuntimeProvider } from "@/context/FlowRuntimeProvider";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
 import SurveyScreenLayout from "./SurveyScreenLayout";
 import { useFetchSurvey } from "@/hooks/useSurvey";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect } from "react";
 import { LogoLoader } from "./loader/LogoLoader";
 import { useCreateSession } from "@/hooks/useSession";
 import { useSession } from "@/context/useSessionContext";
@@ -37,7 +37,7 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
     data: survey,
     isLoading: surveyLoading,
     isError: surveyError,
-  } = useFetchSurvey(shareID!, deviceID,{
+  } = useFetchSurvey(shareID!, deviceID, {
     enabled: sessionReady,
   });
 
@@ -92,8 +92,8 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
   console.log("Survey loaded:", survey);
 
   return (
-    <FlowRuntimeProvider payload={survey!}>
-      <ResponseRegistryProvider>
+    <FlowRuntimeProvider payload={survey}>
+      <ResponseRegistryProvider persistedResponses={survey.responses}>
         <SurveyScreenLayout surveyID={survey.surveyID} shareID={shareID} />
       </ResponseRegistryProvider>
     </FlowRuntimeProvider>

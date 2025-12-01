@@ -7,13 +7,29 @@ import RankListItem from "./RankListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
-import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 
 const RankList = ({ surveyID, options, question }: RankListProps) => {
-  const [localOptions, setLocalOptions] = useState<OptionType[]>(options);
+  const { value: localOptions, setValue: setLocalOptions } = useHydratedResponse<OptionType[]>({
+    question: question!,
+    defaultValue: options, // original ordering
+    mapPersisted: (p) => {
+      if (!Array.isArray(p.value)) return options;
+
+      const sorted = [...p.value].sort((a, b) => a.rank - b.rank);
+
+      const mapped = sorted
+        .map((item) => options.find((o) => o.optionID === item.optionID))
+        .filter(Boolean) as OptionType[];
+
+      // fallback to original options
+      if (mapped.length !== options.length) return options;
+
+      return mapped;
+    },
+  });
   const [error, setError] = useState<string | null>(null);
   const { onSubmitAnswer } = useFlowRuntime();
-  const { setResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
   const {
@@ -32,7 +48,7 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
     handleClick();
     handleOptionChange();
 
-    const reordered = Array.from(localOptions);
+    const reordered = Array.from(localOptions!);
     const [moved] = reordered.splice(source.index, 1);
     reordered.splice(destination.index, 0, moved);
 
@@ -52,13 +68,13 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
   };
 
   const handleSubmit = async () => {
-    const rankedData = localOptions.map((o, idx) => ({
+    const rankedData = localOptions?.map((o, idx) => ({
       optionID: o.optionID,
       value: o.text ?? o.value,
       rank: idx + 1,
     }));
 
-    const rankings = rankedData.map((o) => o.value);
+    const rankings = rankedData?.map((o) => o.value);
 
     if (!question?.questionID || !question?.type || !deviceID) {
       setError("Missing identifiers. Please reload and try again.");
@@ -79,14 +95,12 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
         questionID: question.questionID,
         qType: question.type,
         optionID: null,
-        response: rankedData,
+        response: rankedData!,
         deviceID,
         behavior,
       });
 
-      setResponse(question.questionID, true);
-
-      onSubmitAnswer(rankings);
+      onSubmitAnswer(rankings!);
     } catch (e) {
       console.error("[RankList] submit failed:", e);
       setError("Failed to submit ranking. Please try again.");

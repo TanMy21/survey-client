@@ -8,7 +8,7 @@ import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
-import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 
 const InputResponseNumber = ({
   inputPlaceholder,
@@ -17,55 +17,68 @@ const InputResponseNumber = ({
   surveyID,
 }: InputResponseProps) => {
   const isRequired = useQuestionRequired(question);
-  const [number, setNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
-  const { handleFirstInteraction, handleClick, handleTyping, handlePaste, markSubmission, collectBehaviorData } =
-    useBehavior();
-  const { setResponse } = useResponseRegistry();
+  const {
+    handleFirstInteraction,
+    handleClick,
+    handleTyping,
+    handlePaste,
+    markSubmission,
+    collectBehaviorData,
+  } = useBehavior();
+
+  const {
+    value: number,
+    setValue: setNumber,
+    hydrated,
+    clearHydration,
+  } = useHydratedResponse<string>({
+    question: question!,
+    defaultValue: "",
+    mapPersisted: (p) => String(p.value ?? ""),
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    
     const native = e.nativeEvent as InputEvent | undefined;
     const inputType = native?.inputType;
 
     if (inputType === "deleteContentBackward") {
-      handleTyping("Backspace");  
+      handleTyping("Backspace");
     } else {
       const lastChar = value.slice(-1);
       if (lastChar) {
-        handleTyping(lastChar);  
+        handleTyping(lastChar);
       }
     }
 
     setNumber(value);
+    if (hydrated) clearHydration();
   };
 
   const handlePasteEvent = () => {
     handlePaste();
+    if (hydrated) clearHydration();
   };
 
   const handleSubmit = async () => {
- const trimmed = number.trim();
+    const trimmed = number?.trim();
     const result = numberResponseSchema.safeParse({ number: trimmed });
 
-    
     if (isRequired && trimmed === "") {
       setError("Your response is required for this question");
       return;
     }
 
-     
     if (!result.success) {
       setError(result.error.format().number?._errors[0] ?? "Invalid input");
       return;
     }
 
-     
     if (!question?.questionID || !deviceID) {
       setError("Missing identifiers. Please reload and try again.");
       return;
@@ -73,39 +86,31 @@ const InputResponseNumber = ({
 
     setError(null);
 
-     
-    handleFirstInteraction();  
-    handleClick();  
+    handleFirstInteraction();
+    handleClick();
     markSubmission();
 
-    
     const behavior = collectBehaviorData();
     console.log("📦 Number input behavior data:", behavior);
     console.log("Input submitted:", trimmed);
 
-    
     await mutateAsync({
       surveyID,
       questionID: question.questionID,
       qType: question.type,
       optionID: null,
-      response: trimmed,
+      response: trimmed!,
       deviceID,
       behavior,
     });
 
-    
-    setResponse(question.questionID, true);
-     
-    onSubmitAnswer(trimmed);
-    
-    setNumber("");
+    onSubmitAnswer(trimmed!);
   };
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
   const handleBlur = () => {
-    const trimmed = number.trim();
+    const trimmed = number?.trim();
 
     if (trimmed === "") {
       if (isRequired) {
@@ -129,7 +134,7 @@ const InputResponseNumber = ({
         <input
           type="number"
           placeholder={inputPlaceholder}
-          value={number}
+          value={number!}
           onChange={handleChange}
           onPaste={handlePasteEvent}
           onFocus={handleFirstInteraction}

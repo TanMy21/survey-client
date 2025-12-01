@@ -7,7 +7,8 @@ import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
-import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import z from "zod";
 
 const InputResponseText = ({
   inputPlaceholder,
@@ -15,13 +16,22 @@ const InputResponseText = ({
   question,
   surveyID,
 }: InputResponseProps) => {
-  const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
   const deviceID = useDeviceId();
-  const { setResponse } = useResponseRegistry();
   const { mutateAsync, isPending } = useSubmitResponse();
   const { onSubmitAnswer } = useFlowRuntime();
+
+  const {
+    value: text,
+    setValue: setText,
+    hydrated,
+    clearHydration,
+  } = useHydratedResponse<string>({
+    question: question!,
+    defaultValue: "",
+    mapPersisted: (p) => String(p.value ?? ""),
+  });
 
   const {
     handleFirstInteraction,
@@ -34,7 +44,7 @@ const InputResponseText = ({
   } = useBehavior();
 
   const handleSubmit = async () => {
-    const trimmed = text.trim();
+    const trimmed = text?.trim();
     const result = textResponseSchema.safeParse({ text: trimmed });
 
     if (isRequired && trimmed === "") {
@@ -45,7 +55,7 @@ const InputResponseText = ({
     if (!question?.questionID || !deviceID) return;
 
     if (!result.success) {
-      const errorMessage = result.error.format().text?._errors?.[0] ?? "Invalid input";
+      const errorMessage = z.prettifyError(result.error) || "Invalid input";
       setError(errorMessage);
     } else {
       setError(null);
@@ -64,10 +74,7 @@ const InputResponseText = ({
         behavior,
       });
 
-
-      setResponse(question.questionID, true);
       onSubmitAnswer(text);
-      setText("");
     }
   };
 
@@ -84,7 +91,7 @@ const InputResponseText = ({
   };
 
   const handleBlur = () => {
-    const trimmed = text.trim();
+    const trimmed = text?.trim();
 
     if (trimmed === "") {
       if (isRequired) {
@@ -95,7 +102,7 @@ const InputResponseText = ({
 
     const result = textResponseSchema.safeParse({ text: trimmed });
     if (!result.success) {
-      setError(result.error.format().text?._errors[0] ?? "Invalid email format");
+      setError(z.prettifyError(result.error) ?? "Invalid email format");
     } else {
       setError(null);
     }
@@ -104,23 +111,25 @@ const InputResponseText = ({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     handleTyping(newValue);
+    if (hydrated) clearHydration();
     setText(newValue);
   };
 
   const handlePasteEvent = () => {
     handlePaste();
+    if (hydrated) clearHydration();
   };
 
   useEffect(() => {
     handleBacktrack();
-  }, []);
+  }, [handleBacktrack]);
 
   return (
     <div className="flex w-full origin-bottom flex-col sm:w-[92%]">
       <div className="mx-auto flex h-[60%] w-[100%] flex-col">
         {/* Input field  */}
         <textarea
-          value={text}
+          value={text!}
           onChange={handleChange}
           onPaste={handlePasteEvent}
           onBlur={handleBlur}
