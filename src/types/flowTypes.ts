@@ -77,6 +77,7 @@ export const NON_FLOW_TYPES = new Set([
   "CONSENT",
   "INSTRUCTIONS",
   "EMAIL_CONTACT",
+  // "END_SCREEN",
 ]);
 
 export const END_SCREEN_TYPE: string = "END_SCREEN";

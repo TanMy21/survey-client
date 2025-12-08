@@ -4,9 +4,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 
 const SurveyNavigatorCompact = ({ disableNext, navPulse }: SurveyNavigatorCompactProps) => {
-  const { currentQuestion, canGoPrev, onPrev, goNext, isLastQuestion } = useFlowRuntime();
+  const { currentQuestion, canGoPrev, onPrev, goNext, isTerminal } = useFlowRuntime();
   const isEnd = currentQuestion.type === "END_SCREEN";
-  const hideNext = isLastQuestion && !isEnd;
+  const hideNext = isTerminal;
 
   const pulseVariant = {
     rest: { scale: 1, boxShadow: "0 0 0px rgba(37,99,235,0)" },
@@ -31,20 +31,24 @@ const SurveyNavigatorCompact = ({ disableNext, navPulse }: SurveyNavigatorCompac
             </motion.button>
           )}
 
-          {!isEnd && !hideNext && (
-            <motion.button
-              className="h-11 w-11 rounded-full p-2 text-gray-700 transition hover:text-black disabled:opacity-40"
-              disabled={disableNext}
-              onClick={goNext}
-              aria-label="Next"
-              variants={pulseVariant}
-              animate={navPulse === "next" ? "pulse" : "rest"}
-              transition={{ type: "spring", stiffness: 400, damping: 18 }}
-              whileTap={{ scale: 0.94 }}
-            >
-              <ChevronRight className="h-6 w-6 sm:h-7 sm:w-7" />
-            </motion.button>
-          )}
+          {
+            // !isEnd &&
+            !hideNext &&
+             (
+              <motion.button
+                className="h-11 w-11 rounded-full p-2 text-gray-700 transition hover:text-black disabled:opacity-40"
+                disabled={disableNext}
+                onClick={goNext}
+                aria-label="Next"
+                variants={pulseVariant}
+                animate={navPulse === "next" ? "pulse" : "rest"}
+                transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                whileTap={{ scale: 0.94 }}
+              >
+                <ChevronRight className="h-6 w-6 sm:h-7 sm:w-7" />
+              </motion.button>
+            )
+          }
         </div>
       </div>
     </div>

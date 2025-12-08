@@ -32,3 +32,9 @@ export interface SessionContextValue {
   setSession: (session: Session) => void;
   clearSession: () => void;
 }
+
+
+export interface PauseSessionArgs {
+  surveyID: string;
+  deviceID: string;
+}

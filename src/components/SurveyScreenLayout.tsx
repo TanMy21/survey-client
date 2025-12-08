@@ -4,8 +4,8 @@ import QuestionRenderer from "./QuestionRenderer";
 import { BacktrackLogger } from "./BacktrackLogger";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { NON_FLOW_TYPES } from "@/types/flowTypes";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { END_SCREEN_TYPE, NON_FLOW_TYPES } from "@/types/flowTypes";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
 import SurveyNavigatorCompact from "./SurveyNavigatorCompact";
 import { useScrollNav } from "@/hooks/useScrollNav";
@@ -13,6 +13,11 @@ import { useSwipeNav } from "@/hooks/useSwipeNav";
 import { useHaptics } from "@/utils/utils";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import SkipOnAdvanceBridge from "./SkipOnAdvancedBridge";
+import { completeSession } from "@/api/sessionApi";
+import { useSession } from "@/context/useSessionContext";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSessionActivitySync } from "@/hooks/useSessionActivitySync";
+ 
 
 const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
   const {
@@ -22,7 +27,9 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
     visitedStack,
     flowEligible,
     canGoPrev,
+    isTerminal,
   } = useFlowRuntime();
+  useSessionActivitySync(surveyID!); 
   const runtime = useFlowRuntime();
   const { canProceed } = useSurveyFlow();
   const isEnd = currentQuestion.type === "END_SCREEN";
@@ -30,6 +37,8 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
   const canScrollNext = !isConsentScreen && canProceed;
   const scrollRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const deviceID = useDeviceId();
+  const { session } = useSession();
   const visitedRef = useRef<string[]>([]);
   const backtrackCountMapRef = useRef<Map<string, number>>(new Map());
   const [navPulse, setNavPulse] = useState<"next" | "prev" | null>(null);
@@ -39,7 +48,6 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
     runtime.goNext();
   }, [runtime]);
 
- 
   const guardedGoPrev = useCallback(() => {
     runtime.onPrev();
   }, [runtime]);
@@ -107,6 +115,30 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
   //       <div className="flex h-screen w-full items-center justify-center">Error Loading Survey.</div>
   //     );
   //   }
+
+  const hasEndScreen = useMemo(
+    () => flowEligible.some((q) => q.type === END_SCREEN_TYPE),
+    [flowEligible]
+  );
+
+  const completionRef = useRef(false);
+
+  useEffect(() => {
+    if (!currentQuestion || !session) return;
+    if (completionRef.current) return;
+
+    const shouldComplete = hasEndScreen ? isEnd : isTerminal;
+
+    if (isEnd) {
+      completionRef.current = true;
+
+      completeSession({
+        surveyID,
+        deviceID,
+        shareID: shareID!,
+      }).catch((err) => console.error("Error completing session:", err));
+    }
+  }, [currentQuestionID, session, hasEndScreen, isEnd, isTerminal, surveyID, deviceID, shareID]);
 
   // progress
   const totalCount = useMemo(
