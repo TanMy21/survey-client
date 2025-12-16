@@ -9,6 +9,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import z from "zod";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const InputResponseText = ({
   inputPlaceholder,
@@ -18,6 +19,7 @@ const InputResponseText = ({
 }: InputResponseProps) => {
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
+  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
   const { onSubmitAnswer } = useFlowRuntime();
@@ -61,6 +63,7 @@ const InputResponseText = ({
       setError(null);
       handleClick();
       markSubmission();
+      markAnswered(question.questionID);
       const behavior = collectBehaviorData();
       console.log("📦 TextScreen behavior data:", behavior);
       console.log("Submitted response:", text);
@@ -73,6 +76,8 @@ const InputResponseText = ({
         deviceID,
         behavior,
       });
+
+      setRealTimeResponse(question.questionID, text!, null);
 
       onSubmitAnswer(text);
     }
@@ -110,6 +115,7 @@ const InputResponseText = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
+    markTouched(question?.questionID!);
     handleTyping(newValue);
     if (hydrated) clearHydration();
     setText(newValue);
@@ -117,12 +123,19 @@ const InputResponseText = ({
 
   const handlePasteEvent = () => {
     handlePaste();
+    markTouched(question?.questionID!);
     if (hydrated) clearHydration();
   };
 
   useEffect(() => {
     handleBacktrack();
   }, [handleBacktrack]);
+
+  useEffect(() => {
+    if (hydrated && text !== "") {
+      markAnswered(question?.questionID!);
+    }
+  }, [hydrated, text, question?.questionID, markAnswered]);
 
   return (
     <div className="flex w-full origin-bottom flex-col sm:w-[92%]">

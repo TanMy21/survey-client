@@ -22,11 +22,12 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
     isIdle,
     isPending: sessionPending,
     isSuccess: sessionReady,
-  } = useCreateSession({
-    onSuccess: (session: Session) => {
-      setSession(session);
-    },
-  });
+  } = useCreateSession();
+  //   {
+  //   onSuccess: (session: Session) => {
+  //     setSession(session);
+  //   },
+  // }
 
   useEffect(() => {
     if (!isIdle) return; // mutation already triggered or completed
@@ -41,39 +42,15 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
     enabled: sessionReady,
   });
 
-  // const createSessionOnceRef = useRef(false);
+  const participantSession = survey?.participantSession;
 
-  // const payload = useMemo(() => {
-  //   if (!data) return null;
+  useEffect(() => {
+    if (participantSession) {
+      setSession(participantSession);
+    }
+  }, [participantSession, setSession]);
 
-  //   const base = [...(data.questions ?? [])];
-
-  //   const consentScreen = {
-  //     questionID: "consent-screen",
-  //     type: "CONSENT",
-  //     order: -2,
-  //   } as any;
-
-  //   const welcomeIdx = base.findIndex((q) => q.type === "WELCOME_SCREEN");
-  //   if (welcomeIdx >= 0) {
-  //     const welcomeOrder = base[welcomeIdx].order ?? 0;
-  //     consentScreen.order = welcomeOrder + 0.5;
-  //     base.push(consentScreen);
-  //   } else {
-  //     consentScreen.order = -1e6;
-  //     base.push(consentScreen);
-  //   }
-
-  //   const questionsWithInjectedConsentScreen = base.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-
-  //   return {
-  //     shareID,
-  //     questions: questionsWithInjectedConsentScreen,
-  //     FlowCondition: data.FlowCondition,
-  //   };
-  // }, [data, shareID]);
-
-  if (surveyLoading || sessionPending || !session) {
+  if (surveyLoading || sessionPending || !survey) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-white">
         <LogoLoader />
@@ -88,8 +65,6 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
       </div>
     );
   }
-
-  console.log("Survey loaded:", survey);
 
   return (
     <FlowRuntimeProvider payload={survey}>

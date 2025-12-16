@@ -2,15 +2,20 @@ import { useBehavior } from "@/context/BehaviorTrackerContext";
 import type { OptionType } from "@/types/optionTypes";
 import type { RankListProps } from "@/types/responseTypes";
 import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-pangea/dnd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RankListItem from "./RankListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const RankList = ({ surveyID, options, question }: RankListProps) => {
-  const { value: localOptions, setValue: setLocalOptions } = useHydratedResponse<OptionType[]>({
+  const {
+    value: localOptions,
+    setValue: setLocalOptions,
+    hydrated,
+  } = useHydratedResponse<OptionType[]>({
     question: question!,
     defaultValue: options, // original ordering
     mapPersisted: (p) => {
@@ -29,6 +34,7 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
     },
   });
   const [error, setError] = useState<string | null>(null);
+  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
@@ -47,6 +53,7 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
     handleFirstInteraction();
     handleClick();
     handleOptionChange();
+    markTouched(question?.questionID!);
 
     const reordered = Array.from(localOptions!);
     const [moved] = reordered.splice(source.index, 1);
@@ -83,6 +90,7 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
 
     handleFirstInteraction();
     handleClick();
+    markAnswered(question.questionID);
     markSubmission();
 
     const behavior = collectBehaviorData();
@@ -100,12 +108,20 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
         behavior,
       });
 
+      setRealTimeResponse(question.questionID, rankings!, null);
+
       onSubmitAnswer(rankings!);
     } catch (e) {
       console.error("[RankList] submit failed:", e);
       setError("Failed to submit ranking. Please try again.");
     }
   };
+
+  useEffect(() => {
+    if (hydrated && localOptions?.length) {
+      markAnswered(question?.questionID!);
+    }
+  }, [hydrated, localOptions, question?.questionID, markAnswered]);
 
   return (
     <div className="flex w-full origin-bottom flex-col sm:w-3/5">

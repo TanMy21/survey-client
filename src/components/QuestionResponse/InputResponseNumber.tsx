@@ -3,12 +3,13 @@ import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 import type { InputResponseProps } from "@/types/responseTypes";
 import { numberResponseSchema } from "@/utils/validationSchema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const InputResponseNumber = ({
   inputPlaceholder,
@@ -18,6 +19,7 @@ const InputResponseNumber = ({
 }: InputResponseProps) => {
   const isRequired = useQuestionRequired(question);
   const [error, setError] = useState<string | null>(null);
+  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
@@ -43,6 +45,8 @@ const InputResponseNumber = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+
+    markTouched(question?.questionID!);
 
     const native = e.nativeEvent as InputEvent | undefined;
     const inputType = native?.inputType;
@@ -89,6 +93,7 @@ const InputResponseNumber = ({
     handleFirstInteraction();
     handleClick();
     markSubmission();
+    markAnswered(question.questionID);
 
     const behavior = collectBehaviorData();
     console.log("📦 Number input behavior data:", behavior);
@@ -103,6 +108,8 @@ const InputResponseNumber = ({
       deviceID,
       behavior,
     });
+
+    setRealTimeResponse(question.questionID, trimmed!, null);
 
     onSubmitAnswer(trimmed!);
   };
@@ -126,6 +133,12 @@ const InputResponseNumber = ({
       setError(null);
     }
   };
+
+    useEffect(() => {
+    if (hydrated && number !== "") {
+      markAnswered(question?.questionID!);
+    }
+  }, [hydrated, number, question?.questionID, markAnswered]);
 
   return (
     <div className="flex w-full origin-bottom flex-col sm:w-[92%]">

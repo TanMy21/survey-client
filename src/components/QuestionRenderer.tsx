@@ -10,7 +10,12 @@ const QuestionRenderer = ({ question, surveyID, currentIndex }: QuestionProps) =
       className="mx-auto min-h-screen w-[92%] border-2 border-blue-500 p-1 sm:w-[98%] sm:p-1 md:p-4"
       style={{ width: isMobile ? "98%" : "92%" }}
     >
-      <Component question={question} surveyID={surveyID} currentIndex={currentIndex} />
+      <Component
+        key={question?.questionID}
+        question={question}
+        surveyID={surveyID}
+        currentIndex={currentIndex}
+      />
     </div>
   );
 };

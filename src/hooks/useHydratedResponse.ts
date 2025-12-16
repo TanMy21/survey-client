@@ -1,35 +1,66 @@
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 import type { HydrateOptions } from "@/types/responseTypes";
-import { useEffect, useState } from "react";
- 
-
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useHydratedResponse<T>({
   question,
   mapPersisted,
   defaultValue,
 }: HydrateOptions<T>) {
-  const { persistedResponses, setResponse } = useResponseRegistry();
+  const { persistedResponses, getRealTimeResponse } = useResponseRegistry();
+  const questionID = question.questionID;
 
-  const [value, setValue] = useState<T | null>(defaultValue ?? null);
-  const [hydrated, setHydrated] = useState(false);
+  const realTimeResponse = getRealTimeResponse(questionID);
+  const persisted = realTimeResponse ?? persistedResponses[questionID];
 
+  const dirtyRef = useRef(false);
+
+  const [value, _setValue] = useState<T>(() => {
+    if (persisted) return mapPersisted(persisted);
+    return defaultValue as T;
+  });
+  const [hydrated, setHydrated] = useState<boolean>(() => !!persisted);
+
+  /**
+   * HARD RE-HYDRATE on question activation
+   */
   useEffect(() => {
-    const persisted = persistedResponses[question.questionID];
+    dirtyRef.current = false;
 
+    if (persisted) {
+      _setValue(mapPersisted(persisted));
+      setHydrated(true);
+    } else if (defaultValue !== undefined) {
+      _setValue(defaultValue);
+      setHydrated(false);
+    }
+  }, [questionID, , persistedResponses[questionID]]); 
+
+  /**
+   * Optional: handle late-arriving persisted responses
+   */
+  useEffect(() => {
     if (!persisted) return;
+    if (dirtyRef.current) return;
 
-    let mapped: T;
-
-    if (mapPersisted) mapped = mapPersisted(persisted);
-    else mapped = persisted.value as T;
-
-    setValue(mapped);
-    setResponse(question.questionID, true);
+    _setValue(mapPersisted(persisted));
     setHydrated(true);
-  }, [persistedResponses, question.questionID, setResponse]);
+  }, [persisted, mapPersisted]);
 
-  const clearHydration = () => setHydrated(false);
+  /**
+   * User-driven updates
+   */
+  const setValue: React.Dispatch<React.SetStateAction<T>> = useCallback((next) => {
+    dirtyRef.current = true;
+    setHydrated(false);
+
+    _setValue((prev) => (typeof next === "function" ? (next as (p: T) => T)(prev) : next));
+  }, []);
+
+  const clearHydration = useCallback(() => {
+    dirtyRef.current = true;
+    setHydrated(false);
+  }, []);
 
   return { value, setValue, hydrated, clearHydration };
 }

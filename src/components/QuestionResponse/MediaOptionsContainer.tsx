@@ -11,10 +11,12 @@ import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProps) => {
   const isMobile = useIsMobile();
   const isRequired = useQuestionRequired(question);
+  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
@@ -25,7 +27,6 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
     value: selectedOptions,
     setValue: setSelectedOptions,
     hydrated,
-    clearHydration,
   } = useHydratedResponse<{ optionID: string; value: string }[]>({
     question: question!,
     defaultValue: [],
@@ -54,6 +55,8 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
       handleFirstInteraction();
       handleClick();
 
+      markTouched(question?.questionID!);
+
       const opt = options.find((o) => o.optionID === optionID);
       const optionValue = opt?.value ?? opt?.text ?? optionID;
 
@@ -67,7 +70,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
           : [...list, { optionID, value: optionValue }];
 
         lastChangedIDRef.current = optionID;
-        return next; 
+        return next;
       });
 
       if (error) setError(null);
@@ -91,6 +94,8 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
     const selectedValues = selectedOptions?.map((o) => o.value);
     console.log("Selected Media Options:", selectedValues);
 
+    markAnswered(question?.questionID!);
+
     await mutateAsync({
       questionID: question?.questionID!,
       qType: question?.type!,
@@ -100,6 +105,8 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
       behavior: behaviorData,
       surveyID,
     });
+
+    setRealTimeResponse(question?.questionID!, selectedValues!, null);
 
     onSubmitAnswer(selectedValues!);
   }, [

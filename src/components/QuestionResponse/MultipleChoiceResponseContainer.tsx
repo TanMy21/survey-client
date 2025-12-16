@@ -11,10 +11,12 @@ import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import type { OptionType } from "@/types/optionTypes";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceContainerProps) => {
   const { options } = question || {};
   const isRequired = useQuestionRequired(question);
+  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
@@ -55,6 +57,8 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
   const handleOptionToggle = useCallback(
     (optionID: string) => {
       handleFirstInteraction();
+
+      markTouched(question?.questionID!);
 
       const opt = options?.find((o) => o.optionID === optionID);
       const value = opt?.value ?? opt?.text ?? optionID;
@@ -103,6 +107,8 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
 
     const selectedValues = selectedOptions?.map((o) => o.value);
 
+    markAnswered(question.questionID);
+
     await mutateAsync({
       questionID: question.questionID,
       qType: question.type,
@@ -112,6 +118,8 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
       behavior: behaviorData,
       surveyID,
     });
+
+    setRealTimeResponse(question.questionID, selectedValues!, null);
 
     onSubmitAnswer(selectedValues!);
   }, [

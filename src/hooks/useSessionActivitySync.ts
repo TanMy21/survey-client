@@ -36,6 +36,9 @@ export function useSessionActivitySync(surveyID: string) {
    */
   useEffect(() => {
     if (!session) return;
+    if (session.sessionState === "COMPLETED") return;
+
+    // if (!isQuestionRef.current) return;
 
     const qType = currentQuestion?.type;
     const isNonQuestion = !qType || NON_FLOW_TYPES.has(qType) || qType === END_SCREEN_TYPE;
@@ -61,7 +64,11 @@ export function useSessionActivitySync(surveyID: string) {
    *   markActive/pause (so non-question screens are ignored automatically).
    */
   useEffect(() => {
-    if (!session || !deviceID) return;
+    if (!session) return;
+    if (!deviceID) return;
+    if (session.sessionState === "COMPLETED") return;
+
+    // if (!isQuestionRef.current) return;
 
     // Create broadcast channel for this survey + device.
     const channel = new BroadcastChannel(`survey-activity-${surveyID}-${deviceID}`);
@@ -83,7 +90,7 @@ export function useSessionActivitySync(surveyID: string) {
         // 1) No tab of this survey is visible
         // 2) And this tab is (or was) on a question screen.
         if (!anyTabVisibleRef.current && isQuestionRef.current) {
-          void pause({ surveyID, deviceID });
+          void pause({ surveyID, deviceID: deviceID! });
         }
       }, 200);
     };
@@ -97,12 +104,12 @@ export function useSessionActivitySync(surveyID: string) {
 
         // Only mark ACTIVE if this tab is currently on a question.
         if (isQuestionRef.current) {
-          void markActive({ surveyID, deviceID });
+          void markActive({ surveyID, deviceID: deviceID! });
         }
       } else if (type === "HIDDEN") {
         if (document.visibilityState === "visible" && isQuestionRef.current) {
           anyTabVisibleRef.current = true;
-          void markActive({ surveyID, deviceID });
+          void markActive({ surveyID, deviceID: deviceID! });
           broadcast("VISIBLE"); // announce as visible again
           return;
         }
@@ -123,7 +130,7 @@ export function useSessionActivitySync(surveyID: string) {
 
         // Only mark ACTIVE when we are actually on a question.
         if (isQuestionRef.current) {
-          void markActive({ surveyID, deviceID });
+          void markActive({ surveyID, deviceID: deviceID! });
         }
       } else {
         anyTabVisibleRef.current = false;
@@ -140,7 +147,7 @@ export function useSessionActivitySync(surveyID: string) {
       broadcast("VISIBLE");
 
       if (isQuestionRef.current) {
-        void markActive({ surveyID, deviceID });
+        void markActive({ surveyID, deviceID: deviceID! });
       }
     }
 

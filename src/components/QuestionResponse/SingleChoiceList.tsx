@@ -10,6 +10,7 @@ import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
   const { options } = question || {};
@@ -31,6 +32,7 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
   });
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
+  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +60,7 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
 
     handleFirstInteraction();
     handleClick();
-
+    markAnswered(question.questionID);
     markSubmission();
     const behavior = collectBehaviorData();
     console.log("📦 SingleChoiceList behavior data:", behavior);
@@ -74,6 +76,8 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
       behavior,
     });
 
+    setRealTimeResponse(question.questionID, optionValue, null);
+
     setError(null);
     onSubmitAnswer(optionValue);
   }, [options, selectedOptionID, isRequired, markSubmission, mutateAsync, collectBehaviorData]);
@@ -82,7 +86,7 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
 
   const handleSelect = (optionID: string) => {
     handleFirstInteraction();
-
+    markTouched(question?.questionID!);
     if (selectedOptionID !== optionID) {
       handleOptionChange();
     }
@@ -112,6 +116,12 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
     getPulseTargets,
     vibrate: true,
   });
+
+  useEffect(() => {
+    if (hydrated && selectedOptionID) {
+      markAnswered(question?.questionID!);
+    }
+  }, [hydrated, selectedOptionID, question?.questionID, markAnswered]);
 
   return (
     <div className="flex w-[100%] origin-bottom flex-col sm:w-[60%]">

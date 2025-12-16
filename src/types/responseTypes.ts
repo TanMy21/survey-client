@@ -7,8 +7,14 @@ export interface ResponseData {
   questionID: string;
   qType: string | null;
   optionID: string | null;
-  response: string | string[] | number | number[] | null | Record<string, unknown>              
-          | Array<Record<string, unknown>>  ;
+  response:
+    | string
+    | string[]
+    | number
+    | number[]
+    | null
+    | Record<string, unknown>
+    | Array<Record<string, unknown>>;
   participantID?: string | null;
   behavior?: any;
   skipped?: boolean;
@@ -146,10 +152,9 @@ export interface MediaOptionsProps {
 
 export interface HydrateOptions<T> {
   question: { questionID: string };
-  mapPersisted?: (persisted: any) => T;    
-  defaultValue?: T;                       
+  mapPersisted: (persisted: any) => T;
+  defaultValue?: T;
 }
-
 
 export interface MediaOptionProps {
   option: OptionType;
@@ -170,32 +175,31 @@ export interface ThreeDViewProps {
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
 }
 
-
 export type RecordConsentPayload = {
   surveyID?: string;
-  deviceID: string;              
-  consentGiven: boolean;             
-  consentTimestamp?: string;    
+  deviceID: string;
+  consentGiven: boolean;
+  consentTimestamp?: string;
 };
 
 export type RecordConsentResponse = {
   deviceID: string;
   consentGiven: boolean;
-  consentTimestamp: string | null;      
+  consentTimestamp: string | null;
 };
 
 export type EmailResponsePayload = {
   surveyID?: string;
-  deviceID: string;          
-  questionID: string;          
-  email: string;   
-  behavior?: any;     
- };
+  deviceID: string;
+  questionID: string;
+  email: string;
+  behavior?: any;
+};
 
 export type EmailResponseResult = {
   id: string;
   questionId: string;
-  storedAt: string;            
+  storedAt: string;
 };
 
 type Register =
@@ -204,43 +208,54 @@ type Register =
 
 export type BehaviorArgs = {
   surveyID?: string;
-  registerBeforeNext:Register;
+  registerBeforeNext: Register;
   collectBehaviorData: () => unknown;
   questionID: string;
   deviceID: string;
 };
 
-
 export type SubmitResponsePayload = {
-  questionID: string;            
-  qType: string; 
-  value: unknown;               
-  deviceID?: string;            
-  behavior?: unknown;           
+  questionID: string;
+  qType: string;
+  value: unknown;
+  deviceID?: string;
+  behavior?: unknown;
 };
+
+export type ResponseState = "UNTOUCHED" | "TOUCHED" | "ANSWERED" | "SKIPPED";
 
 export type PersistedResponseMap = Record<
   string,
   {
-    value: any;        
-    optionID: string | null;  
+    value: any;
+    optionID: string | null;
   }
 >;
 
-export type  ResponseRegistry = {
+export type ResponseRegistry = {
+  getState: (qid: string) => ResponseState;
+
+  markTouched: (qid: string) => void;
+  markAnswered: (qid: string) => void;
+  markSkipped: (qid: string) => void;
+
   isResponse: (qid: string) => boolean;
   setResponse: (qid: string, v: boolean) => void;
+
+  setRealTimeResponse: (qid: string, value: any, optionID?: string | null) => void;
+  getRealTimeResponse: (qid: string) => { value: any; optionID: string | null } | null;
+
   persistedResponses: PersistedResponseMap;
 };
 
 export interface ResponseRegistryProviderProps {
   children: React.ReactNode;
-  initial?: Record<string, boolean>;    
+  initial?: Record<string, ResponseState>;
   persistedResponses?: Array<{
     relatedQuestionID: string;
     response: any;
     relatedOptionID: string | null;
-  }>;                                  
+  }>;
 }
 
 export type SubmitResponseSkippedPayload = {
@@ -250,4 +265,4 @@ export type SubmitResponseSkippedPayload = {
   deviceID: string;
   skipped: boolean;
   behavior?: unknown;
-}
+};

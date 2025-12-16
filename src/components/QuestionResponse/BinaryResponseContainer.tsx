@@ -3,18 +3,20 @@ import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { BinaryResponseYes, BinaryResponseNo } from "./BinaryResponseYes";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainerProps) => {
   const { questionID, questionPreferences } = question;
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
+  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
@@ -41,7 +43,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     clearHydration,
   } = useHydratedResponse<string>({
     question,
-    mapPersisted: (p) => p.value, 
+    mapPersisted: (p) => p.value,
   });
 
   const handleSubmit = useCallback(async () => {
@@ -51,6 +53,8 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     }
 
     if (!deviceID || !questionID || !selectedValue) return;
+
+    markAnswered(questionID);
 
     markSubmission();
     const data = collectBehaviorData();
@@ -66,6 +70,8 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
       response: selectedValue,
       behavior: data,
     });
+
+    setRealTimeResponse(questionID, selectedValue, null);
 
     onSubmitAnswer(selectedValue);
   }, [
@@ -99,6 +105,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     handleFirstInteraction();
     handleClick();
     handleOptionChange();
+    markTouched(questionID);
     if (selectedValue !== buttonTextYes) {
       handleOptionChange();
     }
@@ -110,6 +117,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     handleFirstInteraction();
     handleClick();
     handleOptionChange();
+    markTouched(questionID);
     if (selectedValue !== buttonTextNo) {
       handleOptionChange();
     }
@@ -124,6 +132,12 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
       onSelect();
     }
   };
+
+  useEffect(() => {
+    if (hydrated && selectedValue != null) {
+      markAnswered(questionID);
+    }
+  }, [hydrated, selectedValue, questionID, markAnswered]);
 
   return (
     <div className="mx-auto flex h-full w-full flex-col items-center justify-center gap-2 p-2 sm:w-4/5">

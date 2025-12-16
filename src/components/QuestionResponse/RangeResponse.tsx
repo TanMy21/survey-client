@@ -2,18 +2,20 @@ import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import type { RangeResponseProps } from "@/types/responseTypes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProgressiveSlider from "./ProgressiveSlider";
 import ScaleCounter from "./ScaleCounter";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const isMobile = useIsMobile();
   const { minValue, maxValue } = question.questionPreferences?.uiConfig || {};
   const isRequired = useQuestionRequired(question);
+  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
@@ -46,6 +48,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const handleSliderChange = (value: number) => {
     handleFirstInteraction();
     handleClick();
+    markTouched(question.questionID);
     setSelectedValue((prev) => {
       if (prev !== value) {
         handleOptionChange();
@@ -70,6 +73,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
 
     handleFirstInteraction();
     handleClick();
+    markAnswered(question.questionID);
     markSubmission();
 
     const behavior = collectBehaviorData();
@@ -86,8 +90,16 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
       surveyID,
     });
 
+    setRealTimeResponse(question.questionID, selectedValue!, null);
+
     onSubmitAnswer(selectedValue);
   };
+
+  useEffect(() => {
+    if (hydrated && selectedValue != null) {
+      markAnswered(question.questionID);
+    }
+  }, [hydrated, selectedValue, question.questionID, markAnswered]);
 
   return (
     <div className="w-4/5 p-2 sm:p-3 md:p-4 xl:p-6">
