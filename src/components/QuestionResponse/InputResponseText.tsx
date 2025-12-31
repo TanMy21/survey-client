@@ -32,7 +32,10 @@ const InputResponseText = ({
   } = useHydratedResponse<string>({
     question: question!,
     defaultValue: "",
-    mapPersisted: (p) => String(p.value ?? ""),
+    mapPersisted: (p) => {
+      if (typeof p.value === "string") return p.value;
+      return "";
+    },
   });
 
   const {

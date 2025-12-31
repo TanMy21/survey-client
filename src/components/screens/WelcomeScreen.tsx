@@ -4,12 +4,12 @@ import type { QuestionProps } from "@/types/questionTypes";
 import { MoveRight } from "lucide-react";
 import { useEffect } from "react";
 import CenteredStack from "../layout/CenteredStack";
-import QuestionTextandDescription from "../QuestionTextandDescription";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import ScreenRoot from "../layout/ScreenRoot";
 import { ResponseContainer } from "../layout/ResponseContainer";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useBehaviorFlush } from "@/api/responseApi";
+import { WelcomeScreenTextandDescription } from "../WelcomeScreenTextandDescription";
 
 const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
   const { questionPreferences } = question || {};
@@ -46,7 +46,7 @@ const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
   return (
     <ScreenRoot>
       <CenteredStack>
-        <QuestionTextandDescription surveyID={surveyID} question={question} />
+        <WelcomeScreenTextandDescription surveyID={surveyID} question={question} />
       </CenteredStack>
       <ResponseContainer>
         <button

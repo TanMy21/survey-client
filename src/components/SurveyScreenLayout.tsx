@@ -129,7 +129,9 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
 
     const shouldComplete = hasEndScreen ? isEnd : isTerminal;
 
-    if (isEnd) {
+    // if (!shouldComplete) return;
+
+    if (shouldComplete) {
       completionRef.current = true;
 
       completeSession({

@@ -42,13 +42,13 @@ export const completeSession = async ({ surveyID, deviceID, shareID }: SessionAr
   }
 };
 
-export async function pauseSession({ surveyID, deviceID }: PauseSessionArgs) {
+export async function pauseSession({ surveyID, deviceID, currentQuestionID }: PauseSessionArgs) {
   try {
     await fetch(`${import.meta.env.VITE_BASE_URL}/ses/pause`, {
       method: "POST",
       keepalive: true, // for tab close
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ surveyID, deviceID }),
+      body: JSON.stringify({ surveyID, deviceID, currentQuestionID }),
     });
   } catch (e) {
     console.warn("pauseSession failed:", e);

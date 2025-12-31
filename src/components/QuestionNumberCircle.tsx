@@ -6,7 +6,7 @@ const QuestionNumberCircle = ({
   orderFontSize,
 }: QuestionNumberProps) => {
   return (
-    <div className="flex h-[98%] w-[24%] items-center justify-center sm:w-[4%] border-2 border-violet-600">
+    <div className="flex h-[98%] w-[24%] items-center justify-center sm:w-[6%] border-2 border-violet-600 shrink-0">
       <div
         className="mt-1 mr-2 flex items-center justify-center rounded-full"
         style={{

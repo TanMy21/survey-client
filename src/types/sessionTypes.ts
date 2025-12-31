@@ -37,4 +37,5 @@ export interface SessionContextValue {
 export interface PauseSessionArgs {
   surveyID: string;
   deviceID: string;
+  currentQuestionID: string;
 }

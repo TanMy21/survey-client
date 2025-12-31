@@ -9,7 +9,6 @@ import { useSession } from "@/context/useSessionContext";
 import { getOrCreateDeviceId } from "@/utils/deviceID";
 import { buildParticipantMeta } from "@/utils/fingerprint";
 import { ResponseRegistryProvider } from "@/context/ResponseRegistry";
-import type { Session } from "@/types/sessionTypes";
 
 const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
   const deviceID = getOrCreateDeviceId();
