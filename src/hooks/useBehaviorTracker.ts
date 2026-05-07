@@ -1,3 +1,5 @@
+import { useBehaviorEvent } from "@/context/BehaviorEventProvider";
+import type { BehaviorEventInput } from "@/types/responseTypes";
 import { useEffect, useRef, useState } from "react";
 
 export const useBehaviorTracker = (
@@ -5,6 +7,8 @@ export const useBehaviorTracker = (
   questionType: string,
   backtrackCountMapRef: React.RefObject<Map<string, number>>
 ) => {
+  const { getOffsetMs } = useBehaviorEvent();
+
   // Pointer and device type
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
@@ -25,6 +29,9 @@ export const useBehaviorTracker = (
   const [isFocused, setIsFocused] = useState(true);
   const blurDurationsRef = useRef<number[]>([]);
 
+  // Stores timeline events for this question (buffered until flush)
+  const eventsRef = useRef<BehaviorEventInput[]>([]);
+
   // Tracking
   const scrollEventsRef = useRef<{ scrollY: number; scrollPct: number; timestamp: number }[]>([]);
   const hoverDurationsRef = useRef<Record<string, number> | null>(null);
@@ -44,9 +51,25 @@ export const useBehaviorTracker = (
     keyTimestamps: [] as number[],
   });
 
+  /**
+   * Pushes a new timeline event with offset from the session anchor.
+   * NOTE: offsetMs must be based on one global sessionStartPerfRef (provided by context).
+   */
+  const pushEvent = (event: BehaviorEventInput) => {
+    eventsRef.current.push(event);
+  };
+
   // Handlers
   const handleFirstInteraction = () => {
-    firstInteractionRef.current ??= new Date();
+    if (!firstInteractionRef.current) {
+      firstInteractionRef.current = new Date(); // keep summary if you want
+      pushEvent({ type: "FIRST_INTERACTION", offsetMs: getOffsetMs(), questionID });
+      pushEvent({
+        type: "HESITATION_ENDED",
+        offsetMs: getOffsetMs(),
+        questionID,
+      });
+    }
   };
 
   const handleClick = () => {
@@ -71,12 +94,17 @@ export const useBehaviorTracker = (
   };
 
   const handleBacktrack = () => {
-    if (hasBacktrackIncrementedRef.current) return;  
+    if (hasBacktrackIncrementedRef.current) return;
     const map = backtrackCountMapRef.current;
-    if (!map) return;  
+    if (!map) return;
     const current = map.get(questionID) || 0;
     map.set(questionID, current + 1);
     hasBacktrackIncrementedRef.current = true;
+    pushEvent({
+      type: "BACKTRACKED",
+      offsetMs: getOffsetMs(),
+      questionID,
+    });
   };
 
   const handleInputMethodSwitch = () => {
@@ -89,6 +117,14 @@ export const useBehaviorTracker = (
     }
   };
 
+  const markAnsweredEvent = () => {
+    pushEvent({
+      type: "ANSWERED",
+      offsetMs: getOffsetMs(),
+      questionID,
+    });
+  };
+
   // ---- Idle detection (30s) ----
   const IDLE_MS = 30_000;
   const idleStartRef = useRef<number | null>(null);
@@ -98,6 +134,11 @@ export const useBehaviorTracker = (
     stopIdleTimer();
     idleTimerRef.current = window.setTimeout(() => {
       idleStartRef.current = Date.now();
+      pushEvent({
+        type: "IDLE_STARTED",
+        offsetMs: getOffsetMs(),
+        questionID,
+      });
     }, IDLE_MS);
   };
 
@@ -110,6 +151,11 @@ export const useBehaviorTracker = (
 
   const bumpActivity = () => {
     if (idleStartRef.current != null) {
+      pushEvent({
+        type: "IDLE_ENDED",
+        offsetMs: getOffsetMs(),
+        questionID,
+      });
       const end = Date.now();
       const start = idleStartRef.current;
       idleTimeoutsRef.current.push({ start, end, duration: end - start });
@@ -117,6 +163,21 @@ export const useBehaviorTracker = (
     }
     startIdleTimer();
   };
+
+  useEffect(() => {
+    pushEvent({
+      type: "QUESTION_STARTED",
+      offsetMs: getOffsetMs(),
+      questionID,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    pushEvent({
+      type: "HESITATION_STARTED",
+      offsetMs: getOffsetMs(),
+      questionID,
+    });
+  }, [questionID]);
 
   useEffect(() => {
     startIdleTimer();
@@ -203,6 +264,7 @@ export const useBehaviorTracker = (
     const onFocus = () => {
       setIsFocused(true);
       setFocusCount((c) => c + 1);
+      pushEvent({ type: "FOCUS_GAINED", offsetMs: getOffsetMs(), questionID });
       if (blurStart.current) {
         blurDurationsRef.current.push(Date.now() - blurStart.current);
         blurStart.current = null;
@@ -213,6 +275,7 @@ export const useBehaviorTracker = (
       setIsFocused(false);
       setBlurCount((c) => c + 1);
       blurStart.current = Date.now();
+      pushEvent({ type: "FOCUS_LOST", offsetMs: getOffsetMs(), questionID });
     };
 
     const onVisibility = () => {
@@ -274,6 +337,12 @@ export const useBehaviorTracker = (
       ? Math.max(...scrollEventsRef.current.map((e) => e.scrollY))
       : 0;
 
+    //  Copy events BEFORE resetting
+    const events = [...eventsRef.current];
+
+    //  Reset buffer for next usage
+    eventsRef.current = [];
+
     return {
       questionID,
       questionType,
@@ -304,6 +373,7 @@ export const useBehaviorTracker = (
         avgKeyDelay,
       },
       movementTracks: movementTracksRef.current,
+      events,
     };
   };
 
@@ -316,6 +386,7 @@ export const useBehaviorTracker = (
     handleBacktrack,
     handleInputMethodSwitch,
     markSubmission,
+    markAnsweredEvent,
     collectBehaviorData,
   };
 };

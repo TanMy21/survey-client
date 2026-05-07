@@ -16,8 +16,13 @@ const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
   const { setCanProceed } = useSurveyFlow();
   const { goNext, registerBeforeNext } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { handleFirstInteraction, handleClick, markSubmission, collectBehaviorData } =
-    useBehavior();
+  const {
+    handleFirstInteraction,
+    handleClick,
+    markSubmission,
+    markAnsweredEvent,
+    collectBehaviorData,
+  } = useBehavior();
 
   const { flushOnce } = useBehaviorFlush({
     surveyID,
@@ -37,6 +42,7 @@ const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
     handleFirstInteraction();
     handleClick();
     markSubmission();
+    markAnsweredEvent();
     const data = collectBehaviorData();
     console.log("📦 WelcomeScreen behavior data:", data);
     await flushOnce();

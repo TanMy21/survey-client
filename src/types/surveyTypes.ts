@@ -40,3 +40,17 @@ export interface SurveyNavigatorCompactProps {
   disableNext: boolean;
   navPulse?: "next" | "prev" | null;
 }
+
+
+export type SurveyFetchError = Error & {
+  status?: number;
+  code?: string;
+};
+
+export type SurveyUnavailableVariant = "not-found" | "expired" | "not-started" | "unavailable" | "error";
+
+export type SurveyUnavailableScreenProps = {
+  variant: SurveyUnavailableVariant;
+};
+
+ 

@@ -26,6 +26,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
     handleClick,
     handleOptionChange,
     markSubmission,
+    markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
 
@@ -75,6 +76,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
     handleClick();
     markAnswered(question.questionID);
     markSubmission();
+    markAnsweredEvent();
 
     const behavior = collectBehaviorData();
     console.log("📦 RangeScreen behavior data:", behavior);

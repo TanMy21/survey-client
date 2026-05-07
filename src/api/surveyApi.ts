@@ -1,12 +1,24 @@
-export const fetchSurvey = async (shareID: string, deviceID:string) => {
+import type { SurveyFetchError } from "@/types/surveyTypes";
+
+export const fetchSurvey = async (shareID: string, deviceID: string) => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/ses/${shareID}?deviceID=${deviceID}`);
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/ses/${shareID}?deviceID=${deviceID}`
+    );
+
+    const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-      throw new Error("Network error");
-    }
+      const error = new Error(data?.message || "Error loading survey.") as SurveyFetchError;
 
-    const data = await response.json();
+      // HTTP status fallback,   404, 410, 403.
+      error.status = response.status;
+
+      // Backend error code, e.g. SURVEY_NOT_FOUND, SURVEY_EXPIRED.
+      error.code = data?.code;
+
+      throw error;
+    }
 
     return data;
   } catch (error) {

@@ -9,7 +9,12 @@ import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitEmailResponse } from "@/hooks/useSurvey";
 
-const InputResponse = ({surveyID, inputPlaceholder, submitButtonText, question }: InputResponseProps) => {
+const InputResponse = ({
+  surveyID,
+  inputPlaceholder,
+  submitButtonText,
+  question,
+}: InputResponseProps) => {
   const [emailContact, setEmailContact] = useState("");
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
@@ -23,6 +28,7 @@ const InputResponse = ({surveyID, inputPlaceholder, submitButtonText, question }
     handleTyping,
     handlePaste,
     markSubmission,
+    markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
 
@@ -50,6 +56,7 @@ const InputResponse = ({surveyID, inputPlaceholder, submitButtonText, question }
     handleFirstInteraction();
     handleClick();
     markSubmission();
+    markAnsweredEvent();
 
     const behavior = collectBehaviorData();
 

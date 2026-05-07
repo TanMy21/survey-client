@@ -33,6 +33,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     handleClick,
     handleOptionChange,
     markSubmission,
+    markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
 
@@ -57,6 +58,8 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     markAnswered(questionID);
 
     markSubmission();
+    markAnsweredEvent();
+
     const data = collectBehaviorData();
     console.log("📦 BinaryResponse behavior data:", data);
     console.log("Selected response:", selectedValue);

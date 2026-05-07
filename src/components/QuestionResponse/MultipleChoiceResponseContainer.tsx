@@ -32,6 +32,7 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
     handleOptionChange,
     handleClick,
     markSubmission,
+    markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
 
@@ -100,6 +101,7 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
     handleFirstInteraction();
     handleClick();
     markSubmission();
+    markAnsweredEvent();
 
     const behaviorData = collectBehaviorData();
     console.log("📦 MultipleChoiceScreen behavior data:", behaviorData);

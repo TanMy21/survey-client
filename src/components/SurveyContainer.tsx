@@ -9,6 +9,8 @@ import { useSession } from "@/context/useSessionContext";
 import { getOrCreateDeviceId } from "@/utils/deviceID";
 import { buildParticipantMeta } from "@/utils/fingerprint";
 import { ResponseRegistryProvider } from "@/context/ResponseRegistry";
+import { getSurveyUnavailableVariant } from "@/utils/getSurveyUnavailabel";
+import { SurveyUnavailableScreen } from "./screens/SurveyUnavailabelScreen";
 
 const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
   const deviceID = getOrCreateDeviceId();
@@ -21,6 +23,8 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
     isIdle,
     isPending: sessionPending,
     isSuccess: sessionReady,
+    isError: sessionError,
+    error: createSessionError,
   } = useCreateSession();
   //   {
   //   onSuccess: (session: Session) => {
@@ -37,6 +41,7 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
     data: survey,
     isLoading: surveyLoading,
     isError: surveyError,
+    error: fetchSurveyError,
   } = useFetchSurvey(shareID!, deviceID, {
     enabled: sessionReady,
   });
@@ -49,18 +54,22 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
     }
   }, [participantSession, setSession]);
 
+  if (sessionError) {
+    const variant = getSurveyUnavailableVariant(createSessionError);
+
+    return <SurveyUnavailableScreen variant={variant} />;
+  }
+
+  if (surveyError) {
+    const variant = getSurveyUnavailableVariant(fetchSurveyError);
+
+    return <SurveyUnavailableScreen variant={variant} />;
+  }
+
   if (surveyLoading || sessionPending || !survey) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-white">
         <LogoLoader />
-      </div>
-    );
-  }
-
-  if (surveyError || !survey) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-white p-4 text-center">
-        <h1 className="text-xl text-red-500">Error loading survey. Please try again.</h1>
       </div>
     );
   }

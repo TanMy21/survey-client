@@ -41,3 +41,5 @@ export function injectConsentAfterWelcome(questions: any[]): any[] {
   // Comment: If no welcome, prepend consent to guarantee first render
   return [consentNode, ...list];
 }
+
+

@@ -36,6 +36,7 @@ const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainer
     handleClick,
     handleOptionChange,
     markSubmission,
+    markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
 
@@ -50,6 +51,7 @@ const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainer
     markAnswered(questionID);
 
     markSubmission();
+    markAnsweredEvent();
 
     const data = collectBehaviorData();
     const three = (window as any).__r3f_collect__?.();

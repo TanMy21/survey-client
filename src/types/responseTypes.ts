@@ -266,3 +266,31 @@ export type SubmitResponseSkippedPayload = {
   skipped: boolean;
   behavior?: unknown;
 };
+
+
+ 
+export type BehaviorEventTypeKey =
+  | "QUESTION_STARTED"
+  | "FIRST_INTERACTION"
+  | "ANSWERED"
+  | "FOCUS_LOST"
+  | "FOCUS_GAINED"
+  | "BACKTRACKED"
+  | "HESITATION_STARTED"
+  | "HESITATION_ENDED"
+  | "IDLE_STARTED"
+  | "IDLE_ENDED";
+
+export type BehaviorEventInput = {
+  type: BehaviorEventTypeKey;
+  offsetMs: number;        
+  questionID?: string;     
+  meta?: Record<string, unknown>; 
+};
+
+
+
+export type BehaviorEventCtx = {
+  sessionStartPerfMs: number;
+  getOffsetMs: () => number;
+};

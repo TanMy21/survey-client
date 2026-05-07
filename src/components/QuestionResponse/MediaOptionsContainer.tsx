@@ -20,8 +20,13 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
-  const { handleFirstInteraction, handleClick, markSubmission, collectBehaviorData } =
-    useBehavior();
+  const {
+    handleFirstInteraction,
+    handleClick,
+    markSubmission,
+    markAnsweredEvent,
+    collectBehaviorData,
+  } = useBehavior();
 
   const {
     value: selectedOptions,
@@ -87,6 +92,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
     handleClick();
 
     markSubmission();
+    markAnsweredEvent();
 
     const behaviorData = collectBehaviorData();
     console.log("📦 MediaScreen behavior data:", behaviorData);

@@ -17,7 +17,7 @@ import { completeSession } from "@/api/sessionApi";
 import { useSession } from "@/context/useSessionContext";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSessionActivitySync } from "@/hooks/useSessionActivitySync";
- 
+import { BehaviorEventProvider } from "@/context/BehaviorEventProvider";
 
 const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
   const {
@@ -29,7 +29,7 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
     canGoPrev,
     isTerminal,
   } = useFlowRuntime();
-  useSessionActivitySync(surveyID!); 
+  useSessionActivitySync(surveyID!);
   const runtime = useFlowRuntime();
   const { canProceed } = useSurveyFlow();
   const isEnd = currentQuestion.type === "END_SCREEN";
@@ -185,21 +185,23 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
           style={{ touchAction: "pan-y", padding: isMobile ? "1px" : "2px" }}
           className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 border-amber-500 pb-24 sm:p-1 sm:pb-20"
         >
-          <SlideMotion direction={"right"} keyProp={currentQuestionID}>
-            <BehaviorTrackerProvider
-              questionID={currentQuestionID}
-              questionType={currentQuestion.type}
-              backtrackCountMapRef={backtrackCountMapRef}
-            >
-              <SkipOnAdvanceBridge surveyID={surveyID!} />
-              <BacktrackLogger questionID={currentQuestionID} visitedRef={visitedRef} />
-              <QuestionRenderer
-                question={currentQuestion}
-                surveyID={shareID}
-                currentIndex={currentDisplayIndex!}
-              />
-            </BehaviorTrackerProvider>
-          </SlideMotion>
+          <BehaviorEventProvider>
+            <SlideMotion direction={"right"} keyProp={currentQuestionID}>
+              <BehaviorTrackerProvider
+                questionID={currentQuestionID}
+                questionType={currentQuestion.type}
+                backtrackCountMapRef={backtrackCountMapRef}
+              >
+                <SkipOnAdvanceBridge surveyID={surveyID!} />
+                <BacktrackLogger questionID={currentQuestionID} visitedRef={visitedRef} />
+                <QuestionRenderer
+                  question={currentQuestion}
+                  surveyID={shareID}
+                  currentIndex={currentDisplayIndex!}
+                />
+              </BehaviorTrackerProvider>
+            </SlideMotion>
+          </BehaviorEventProvider>
         </div>
       </div>
 

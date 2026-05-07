@@ -29,6 +29,7 @@ const InputResponseNumber = ({
     handleTyping,
     handlePaste,
     markSubmission,
+    markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
 
@@ -93,6 +94,7 @@ const InputResponseNumber = ({
     handleFirstInteraction();
     handleClick();
     markSubmission();
+    markAnsweredEvent();
     markAnswered(question.questionID);
 
     const behavior = collectBehaviorData();
@@ -134,7 +136,7 @@ const InputResponseNumber = ({
     }
   };
 
-    useEffect(() => {
+  useEffect(() => {
     if (hydrated && number !== "") {
       markAnswered(question?.questionID!);
     }

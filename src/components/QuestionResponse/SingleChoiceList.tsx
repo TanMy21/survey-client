@@ -45,6 +45,7 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
     handleClick,
     handleOptionChange,
     markSubmission,
+    markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
 
@@ -62,6 +63,7 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
     handleClick();
     markAnswered(question.questionID);
     markSubmission();
+    markAnsweredEvent();
     const behavior = collectBehaviorData();
     console.log("📦 SingleChoiceList behavior data:", behavior);
     console.log("Selected option value:", optionValue);

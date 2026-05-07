@@ -43,6 +43,7 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
     handleClick,
     handleOptionChange,
     markSubmission,
+    markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
 
@@ -92,6 +93,7 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
     handleClick();
     markAnswered(question.questionID);
     markSubmission();
+    markAnsweredEvent();
 
     const behavior = collectBehaviorData();
     console.log("📦 RankScreen behavior data:", behavior);

@@ -45,6 +45,7 @@ const InputResponseText = ({
     handlePaste,
     handleClick,
     markSubmission,
+    markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
 
@@ -67,6 +68,7 @@ const InputResponseText = ({
       handleClick();
       markSubmission();
       markAnswered(question.questionID);
+      markAnsweredEvent();
       const behavior = collectBehaviorData();
       console.log("📦 TextScreen behavior data:", behavior);
       console.log("Submitted response:", text);
