@@ -234,6 +234,18 @@ const goNext = useCallback(() => {
     terminalTargetQuestionID(state) === state.currentQuestionID ||
     naturalNextQuestionID(state, state.currentQuestionID) === null;
 
+    // Returns the next visible survey node based on the current nav order.
+// This is useful for preloading the next question background before navigation.
+const nextQuestion = useMemo(() => {
+  const currentIndex = state.navIndexById[state.currentQuestionID];
+
+  // If the current question is not found, there is no safe next question.
+  if (currentIndex == null) return null;
+
+  // Returns the next item in the full navigation list, including non-flow screens.
+  return state.navAll[currentIndex + 1] ?? null;
+}, [state.currentQuestionID, state.navAll, state.navIndexById]);
+
   // const onSubmitAnswer = useCallback(
   //   (answer: AnswerPrimitive) => {
   //     setState((s) => {
@@ -295,6 +307,7 @@ const goNext = useCallback(() => {
     currentQuestion: currentQObj,
     currentQuestionID: state.currentQuestionID,
     currentDisplayIndex,
+    nextQuestion,
     onSubmitAnswer,
     onPrev,
     goNext, registerBeforeNext,

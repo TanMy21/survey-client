@@ -5,7 +5,7 @@ import QuestionTextandDescription from "../QuestionTextandDescription";
 import ScreenRoot from "../layout/ScreenRoot";
 import CenteredStack from "../layout/CenteredStack";
 import { ResponseContainer } from "../layout/ResponseContainer";
-import { SuccessCheckmark } from "../motion/SuccessCheckmark";
+import sucessVideo from "../loader/check_500.webm";
 
 const EndScreen = ({ surveyID, question }: QuestionProps) => {
   const { handleClick, markSubmission, collectBehaviorData } = useBehavior();
@@ -29,7 +29,14 @@ const EndScreen = ({ surveyID, question }: QuestionProps) => {
               exit={{ y: -20, opacity: 0 }}
               className="flex flex-col items-center"
             >
-              <SuccessCheckmark size={100} />
+              <video
+                src={sucessVideo}
+                autoPlay
+                loop={false}
+                muted
+                playsInline
+                className="h-[150px] w-[150px]"
+              />
             </motion.div>
           </AnimatePresence>
           <motion.div

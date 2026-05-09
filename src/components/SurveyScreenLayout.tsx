@@ -24,6 +24,7 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
     currentQuestion,
     currentQuestionID,
     currentDisplayIndex,
+    nextQuestion,
     visitedStack,
     flowEligible,
     canGoPrev,
@@ -156,17 +157,33 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
   }, [visitedStack, flowEligible, totalCount]);
 
   const { questionPreferences } = currentQuestion || {};
+
+  const nextImageUrl = nextQuestion?.questionPreferences?.questionImageTemplateUrl;
+
   const { questionImageTemplate, questionImageTemplateUrl, questionBackgroundColor } =
     questionPreferences || {};
   const backgroundStyle = questionImageTemplate
     ? {
+      backgroundColor: questionBackgroundColor || "white",
         backgroundImage: `url(${questionImageTemplateUrl})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }
     : questionBackgroundColor
-      ? { backgroundColor: questionBackgroundColor }
+      ? { backgroundColor: questionBackgroundColor}
       : { backgroundColor: "white" };
+
+  // Preloads current and next background images so the browser has them ready before paint/navigation.
+  useEffect(() => {
+    const urls = [questionImageTemplateUrl, nextImageUrl].filter(Boolean) as string[];
+
+    urls.forEach((url) => {
+      const image = new Image();
+
+      // Starts fetching the image and allows browser cache to reuse it later.
+      image.src = url;
+    });
+  }, [questionImageTemplateUrl, nextImageUrl]);
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-white">

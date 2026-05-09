@@ -48,6 +48,7 @@ export interface UseFlowControllerApi {
   currentQuestion: Question;
   currentQuestionID: string;
   currentDisplayIndex: number | null;
+  nextQuestion: Question | null;
   onSubmitAnswer: (answer: AnswerPrimitive) => void;
   onPrev: () => void;
   goNext: () => void;
@@ -94,7 +95,7 @@ export interface ScrollNavProps {
   cooldownMs?: number;
   wheelThreshold?: number;
   touchThreshold?: number;
-   onNavigate?: (dir: "next" | "prev") => void;
+  onNavigate?: (dir: "next" | "prev") => void;
 }
 
 export interface SwipeNavProps {
