@@ -25,11 +25,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 export function useFlowController(payload: SurveyPayload): UseFlowControllerApi {
   const flowEligible = useMemo(() => buildFlowEligible(payload.questions), [payload.questions]);
   const indexMap = useMemo(() => indexByQuestionID(flowEligible), [flowEligible]);
-  const consentQuestionID = payload.questions.find(
-  q => q.type === "CONSENT"
-)?.questionID || null;
-  
-  
+  const consentQuestionID = payload.questions.find((q) => q.type === "CONSENT")?.questionID || null;
+
   // B) NEW: full list for free nav (includes everything, ordered by .order)
   const navAll = useMemo(
     () => [...payload.questions].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
@@ -142,63 +139,58 @@ export function useFlowController(payload: SurveyPayload): UseFlowControllerApi 
   //   [state.displayIndexMap]
   // );
 
-
-const isLastQuestion = state.currentQuestionID === state.lastQuestionID;
-    const beforeNextRef = useRef<Array<() => Promise<void> | void>>([]);
+  const isLastQuestion = state.currentQuestionID === state.lastQuestionID;
+  const beforeNextRef = useRef<Array<() => Promise<void> | void>>([]);
   const isAdvancingRef = useRef(false);
 
   const registerBeforeNext = useCallback((fn: () => Promise<void> | void) => {
     beforeNextRef.current.push(fn);
     return () => {
-      beforeNextRef.current = beforeNextRef.current.filter(f => f !== fn);
+      beforeNextRef.current = beforeNextRef.current.filter((f) => f !== fn);
     };
   }, []);
 
-
-
   // CHANGE: add a shared "advanceTo" that ALWAYS runs beforeNext hooks
-const advanceTo = useCallback(
-  async (computeNextQID: (s: FlowRuntimeState) => string | null) => {
-    if (isAdvancingRef.current) return;
-    isAdvancingRef.current = true;
-    try {
-      for (const fn of beforeNextRef.current) await fn(); // CHANGE: run interceptors
-      setState((s) => {
-        const nextQID = computeNextQID(s) ?? s.currentQuestionID;
-        if (!nextQID || nextQID === s.currentQuestionID) return s;
-        return pushForward(s, nextQID);
-      });
-    } finally {
-      isAdvancingRef.current = false;
-    }
-  },
-  [setState]
-);
-
-// CHANGE: make goNext use advanceTo
-const goNext = useCallback(() => {
-  return advanceTo((s) => {
-
-   const consentNode = s.navAll.find(q => q.type === "CONSENT");
-    if (consentNode) {
-      const currentNode = s.navAll.find((q) => q.questionID === s.currentQuestionID);
-
-      // COMMENT: Only enforce if both nodes have a defined order.
-      if (
-        currentNode?.order != null &&
-        consentNode.order != null &&
-        currentNode.order < consentNode.order // COMMENT: "before consent" in sequence
-      ) {
-        return consentNode.questionID; // COMMENT: FORCE navigation to consent
+  const advanceTo = useCallback(
+    async (computeNextQID: (s: FlowRuntimeState) => string | null) => {
+      if (isAdvancingRef.current) return;
+      isAdvancingRef.current = true;
+      try {
+        for (const fn of beforeNextRef.current) await fn(); // CHANGE: run interceptors
+        setState((s) => {
+          const nextQID = computeNextQID(s) ?? s.currentQuestionID;
+          if (!nextQID || nextQID === s.currentQuestionID) return s;
+          return pushForward(s, nextQID);
+        });
+      } finally {
+        isAdvancingRef.current = false;
       }
-    }
+    },
+    [setState]
+  );
 
-    const idx = s.navIndexById[s.currentQuestionID];
-    const nextNode = idx != null ? s.navAll[idx + 1] : undefined;
-    return nextNode?.questionID ?? terminalTargetQuestionID(s);
-  });
-}, [advanceTo]);
+  // CHANGE: make goNext use advanceTo
+  const goNext = useCallback(() => {
+    return advanceTo((s) => {
+      const consentNode = s.navAll.find((q) => q.type === "CONSENT");
+      if (consentNode) {
+        const currentNode = s.navAll.find((q) => q.questionID === s.currentQuestionID);
 
+        // COMMENT: Only enforce if both nodes have a defined order.
+        if (
+          currentNode?.order != null &&
+          consentNode.order != null &&
+          currentNode.order < consentNode.order // COMMENT: "before consent" in sequence
+        ) {
+          return consentNode.questionID; // COMMENT: FORCE navigation to consent
+        }
+      }
+
+      const idx = s.navIndexById[s.currentQuestionID];
+      const nextNode = idx != null ? s.navAll[idx + 1] : undefined;
+      return nextNode?.questionID ?? terminalTargetQuestionID(s);
+    });
+  }, [advanceTo]);
 
   // const goNext = useCallback(async() => {
 
@@ -225,26 +217,38 @@ const goNext = useCallback(() => {
   //   }
   // }, [setState]);
 
-
-
-
-
   const currentQObj = currentQuestion(state);
   const isTerminal =
     terminalTargetQuestionID(state) === state.currentQuestionID ||
     naturalNextQuestionID(state, state.currentQuestionID) === null;
 
-    // Returns the next visible survey node based on the current nav order.
-// This is useful for preloading the next question background before navigation.
-const nextQuestion = useMemo(() => {
-  const currentIndex = state.navIndexById[state.currentQuestionID];
+  // Returns the next visible survey node based on the current nav order.
+  // This is useful for preloading the next question background before navigation.
+  // Predicts the next question/screen without changing the actual flow state.
+  // This is only used for preloading the next background image.
+  const nextQuestion = useMemo(() => {
+    const consentNode = state.navAll.find((q) => q.type === "CONSENT");
+    const currentNode = state.navAll.find((q) => q.questionID === state.currentQuestionID);
 
-  // If the current question is not found, there is no safe next question.
-  if (currentIndex == null) return null;
+    // Mirrors the same consent jump logic used inside goNext.
+    // This keeps preload prediction aligned with your existing navigation behavior.
+    if (
+      consentNode &&
+      currentNode?.order != null &&
+      consentNode.order != null &&
+      currentNode.order < consentNode.order
+    ) {
+      return consentNode;
+    }
 
-  // Returns the next item in the full navigation list, including non-flow screens.
-  return state.navAll[currentIndex + 1] ?? null;
-}, [state.currentQuestionID, state.navAll, state.navIndexById]);
+    const currentIndex = state.navIndexById[state.currentQuestionID];
+
+    // If the current question is missing from navAll, there is no safe next question.
+    if (currentIndex == null) return null;
+
+    // Falls back to the normal next item in the ordered navigation list.
+    return state.navAll[currentIndex + 1] ?? null;
+  }, [state.currentQuestionID, state.navAll, state.navIndexById]);
 
   // const onSubmitAnswer = useCallback(
   //   (answer: AnswerPrimitive) => {
@@ -259,18 +263,16 @@ const nextQuestion = useMemo(() => {
   // );
 
   const onSubmitAnswer = useCallback(
-  (answer: AnswerPrimitive) => {
-    return advanceTo((s) => {
-      const qIdx = s.indexByQuestionID[s.currentQuestionID];
-      if (qIdx == null) return null;
-      const q = s.flowEligible[qIdx];
-      return evaluateNextQuestionID(s, q, answer);  // CHANGE: now array-aware
-    });
-  },
-  [advanceTo]
-);
-
-
+    (answer: AnswerPrimitive) => {
+      return advanceTo((s) => {
+        const qIdx = s.indexByQuestionID[s.currentQuestionID];
+        if (qIdx == null) return null;
+        const q = s.flowEligible[qIdx];
+        return evaluateNextQuestionID(s, q, answer); // CHANGE: now array-aware
+      });
+    },
+    [advanceTo]
+  );
 
   const onPrev = useCallback(() => {
     setState((s) => {
@@ -310,11 +312,13 @@ const nextQuestion = useMemo(() => {
     nextQuestion,
     onSubmitAnswer,
     onPrev,
-    goNext, registerBeforeNext,
+    goNext,
+    registerBeforeNext,
     getDisplayIndex: () => null,
     canGoPrev: state.cursor > 0,
     isTerminal,
     visitedStack: state.history.slice(0, state.cursor + 1),
-    flowEligible: state.flowEligible,isLastQuestion,
+    flowEligible: state.flowEligible,
+    isLastQuestion,
   };
 }

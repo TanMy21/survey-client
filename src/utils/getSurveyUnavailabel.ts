@@ -31,5 +31,9 @@ export const getSurveyUnavailableVariant = (error: unknown): SurveyUnavailableVa
     return "unavailable";
   }
 
+  if (surveyError?.status === 423) {
+    return "locked";
+  }
+
   return "error";
 };

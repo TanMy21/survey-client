@@ -101,16 +101,6 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
 
   //   usePreloadNeighbors(questions, currentQuestionIndex, 1);
 
-  // if (isSessionCompleted(sessions)) {
-  //   return (
-  //     <div className="flex justify-center items-center h-screen p-4 text-center bg-white">
-  //       <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold">
-  //         You have already completed the survey.
-  //       </h1>
-  //     </div>
-  //   );
-  // }
-
   //   if (!questions.length) {
   //     return (
   //       <div className="flex h-screen w-full items-center justify-center">Error Loading Survey.</div>
@@ -164,13 +154,13 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
     questionPreferences || {};
   const backgroundStyle = questionImageTemplate
     ? {
-      backgroundColor: questionBackgroundColor || "white",
+        backgroundColor: questionBackgroundColor || "white",
         backgroundImage: `url(${questionImageTemplateUrl})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }
     : questionBackgroundColor
-      ? { backgroundColor: questionBackgroundColor}
+      ? { backgroundColor: questionBackgroundColor }
       : { backgroundColor: "white" };
 
   // Preloads current and next background images so the browser has them ready before paint/navigation.
@@ -222,7 +212,7 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
         </div>
       </div>
 
-      <SurveyNavigatorCompact disableNext={!canProceed} navPulse={navPulse} />
+      <SurveyNavigatorCompact disableNext={!canProceed} navPulse={navPulse} shareID={shareID} />
     </div>
   );
 };

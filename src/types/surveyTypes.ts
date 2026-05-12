@@ -39,18 +39,22 @@ export type FlowContextType = {
 export interface SurveyNavigatorCompactProps {
   disableNext: boolean;
   navPulse?: "next" | "prev" | null;
+  shareID?: string;
 }
-
 
 export type SurveyFetchError = Error & {
   status?: number;
   code?: string;
 };
 
-export type SurveyUnavailableVariant = "not-found" | "expired" | "not-started" | "unavailable" | "error";
+export type SurveyUnavailableVariant =
+  | "not-found"
+  | "expired"
+  | "not-started"
+  | "unavailable"
+  | "error"
+  | "locked";
 
 export type SurveyUnavailableScreenProps = {
   variant: SurveyUnavailableVariant;
 };
-
- 

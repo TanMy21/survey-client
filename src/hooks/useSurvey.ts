@@ -1,9 +1,18 @@
-import { postResponse, postResponseSkipped, recordConsent, submitEmailResponse } from "@/api/responseApi";
+import {
+  postResponse,
+  postResponseSkipped,
+  recordConsent,
+  submitEmailResponse,
+} from "@/api/responseApi";
 import { fetchSurvey } from "@/api/surveyApi";
-import type { EmailResponsePayload, EmailResponseResult, RecordConsentPayload, RecordConsentResponse, SubmitResponseSkippedPayload  } from "@/types/responseTypes";
+import type {
+  EmailResponsePayload,
+  EmailResponseResult,
+  RecordConsentPayload,
+  RecordConsentResponse,
+  SubmitResponseSkippedPayload,
+} from "@/types/responseTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-
 
 export const useFetchSurvey = (
   shareID: string,
@@ -14,12 +23,12 @@ export const useFetchSurvey = (
     queryKey: ["survey", shareID],
     queryFn: () => fetchSurvey(shareID, deviceID),
     staleTime: 5 * 60 * 1000,
-    enabled: options?.enabled ?? true,   
+    enabled: options?.enabled ?? true,
   });
 };
 
 export function useSubmitResponse() {
-  return useMutation ({
+  return useMutation({
     mutationFn: postResponse,
   });
 }
@@ -35,7 +44,6 @@ export function useSubmitEmailResponse() {
     mutationFn: submitEmailResponse,
   });
 }
-
 
 export function useSubmitResponseSkipped() {
   const qc = useQueryClient();

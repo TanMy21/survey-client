@@ -1,5 +1,12 @@
 import type { SurveyUnavailableScreenProps } from "@/types/surveyTypes";
-import { AlertCircle, Clock3, FileQuestion, LockKeyhole, TimerOff } from "lucide-react";
+import {
+  AlertCircle,
+  Clock3,
+  FileQuestion,
+  LockKeyhole,
+  ShieldAlert,
+  TimerOff,
+} from "lucide-react";
 
 export const SurveyUnavailableScreen = ({ variant }: SurveyUnavailableScreenProps) => {
   const content = {
@@ -32,6 +39,14 @@ export const SurveyUnavailableScreen = ({ variant }: SurveyUnavailableScreenProp
       title: "Unable to load survey",
       description: "Something went wrong while loading this survey.",
       hint: "Please refresh the page or try again later.",
+    },
+
+    locked: {
+      icon: ShieldAlert,
+      title: "Survey unavailable",
+      description: "This survey is currently not accepting responses.",
+      hint: "Please contact the person who shared this link if you think this is a mistake.",
+      iconWrapClass: "bg-slate-100 text-slate-700",
     },
   }[variant];
 
