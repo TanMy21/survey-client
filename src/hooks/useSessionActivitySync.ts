@@ -13,8 +13,6 @@ export function useSessionActivitySync(surveyID: string) {
   const { mutateAsync: pause } = usePauseSession();
   const { mutateAsync: markActive } = useMarkActive();
 
-  console.log("Device ID: ", deviceID);
-
   const currentQuestionIDRef = useRef<string | null>(null);
 
   // Global visibility flag across tabs
@@ -43,11 +41,6 @@ export function useSessionActivitySync(surveyID: string) {
    *   treat that as survey started / resumed and mark ACTIVE once.
    */
   useEffect(() => {
-    // if (!session) return;
-    // if (session.sessionState === "COMPLETED") return;
-
-    // if (!isQuestionRef.current) return;
-
     const qType = currentQuestion?.type;
     const isNonQuestion = !qType || NON_FLOW_TYPES.has(qType) || qType === END_SCREEN_TYPE;
 
@@ -79,8 +72,6 @@ export function useSessionActivitySync(surveyID: string) {
    */
   useEffect(() => {
     if (!deviceID) return;
-
-    // if (!isQuestionRef.current) return;
 
     // Create broadcast channel for this survey + device.
     const channel = new BroadcastChannel(`survey-activity-${surveyID}-${deviceID}`);

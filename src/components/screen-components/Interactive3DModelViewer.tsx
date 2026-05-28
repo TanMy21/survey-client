@@ -10,7 +10,7 @@ import Scene from "./Scene";
 import Model3dLoader from "../loader/Model3dLoader";
 
 function LoaderOverlay() {
-  const { active, progress, item } = useProgress();
+  const { active, progress } = useProgress();
   if (!active) return null;
   return (
     <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/70">
@@ -19,7 +19,6 @@ function LoaderOverlay() {
       <div className="text-sm font-medium text-gray-700">
         Loading 3D model… {Math.round(progress)}%
       </div>
-      {item && <div className="text-xs text-gray-500">{item}</div>}
     </div>
   );
 }
@@ -104,6 +103,10 @@ export const Interactive3DModelViewer = ({
         frameloop="demand"
         style={{ position: "absolute", inset: 0 }}
         camera={{ fov: 50, near: 0.05, far: 1000, position: [1.2, 1.1, 1.3] }}
+        // Fires only when the pointer/click does not hit any 3D object.
+        onPointerMissed={(e) => {
+          analyticsRef.current?.recordEmptySpaceClick?.(e);
+        }}
       >
         <Suspense fallback={<Model3dLoader />}>
           <Scene

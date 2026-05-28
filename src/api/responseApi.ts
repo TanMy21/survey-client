@@ -1,4 +1,13 @@
-import type { BehaviorArgs, EmailResponsePayload, EmailResponseResult, RecordConsentPayload, RecordConsentResponse, ResponseData, SubmitResponseSkippedPayload } from "@/types/responseTypes";
+import type {
+  BehaviorArgs,
+  EmailResponsePayload,
+  EmailResponseResult,
+  RecordConsentPayload,
+  RecordConsentResponse,
+  ResponseData,
+  StoreThreeDBehaviorPayload,
+  SubmitResponseSkippedPayload,
+} from "@/types/responseTypes";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 
@@ -42,9 +51,11 @@ export const postResponse = async ({
   }
 };
 
-
-export const recordConsent = async({
- surveyID, deviceID, consentGiven, consentTimestamp
+export const recordConsent = async ({
+  surveyID,
+  deviceID,
+  consentGiven,
+  consentTimestamp,
 }: RecordConsentPayload): Promise<RecordConsentResponse> => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}/q/res/consent`, {
     method: "POST",
@@ -61,10 +72,14 @@ export const recordConsent = async({
     throw new Error(text || `Failed to record consent (${res.status})`);
   }
   return res.json();
-}
+};
 
-export const submitEmailResponse = async ({ surveyID,
- deviceID, questionID, email, behavior
+export const submitEmailResponse = async ({
+  surveyID,
+  deviceID,
+  questionID,
+  email,
+  behavior,
 }: EmailResponsePayload): Promise<EmailResponseResult> => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}/q/res/email`, {
     method: "POST",
@@ -74,7 +89,11 @@ export const submitEmailResponse = async ({ surveyID,
     },
     credentials: "include",
     body: JSON.stringify({
-     surveyID, deviceID, questionID, email, behavior
+      surveyID,
+      deviceID,
+      questionID,
+      email,
+      behavior,
     }),
   });
 
@@ -83,11 +102,10 @@ export const submitEmailResponse = async ({ surveyID,
     throw new Error(text || `Failed to submit email (${res.status})`);
   }
   return res.json();
-}
-
+};
 
 async function postBehavior(payload: {
-  surveyID?:string;
+  surveyID?: string;
   deviceID: string;
   questionID: string;
   behavior: unknown;
@@ -121,8 +139,8 @@ export function useBehaviorFlush({
       await mutateAsync({
         surveyID,
         deviceID,
-        questionID,  
-        behavior, 
+        questionID,
+        behavior,
       });
       sentRef.current = true;
     });
@@ -137,7 +155,7 @@ export function useBehaviorFlush({
         surveyID,
         questionID,
         deviceID,
-        behavior, 
+        behavior,
       });
       sentRef.current = true;
     },
@@ -155,4 +173,29 @@ export async function postResponseSkipped(body: SubmitResponseSkippedPayload) {
     throw new Error(text || "Failed to submit response");
   }
   return res.json();
+}
+
+async function storeThreeDBehavior(payload: StoreThreeDBehaviorPayload) {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/q/behavior/3d`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      // Prevents duplicate stores for same participant/question
+      "Idempotency-Key": `3d-behavior-${payload.deviceID}-${payload.questionID}`,
+    },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to store 3D behavior");
+  }
+
+  return res.json();
+}
+
+export function useStoreThreeDBehavior() {
+  return useMutation({
+    mutationFn: storeThreeDBehavior,
+  });
 }

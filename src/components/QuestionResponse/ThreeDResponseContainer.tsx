@@ -9,11 +9,15 @@ import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import { useStoreThreeDBehavior } from "@/api/responseApi";
 
 const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainerProps) => {
   const { questionID, type } = question;
   const deviceID = useDeviceId();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { mutateAsync } = useSubmitResponse();
+  const { mutateAsync: storeThreeDBehavior } = useStoreThreeDBehavior();
   const { onSubmitAnswer } = useFlowRuntime();
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const isRequired = useQuestionRequired(question);
@@ -29,63 +33,77 @@ const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainer
     mapPersisted: (p) => (p.value === "LIKE" || p.value === "DISLIKE" ? p.value : null),
   });
 
-  const [error, setError] = useState<string | null>(null);
-
   const {
     handleFirstInteraction,
     handleClick,
-    handleOptionChange,
+    // handleOptionChange,
     markSubmission,
     markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
 
   const submitValue = async (value: "LIKE" | "DISLIKE") => {
+    if (isSubmitting) return;
     if (isRequired && !value) return;
     if (!deviceID || !questionID) return;
 
-    if (hydrated) {
-      clearHydration();
-      return;
+    setIsSubmitting(true);
+
+    try {
+      if (hydrated) {
+        clearHydration();
+      }
+
+      markAnswered(questionID);
+      markSubmission();
+      markAnsweredEvent();
+
+      const data = collectBehaviorData();
+
+      // Collect 3D behavior before the viewer unmounts.
+      const three = (window as any).__r3f_collect__?.();
+
+      await mutateAsync({
+        surveyID,
+        deviceID,
+        questionID,
+        optionID: null,
+        qType: type,
+        response: value,
+        behavior: data,
+      });
+
+      setRealTimeResponse(questionID, value, null);
+
+      onSubmitAnswer(value);
+
+      if (three && type === "THREE_D") {
+        storeThreeDBehavior({
+          surveyID,
+          deviceID,
+          questionID,
+          finalSelectedAnswer: value,
+          threeDBehavior: three,
+        }).catch((error) => {
+          console.error("Failed to store 3D behavior", error);
+        });
+      }
+    } catch (error) {
+      setIsSubmitting(false);
+      console.error("Failed to submit 3D response", error);
     }
-    markAnswered(questionID);
-
-    markSubmission();
-    markAnsweredEvent();
-
-    const data = collectBehaviorData();
-    const three = (window as any).__r3f_collect__?.();
-
-    console.log("📦 Three D Model interaction:", three);
-    console.log("📦 Three D behavior data:", data);
-    console.log("📦 Selected response:", value);
-
-    await mutateAsync({
-      surveyID,
-      deviceID,
-      questionID,
-      optionID: null,
-      qType: type,
-      response: value,
-      behavior: data,
-    });
-
-    setRealTimeResponse(questionID, value, null);
-
-    onSubmitAnswer(value);
   };
 
   const handleSelect = (value: "LIKE" | "DISLIKE") => {
+    if (isSubmitting) return;
+
     handleFirstInteraction();
     handleClick();
 
-    if (selectedValue !== value) {
-      handleOptionChange();
-    }
     markTouched(questionID);
     setSelectedValue(value);
 
-    if (!hydrated) void submitValue(value);
+    void submitValue(value);
 
     setError(null);
   };
@@ -101,8 +119,9 @@ const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainer
       {/* Dislike */}
       <div className="flex h-[96%] w-[48%] justify-start sm:justify-center">
         <button
+          disabled={isSubmitting}
           onClick={() => handleSelect("DISLIKE")}
-          className={`flex h-16 w-16 items-center justify-center rounded-full text-white shadow-md transition-all duration-150 ease-in-out ${
+          className={`flex h-16 w-16 items-center justify-center rounded-full text-white shadow-md transition-all duration-150 ease-in-out disabled:cursor-not-allowed disabled:opacity-60 ${
             selectedValue === "DISLIKE" ? "scale-110 bg-red-700" : "bg-red-500"
           } hover:scale-105 hover:bg-red-600 active:scale-95`}
         >
@@ -113,8 +132,9 @@ const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainer
       {/* Like */}
       <div className="flex h-[96%] w-[48%] justify-end sm:justify-center">
         <button
+          disabled={isSubmitting}
           onClick={() => handleSelect("LIKE")}
-          className={`flex h-16 w-16 items-center justify-center rounded-full text-white shadow-md transition-all duration-150 ease-in-out ${
+          className={`flex h-16 w-16 items-center justify-center rounded-full text-white shadow-md transition-all duration-150 ease-in-out disabled:cursor-not-allowed disabled:opacity-60 ${
             selectedValue === "LIKE" ? "scale-110 bg-green-700" : "bg-green-500"
           } hover:scale-105 hover:bg-green-600 active:scale-95`}
         >

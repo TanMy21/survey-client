@@ -9,9 +9,24 @@ export interface AnalyticsBridgeApi {
   onFit: () => void;
   onReset: () => void;
   collectR3F: () => any;
+  recordSurfaceClick: (e: any) => void;
+  recordEmptySpaceClick: (e: any) => void;
 }
 
 export interface AnalyticsBridge3DModelProps {
   questionID?: string;
   onReady: (api: AnalyticsBridgeApi) => void;
 }
+
+export type SurfaceClickSample = {
+  t: number;
+  meshName: string | null;
+  materialName: string | null;
+  faceIndex: number | null;
+  screenZoneId: string | null;
+  point: {
+    x: number;
+    y: number;
+    z: number;
+  };
+};

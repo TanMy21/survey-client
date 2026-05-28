@@ -267,8 +267,6 @@ export type SubmitResponseSkippedPayload = {
   behavior?: unknown;
 };
 
-
- 
 export type BehaviorEventTypeKey =
   | "QUESTION_STARTED"
   | "FIRST_INTERACTION"
@@ -283,14 +281,20 @@ export type BehaviorEventTypeKey =
 
 export type BehaviorEventInput = {
   type: BehaviorEventTypeKey;
-  offsetMs: number;        
-  questionID?: string;     
-  meta?: Record<string, unknown>; 
+  offsetMs: number;
+  questionID?: string;
+  meta?: Record<string, unknown>;
 };
-
-
 
 export type BehaviorEventCtx = {
   sessionStartPerfMs: number;
   getOffsetMs: () => number;
+};
+
+export type StoreThreeDBehaviorPayload = {
+  surveyID: string;
+  deviceID: string;
+  questionID: string;
+  finalSelectedAnswer: "LIKE" | "DISLIKE";
+  threeDBehavior: unknown;
 };

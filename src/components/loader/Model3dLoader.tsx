@@ -8,7 +8,7 @@ const Model3dLoader = () => {
     duration: 2,
     ease: "easeInOut",
     repeat: Infinity,
-    repeatType: "reverse", // morph back to a square
+    repeatType: "reverse",  
   };
 
   return (

@@ -13,8 +13,6 @@ function tuneCameraForBounds(cam: THREE.PerspectiveCamera, box: THREE.Box3) {
   const center = box.getCenter(new THREE.Vector3());
   const radius = 0.5 * Math.max(size.x, size.y, size.z);
 
-  // Keep near not absurdly tiny (depth precision improves).
-  // CHANGED: formerly near was fixed small in Canvas; now dynamic:
   cam.near = Math.max(0.01, radius / 1000); // ~1e-3 of radius
   cam.far = Math.max(cam.near + 1, radius * 100); // generous but finite
   cam.updateProjectionMatrix();
@@ -82,9 +80,8 @@ function InitialViewApplier({ object, initialView, frontIsNegZ, controlsRef }: I
   const { camera, size } = useThree();
   const appliedRef = useRef(false);
 
-  // CHANGED: when the model root `object` changes (next question), allow re‑apply once again
   useEffect(() => {
-    appliedRef.current = false; // CHANGED
+    appliedRef.current = false;
   }, [object]);
 
   useEffect(() => {
@@ -98,17 +95,17 @@ function InitialViewApplier({ object, initialView, frontIsNegZ, controlsRef }: I
     // 1) Bounds
     const box = new THREE.Box3().setFromObject(object);
     const sizeV = box.getSize(new THREE.Vector3());
-    const radius = 0.5 * Math.max(sizeV.x, sizeV.y, sizeV.z) || 1; // CHANGED
+    const radius = 0.5 * Math.max(sizeV.x, sizeV.y, sizeV.z) || 1;
 
     // 2) Tune camera near/far to the model
     tuneCameraForBounds(cam, box);
 
-    // 3) CHANGED: set per‑model zoom limits so dolly/pinch always works
+    // 3)   set per‑model zoom limits so dolly/pinch always works
     const minDist = Math.max(0.05, radius * 0.25); // close‑up
     const maxDist = radius * 12; // far‑out
-    controls.minDistance = minDist; // CHANGED
-    controls.maxDistance = maxDist; // CHANGED
-    controls.enableZoom = true; // CHANGED (explicit)
+    controls.minDistance = minDist;
+    controls.maxDistance = maxDist;
+    controls.enableZoom = true;
     controls.update?.();
 
     // 4) Apply your initial view framing
@@ -124,6 +121,31 @@ function InitialViewApplier({ object, initialView, frontIsNegZ, controlsRef }: I
   }, [object, controlsRef, size, camera, initialView, frontIsNegZ]);
 
   return null;
+}
+
+// Builds BVH trees for all mesh geometries inside a model, if not already built.
+function buildBVHForModel(root: THREE.Object3D) {
+  root.traverse((child) => {
+    // Only mesh objects have raycastable geometry.
+    if (!(child instanceof THREE.Mesh)) return;
+
+    // Skip meshes without geometry.
+    if (!child.geometry) return;
+
+    // Build BVH once per geometry.
+    child.geometry.computeBoundsTree?.();
+  });
+}
+
+// Disposes BVH trees for all mesh geometries inside a model, if they exist.
+function disposeBVHForModel(root: THREE.Object3D) {
+  root.traverse((child) => {
+    // Only mesh geometries can have BVH data attached.
+    if (!(child instanceof THREE.Mesh)) return;
+
+    // Removes BVH data from the geometry.
+    child.geometry?.disposeBoundsTree?.();
+  });
 }
 
 const Scene = ({
@@ -154,6 +176,15 @@ const Scene = ({
   modelRoot,
 }: SceneProps) => {
   const invalidate = useThree((s) => s.invalidate);
+
+  // Clean up BVH data when model changes or component unmounts, to free memory.
+  useEffect(() => {
+    return () => {
+      if (modelRoot) {
+        disposeBVHForModel(modelRoot);
+      }
+    };
+  }, [modelRoot]);
 
   // drive frames only when autoRotate is on
   useFrame(() => {
@@ -189,12 +220,24 @@ const Scene = ({
         <CachedModel
           url={validSrc}
           onReady={(obj: Object3D) => {
+            buildBVHForModel(obj);
             setModelRoot(obj);
             invalidate();
           }}
           onPointerOver={(e: any) => onMeshOver?.(e.object.name || e.object.uuid, e)}
           onPointerOut={(e: any) => onMeshOut?.(e.object.name || e.object.uuid, e)}
-          onClick={(e: any) => onMeshClick?.(e.object.name || e.object.uuid, e)}
+          onClick={(e: any) => {
+            e.stopPropagation();
+
+            // Stores exact clicked point/mesh/material/faceIndex for future heatmaps.
+            analyticsRef.current?.recordSurfaceClick?.(e);
+
+            //  simple mesh click count.
+            analyticsRef.current?.onMeshClick?.(e.object.name || e.object.uuid, e);
+
+            //  external click callback behavior.
+            onMeshClick?.(e.object.name || e.object.uuid, e);
+          }}
           onFit={() => {
             analyticsRef.current?.onFit();
             onFit?.();
