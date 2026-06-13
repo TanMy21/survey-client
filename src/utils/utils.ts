@@ -43,3 +43,13 @@ export function injectConsentAfterWelcome(questions: any[]): any[] {
 }
 
 
+export const getTimedChoiceOptionImage = (
+  question: any,
+  side: "left" | "right",
+): { imageUrl?: string; altText?: string | null } | undefined => {
+  const images = question?.questionImages || [];
+
+  const role = side === "left" ? "TIMED_CHOICE_LEFT" : "TIMED_CHOICE_RIGHT";
+
+  return images.find((image: any) => image.role === role) || images[side === "left" ? 0 : 1];
+};

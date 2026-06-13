@@ -1,0 +1,1 @@
+export const DEFAULT_TIMED_CHOICE_MS = 3000;

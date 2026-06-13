@@ -25,10 +25,14 @@ export type Model3DParams = {
 
 export type QuestionTypeKey =
   | "BINARY"
+  | "CONCEPT_FIT"
   | "CONSENT"
+  | "DROPDOWN"
   | "EMAIL_CONTACT"
   | "END_SCREEN"
+  | "IAT"
   | "INSTRUCTIONS"
+  | "INFO_SCREEN"
   | "MEDIA"
   | "NUMBER"
   | "RADIO"
@@ -36,6 +40,7 @@ export type QuestionTypeKey =
   | "RANGE"
   | "TEXT"
   | "THREE_D"
+  | "TIMED_CHOICE"
   | "MULTIPLE_CHOICE"
   | "WELCOME_SCREEN";
 
@@ -153,7 +158,7 @@ export interface UseAutoSubmitPulseOptions {
   feedbackMs?: number;
   onSubmit: () => void;
   getPulseTargets: GetPulseTargets;
-  vibrate?: boolean; 
+  vibrate?: boolean;
   deps?: any[];
 }
 export interface SetInitialViewParams {
