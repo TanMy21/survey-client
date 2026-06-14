@@ -241,7 +241,7 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
         aria-label="Timed choice response container"
         className="flex h-full w-[98%] flex-col gap-2 md:w-4/5"
       >
-        <div className="mx-auto grid h-full w-[98%] grid-cols-1 gap-3 sm:w-[86%] md:grid-cols-2">
+        <div className="mx-auto grid h-full w-[98%] grid-cols-1 gap-6 sm:w-[86%] md:grid-cols-2">
           <div
             ref={firstRef}
             role="radio"

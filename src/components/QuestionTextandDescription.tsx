@@ -36,7 +36,7 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
           isNonOrderableType ? "items-center" : "items-center"
         }`}
       >
-        <div className="mx-auto flex w-full flex-col items-center justify-center gap-2 border-2 border-green-500 md:flex-row shrink-0">
+        <div className="mx-auto flex w-full shrink-0 flex-col items-center justify-center gap-2 border-2 border-green-500 md:flex-row">
           {!isNonOrderableType &&
             currentDisplayIndex !== null &&
             (isMobile ? (
@@ -55,7 +55,7 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
             }`}
           >
             <p
-              className={`w-full max-w-[80ch] leading-[1.4] font-normal break-words ${isNonOrderableType ? "text-center whitespace-nowrap" : "text-start whitespace-normal"}`}
+              className={`w-full max-w-[80ch] leading-[1.4] font-normal break-words ${isNonOrderableType ? "whitespace-normal" : "text-start whitespace-normal"}`}
               style={{
                 fontSize: `${actualTitleFontSize}px`,
                 color: titleFontColor || "black",
@@ -71,21 +71,23 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
           </div>
         </div>
 
-        <div className="my-[8%] flex w-full flex-row items-center justify-center md:my-[1%]">
-          <div>
-            <p
-              className="w-fit whitespace-normal italic"
-              style={{
-                fontSize: `${actualDescriptionFontSize}px`,
-                color: descriptionFontColor,
-                fontFamily:
-                  "BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
-              }}
-            >
-              {description === "Description (optional)" ? null : description}
-            </p>
+        {description && description !== "Description (optional)" && (
+          <div className="my-[8%] flex w-full flex-row items-center justify-center border-2 border-amber-600 md:my-[1%]">
+            <div>
+              <p
+                className="w-fit whitespace-normal italic"
+                style={{
+                  fontSize: `${actualDescriptionFontSize}px`,
+                  color: descriptionFontColor,
+                  fontFamily:
+                    "BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
+                }}
+              >
+                {description}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

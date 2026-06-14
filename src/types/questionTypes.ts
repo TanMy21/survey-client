@@ -218,3 +218,53 @@ export type Question3Dish = {
     fileUrl?: string | null;
   } | null;
 };
+
+export type ConceptFitAnswerSide = "left" | "right";
+
+export type ConceptFitAttributeAnswer = {
+  attributeOptionID: string;
+  attributeText: string;
+  selectedSide: ConceptFitAnswerSide;
+  selectedLabel: string;
+  selectedValue: "FIT" | "DOES_NOT_FIT";
+  selectedAtMs: number;
+  selectedAtSecondFromStart: number;
+  countdownMsRemaining: number;
+  countdownSecondRemaining: number;
+  isOverTime: boolean;
+};
+
+export type IATGroup = "THEME_A" | "THEME_B";
+export type IATRoundType = "INITIAL" | "REVERSED";
+export type IATSide = "left" | "right";
+
+export type IATStimulus = {
+  optionID: string;
+  text: string;
+  value?: string | null;
+  order?: number | null;
+  group: IATGroup;
+};
+
+export type IATAnswer = {
+  round: IATRoundType;
+  roundIndex: number;
+  stimulusIndex: number;
+  stimulusOptionID: string;
+  stimulusText: string;
+  stimulusGroup: IATGroup;
+  selectedSide: IATSide;
+  selectedKey: string;
+  selectedPair: {
+    brand: string;
+    theme: string;
+  };
+  expectedSide: IATSide;
+  isExpectedSide: boolean;
+  responseTimeMs: number;
+  responseTimeSeconds: number;
+  countdownMsRemaining: number;
+  countdownSecondsRemaining: number;
+  isOverTime: boolean;
+  answeredAt: string;
+};

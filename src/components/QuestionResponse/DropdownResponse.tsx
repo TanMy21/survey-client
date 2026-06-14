@@ -8,6 +8,7 @@ import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 import type { SingleChoiceListProps } from "@/types/responseTypes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
+import { ChevronDown } from "lucide-react";
 
 const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
   const { options } = question || {};
@@ -33,7 +34,10 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
 
   const [error, setError] = useState<string | null>(null);
-  const selectRef = useRef<HTMLSelectElement | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const {
     handleFirstInteraction,
@@ -45,11 +49,17 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
     collectBehaviorData,
   } = useBehavior();
 
+  const visibleOptions = options?.slice(0, 20) || [];
+
   const selectedOption = options?.find((opt) => opt.optionID === selectedOptionID);
 
   const selectedOptionValue = selectedOption?.value;
   const selectedOptionText = selectedOption?.text;
 
+  /**
+   * Submits the selected dropdown answer.
+   * Keeps the original validation, behavior tracking, and flow submission.
+   */
   const handleSubmit = useCallback(async () => {
     if (isRequired && !selectedOptionValue) {
       setError("Your response is required for this question");
@@ -106,6 +116,10 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
+  /**
+   * Selects an option from the custom dropdown.
+   * Keeps the original touch, click, option-change, and hydration behavior.
+   */
   const handleSelect = (optionID: string) => {
     handleFirstInteraction();
     markTouched(question?.questionID!);
@@ -117,13 +131,34 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
     handleClick();
     setSelectedOptionID(optionID);
     clearHydration();
+    setIsDropdownOpen(false);
 
     if (error) setError(null);
   };
 
+  /**
+   * Closes the dropdown when clicking outside the custom select.
+   */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!dropdownRef.current?.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  /**
+   * Handles backtrack behavior and focuses the custom select trigger.
+   */
   useEffect(() => {
     handleBacktrack();
-    selectRef.current?.focus();
+    triggerRef.current?.focus();
   }, [handleBacktrack]);
 
   useAutoSubmitPulse({
@@ -131,7 +166,7 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
     delayMs: 2000,
     feedbackMs: 180,
     onSubmit: handleSubmit,
-    getPulseTargets: () => [selectRef.current],
+    getPulseTargets: () => [triggerRef.current],
     vibrate: true,
   });
 
@@ -148,31 +183,88 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
         onKeyDown={handleKeyDown}
       >
         <div className="mx-auto flex w-[96%] flex-col items-center gap-2 p-1 md:w-full">
-          <div className="relative w-full">
-            <select
-              ref={selectRef}
-              value={selectedOptionID || ""}
-              onChange={(event) => handleSelect(event.target.value)}
-              className={`w-full appearance-none rounded-2xl border bg-white px-4 py-4 pr-11 text-base font-semibold text-slate-800 shadow-sm transition outline-none ${
+          <div ref={dropdownRef} className="relative w-full">
+            <button
+              ref={triggerRef}
+              type="button"
+              aria-haspopup="listbox"
+              aria-expanded={isDropdownOpen}
+              onClick={() => setIsDropdownOpen((prev) => !prev)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " " || event.key === "ArrowDown") {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setIsDropdownOpen(true);
+                }
+
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setIsDropdownOpen(false);
+                }
+              }}
+              className={[
+                "flex h-14 w-full items-center justify-between rounded-3xl border bg-white",
+                "px-4 text-left text-[15px] font-semibold",
+                "shadow-[0_8px_24px_rgba(15,23,42,0.06)]",
+                "transition outline-none",
                 selectedOptionID
-                  ? "border-[#005BC4] ring-2 ring-[#005BC4]/10"
-                  : "border-slate-200 hover:border-slate-300"
-              } focus:border-[#005BC4] focus:ring-2 focus:ring-[#005BC4]/15`}
+                  ? "border-[#7C3AED] text-slate-900 ring-2 ring-[#7C3AED]/10"
+                  : "border-slate-200 text-slate-400 hover:border-slate-300",
+                isDropdownOpen ? "border-[#7C3AED] ring-2 ring-[#7C3AED]/15" : "",
+              ].join(" ")}
             >
-              <option value="" disabled>
-                Select an option
-              </option>
+              <span className="truncate">{selectedOptionText || "Select an option"}</span>
 
-              {options?.map((option) => (
-                <option key={option.optionID} value={option.optionID}>
-                  {option.text}
-                </option>
-              ))}
-            </select>
+              <ChevronDown
+                size={20}
+                className={[
+                  "shrink-0 text-slate-500 transition-transform",
+                  isDropdownOpen ? "rotate-180" : "",
+                ].join(" ")}
+              />
+            </button>
 
-            <div className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-slate-400">
-              ▼
-            </div>
+            {isDropdownOpen && (
+              <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-3xl border border-slate-200 bg-white p-2 shadow-[0_18px_45px_rgba(15,23,42,0.14)]">
+                <div
+                  role="listbox"
+                  // Keeps menu scrollable but visually hides the scrollbar.
+                  className="max-h-[240px] overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                >
+                  {visibleOptions.map((option) => {
+                    const isSelected = option.optionID === selectedOptionID;
+
+                    return (
+                      <button
+                        key={option.optionID}
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        onClick={() => handleSelect(option.optionID)}
+                        onKeyDown={(event) => {
+                          event.stopPropagation();
+
+                          if (event.key === "Escape") {
+                            event.preventDefault();
+                            setIsDropdownOpen(false);
+                            triggerRef.current?.focus();
+                          }
+                        }}
+                        className={[
+                          "w-full rounded-2xl px-3 py-3 text-left text-[15px] font-semibold transition",
+                          isSelected
+                            ? "bg-[#7C3AED]/10 text-[#6D28D9]"
+                            : "text-slate-700 hover:bg-slate-100",
+                        ].join(" ")}
+                      >
+                        {option.text}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

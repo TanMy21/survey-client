@@ -23,4 +23,5 @@ export interface OptionType {
   value: string;
   image: string;
   order: number;
+  settings?: any;
 }
