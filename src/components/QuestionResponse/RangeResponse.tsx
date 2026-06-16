@@ -10,6 +10,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const isMobile = useIsMobile();
@@ -53,6 +54,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
     setSelectedValue((prev) => {
       if (prev !== value) {
         handleOptionChange();
+        clearHydration();
       }
       return value;
     });
@@ -69,6 +71,12 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
 
     if (!deviceID || !question?.questionID || !question?.type) {
       setError("Missing identifiers. Please reload and try again.");
+      return;
+    }
+
+    if (hydrated) {
+      markAnswered(question.questionID);
+      onSubmitAnswer(selectedValue);
       return;
     }
 
@@ -96,6 +104,8 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
 
     onSubmitAnswer(selectedValue);
   };
+
+  useRegisterQuestionSubmit(true, handleSubmit);
 
   useEffect(() => {
     if (hydrated && selectedValue != null) {

@@ -2,7 +2,7 @@ import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import type { ThreeDResponseContainerProps } from "@/types/responseTypes";
 import { Heart, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useSubmitResponse } from "@/hooks/useSurvey";
@@ -10,6 +10,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import { useStoreThreeDBehavior } from "@/api/responseApi";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainerProps) => {
   const { questionID, type } = question;
@@ -42,57 +43,85 @@ const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainer
     collectBehaviorData,
   } = useBehavior();
 
-  const submitValue = async (value: "LIKE" | "DISLIKE") => {
-    if (isSubmitting) return;
-    if (isRequired && !value) return;
-    if (!deviceID || !questionID) return;
+  const submitValue = useCallback(
+    async (value: "LIKE" | "DISLIKE") => {
+      if (isSubmitting) return;
+      if (isRequired && !value) return;
+      if (!deviceID || !questionID) return;
 
-    setIsSubmitting(true);
+      setIsSubmitting(true);
 
-    try {
-      if (hydrated) {
-        clearHydration();
-      }
+      try {
+        if (hydrated) {
+          clearHydration();
+        }
 
-      markAnswered(questionID);
-      markSubmission();
-      markAnsweredEvent();
+        markAnswered(questionID);
+        markSubmission();
+        markAnsweredEvent();
 
-      const data = collectBehaviorData();
+        const data = collectBehaviorData();
+        const three = (window as any).__r3f_collect__?.();
 
-      // Collect 3D behavior before the viewer unmounts.
-      const three = (window as any).__r3f_collect__?.();
-
-      await mutateAsync({
-        surveyID,
-        deviceID,
-        questionID,
-        optionID: null,
-        qType: type,
-        response: value,
-        behavior: data,
-      });
-
-      setRealTimeResponse(questionID, value, null);
-
-      onSubmitAnswer(value);
-
-      if (three && type === "THREE_D") {
-        storeThreeDBehavior({
+        await mutateAsync({
           surveyID,
           deviceID,
           questionID,
-          finalSelectedAnswer: value,
-          threeDBehavior: three,
-        }).catch((error) => {
-          console.error("Failed to store 3D behavior", error);
+          optionID: null,
+          qType: type,
+          response: value,
+          behavior: data,
         });
+
+        setRealTimeResponse(questionID, value, null);
+        onSubmitAnswer(value);
+
+        if (three && type === "THREE_D") {
+          storeThreeDBehavior({
+            surveyID,
+            deviceID,
+            questionID,
+            finalSelectedAnswer: value,
+            threeDBehavior: three,
+          }).catch((error) => {
+            console.error("Failed to store 3D behavior", error);
+          });
+        }
+      } catch (error) {
+        setIsSubmitting(false);
+        console.error("Failed to submit 3D response", error);
       }
-    } catch (error) {
-      setIsSubmitting(false);
-      console.error("Failed to submit 3D response", error);
+    },
+    [
+      isSubmitting,
+      isRequired,
+      deviceID,
+      questionID,
+      hydrated,
+      clearHydration,
+      markAnswered,
+      markSubmission,
+      markAnsweredEvent,
+      collectBehaviorData,
+      mutateAsync,
+      surveyID,
+      type,
+      setRealTimeResponse,
+      onSubmitAnswer,
+      storeThreeDBehavior,
+    ]
+  );
+
+  const handleSubmit = useCallback(() => {
+    if (!selectedValue) {
+      setError("Your response is required for this question");
+      return;
     }
-  };
+
+    void submitValue(selectedValue);
+  }, [selectedValue, submitValue]);
+
+  useRegisterQuestionSubmit(isRequired || selectedValue != null, handleSubmit);
 
   const handleSelect = (value: "LIKE" | "DISLIKE") => {
     if (isSubmitting) return;

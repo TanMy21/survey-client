@@ -132,11 +132,19 @@ export const SKIPPABLE_TYPES = new Set([
   "RANK",
   "THREE_D",
   "RADIO",
-  "INFO_SCREEN",
   "IAT",
   "DROPDOWN",
   "TIMED_CHOICE",
   "CONCEPT_FIT",
+]);
+
+export const NON_SKIP_ON_ADVANCE_TYPES = new Set([
+  "WELCOME_SCREEN",
+  "INSTRUCTIONS",
+  "INFO_SCREEN",
+  "EMAIL_CONTACT",
+  "END_SCREEN",
+  "CONSENT",
 ]);
 
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;

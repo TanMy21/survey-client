@@ -9,10 +9,12 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const RankList = ({ surveyID, options, question }: RankListProps) => {
   const {
     value: localOptions,
+    clearHydration,
     setValue: setLocalOptions,
     hydrated,
   } = useHydratedResponse<OptionType[]>({
@@ -49,7 +51,10 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
 
   const handleDragEnd = async (result: DropResult) => {
     const { source, destination } = result;
-    if (!destination || source.index === destination.index) return;
+    if (!destination || source.index === destination.index) {
+      clearHydration();
+      return;
+    }
 
     handleFirstInteraction();
     handleClick();
@@ -89,6 +94,12 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
       return;
     }
 
+    if (hydrated) {
+      markAnswered(question.questionID);
+      onSubmitAnswer(rankings!);
+      return;
+    }
+
     handleFirstInteraction();
     handleClick();
     markAnswered(question.questionID);
@@ -118,6 +129,8 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
       setError("Failed to submit ranking. Please try again.");
     }
   };
+
+  useRegisterQuestionSubmit(true, handleSubmit);
 
   useEffect(() => {
     if (hydrated && localOptions?.length) {

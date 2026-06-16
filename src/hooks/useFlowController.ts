@@ -1,5 +1,6 @@
 import {
   NON_FLOW_TYPES,
+  NON_ORDERED_TYPES,
   type AnswerPrimitive,
   type FlowRuntimeState,
   type SurveyPayload,
@@ -290,7 +291,7 @@ export function useFlowController(payload: SurveyPayload): UseFlowControllerApi 
   const isOrderable = (qid: string, s: FlowRuntimeState) => {
     const idx = s.navIndexById[qid];
     if (idx == null) return false;
-    return !NON_FLOW_TYPES.has(s.navAll[idx].type);
+    return !NON_ORDERED_TYPES.has(s.navAll[idx].type);
   };
 
   // Derive the display number from history
@@ -301,7 +302,7 @@ export function useFlowController(payload: SurveyPayload): UseFlowControllerApi 
       if (isOrderable(state.history[i], state)) count++;
     }
     // Cap to max number of orderable questions
-    const maxOrderable = state.navAll.filter((q) => !NON_FLOW_TYPES.has(q.type)).length;
+    const maxOrderable = state.navAll.filter((q) => !NON_ORDERED_TYPES.has(q.type)).length;
     return Math.min(count, maxOrderable);
   }, [state.cursor, state.history, state.navAll]);
 

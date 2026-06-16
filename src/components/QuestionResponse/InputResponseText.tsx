@@ -10,6 +10,7 @@ import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import z from "zod";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const InputResponseText = ({
   inputPlaceholder,
@@ -60,6 +61,12 @@ const InputResponseText = ({
 
     if (!question?.questionID || !deviceID) return;
 
+    if (hydrated && question) {
+      markAnswered(question.questionID);
+      onSubmitAnswer(trimmed);
+      return;
+    }
+
     if (!result.success) {
       const errorMessage = z.prettifyError(result.error) || "Invalid input";
       setError(errorMessage);
@@ -70,8 +77,7 @@ const InputResponseText = ({
       markAnswered(question.questionID);
       markAnsweredEvent();
       const behavior = collectBehaviorData();
-      console.log("📦 TextScreen behavior data:", behavior);
-      console.log("Submitted response:", text);
+
       await mutateAsync({
         surveyID,
         questionID: question.questionID,
@@ -87,6 +93,8 @@ const InputResponseText = ({
       onSubmitAnswer(text);
     }
   };
+
+  useRegisterQuestionSubmit(isRequired || text.trim() !== "", handleSubmit);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     const key = e.key;
@@ -120,6 +128,11 @@ const InputResponseText = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
+
+    if (newValue !== text) {
+      clearHydration();
+    }
+
     markTouched(question?.questionID!);
     handleTyping(newValue);
     if (hydrated) clearHydration();

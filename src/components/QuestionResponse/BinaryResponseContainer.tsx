@@ -11,6 +11,8 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
+import { autoSubmitDelayMs } from "@/constants/screenConstants";
 
 const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainerProps) => {
   const { questionID, questionPreferences } = question;
@@ -22,8 +24,6 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
   const { mutateAsync, isPending } = useSubmitResponse();
   const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "YES";
   const buttonTextNo = questionPreferences.uiConfig?.buttonTextNo || "NO";
-
-  const autoSubmitDelayMs = 2000;
 
   const yesRef = useRef<HTMLDivElement | null>(null);
   const noRef = useRef<HTMLDivElement | null>(null);
@@ -55,14 +55,18 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
 
     if (!deviceID || !questionID || !selectedValue) return;
 
+    if (hydrated) {
+      markAnswered(questionID);
+      onSubmitAnswer(selectedValue);
+      return;
+    }
+
     markAnswered(questionID);
 
     markSubmission();
     markAnsweredEvent();
 
     const data = collectBehaviorData();
-    console.log("📦 BinaryResponse behavior data:", data);
-    console.log("Selected response:", selectedValue);
 
     await mutateAsync({
       surveyID,
@@ -86,6 +90,8 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     markSubmission,
     onSubmitAnswer,
   ]);
+
+  useRegisterQuestionSubmit(isRequired || selectedValue != null, handleSubmit);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
@@ -111,6 +117,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     markTouched(questionID);
     if (selectedValue !== buttonTextYes) {
       handleOptionChange();
+      clearHydration();
     }
     setSelectedValue(buttonTextYes);
     clearHydration();
@@ -123,6 +130,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     markTouched(questionID);
     if (selectedValue !== buttonTextNo) {
       handleOptionChange();
+      clearHydration();
     }
     setSelectedValue(buttonTextNo);
     clearHydration();

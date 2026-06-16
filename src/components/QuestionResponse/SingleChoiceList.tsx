@@ -11,6 +11,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
   const { options } = question || {};
@@ -59,6 +60,12 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
 
     if (!question?.questionID || !deviceID || !selectedOptionID || !optionValue) return;
 
+    if (hydrated) {
+      markAnswered(question.questionID);
+      onSubmitAnswer(optionValue);
+      return;
+    }
+
     handleFirstInteraction();
     handleClick();
     markAnswered(question.questionID);
@@ -84,6 +91,8 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
     onSubmitAnswer(optionValue);
   }, [options, selectedOptionID, isRequired, markSubmission, mutateAsync, collectBehaviorData]);
 
+  useRegisterQuestionSubmit(isRequired || !!selectedOptionID, handleSubmit);
+
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
   const handleSelect = (optionID: string) => {
@@ -91,10 +100,10 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
     markTouched(question?.questionID!);
     if (selectedOptionID !== optionID) {
       handleOptionChange();
+      clearHydration();
     }
     handleClick();
     setSelectedOptionID(optionID);
-    clearHydration();
     if (error) setError(null);
   };
 

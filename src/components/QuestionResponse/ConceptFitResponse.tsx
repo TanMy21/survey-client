@@ -19,19 +19,20 @@ import { ConceptFitChoiceCard } from "./ConceptFitChoiceCard";
 import { ConceptFitStimulusCard } from "./ConceptFitStimulusCard";
 import { getConceptFitImage } from "@/utils/utils";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
+import { Countdown } from "../screen-components/Countdown";
 
 const ConceptFitResponse = ({
   question,
   surveyID,
-  onResetTimer,
 }: {
   question: QuestionProps["question"];
   surveyID: string;
-  onResetTimer: () => void;
 }) => {
   const isMobile = useIsMobile();
 
-  const { questionID, questionPreferences, options = [] } = question || {};
+  const { questionID, questionPreferences, options = [], type } = question || {};
 
   const uiConfig = questionPreferences?.uiConfig || {};
 
@@ -51,7 +52,6 @@ const ConceptFitResponse = ({
 
   const conceptFitImage = getConceptFitImage(question);
 
-  // Uses compact mobile layout only when the concept image is actually present.
   const useCompactMobileImageLayout =
     isMobile && showImageMode && Boolean(conceptFitImage?.imageUrl);
 
@@ -70,6 +70,9 @@ const ConceptFitResponse = ({
 
   const isRequired = useQuestionRequired(question);
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
+
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const { goNext } = useFlowRuntime();
 
   const {
@@ -84,12 +87,19 @@ const ConceptFitResponse = ({
   const currentAttribute = attributes[currentIndex];
   const isLastAttribute = currentIndex >= attributes.length - 1;
 
+  /**
+   * This resetKey controls the visual countdown.
+   * Whenever currentIndex changes, TimeCountdown remounts/resets visually.
+   */
+  const timerResetKey = `${questionID}-${currentIndex}-${timeLimitMs}`;
+
   useEffect(() => {
     containerRef.current?.focus();
   }, [currentIndex]);
 
   /**
-   * Resets the per-attribute timer whenever the active attribute changes.
+   * This controls the actual timing calculation.
+   * It resets when the active attribute changes.
    */
   useEffect(() => {
     attributeStartedAtRef.current = Date.now();
@@ -103,9 +113,6 @@ const ConceptFitResponse = ({
     };
   }, [currentIndex, questionID]);
 
-  /**
-   * Calculates timing metadata for the selected attribute response.
-   */
   const getSelectionTiming = useCallback(() => {
     const elapsedMs = Date.now() - attributeStartedAtRef.current;
     const remainingMs = Math.max(0, timeLimitMs - elapsedMs);
@@ -119,9 +126,6 @@ const ConceptFitResponse = ({
     };
   }, [timeLimitMs]);
 
-  /**
-   * Builds the final Concept Fit response payload.
-   */
   const buildFinalResponse = useCallback(
     (finalAnswers: ConceptFitAttributeAnswer[]) => {
       return {
@@ -164,18 +168,11 @@ const ConceptFitResponse = ({
     ]
   );
 
-  /**
-   * Finalizes the Concept Fit block and advances the survey flow.
-   */
   const finishConceptFit = useCallback(
-    (finalAnswers: ConceptFitAttributeAnswer[]) => {
-      if (!questionID || hasFinishedRef.current) return;
+    async (finalAnswers: ConceptFitAttributeAnswer[]) => {
+      if (!questionID || hasFinishedRef.current || isPending) return;
 
       hasFinishedRef.current = true;
-
-      markAnswered(questionID);
-      markSubmission();
-      markAnsweredEvent();
 
       const behavior = collectBehaviorData();
       const responseObject = buildFinalResponse(finalAnswers);
@@ -183,25 +180,48 @@ const ConceptFitResponse = ({
       console.log("📦 ConceptFit final response:", responseObject);
       console.log("📦 ConceptFit behavior data:", behavior);
 
-      setRealTimeResponse(questionID, responseObject, null);
+      try {
+        await mutateAsync({
+          surveyID,
+          deviceID,
+          questionID,
+          optionID: null,
+          qType: type!,
+          response: responseObject,
+          behavior,
+        });
 
-      goNext();
+        markAnswered(questionID);
+        markSubmission();
+        markAnsweredEvent();
+
+        setRealTimeResponse(questionID, responseObject as any, null);
+
+        goNext();
+      } catch (error) {
+        console.error("ConceptFit submit error:", error);
+
+        hasFinishedRef.current = false;
+        setError("Could not save your response. Please try again.");
+      }
     },
     [
       questionID,
+      surveyID,
+      deviceID,
+      type,
+      isPending,
+      collectBehaviorData,
+      buildFinalResponse,
+      mutateAsync,
       markAnswered,
       markSubmission,
       markAnsweredEvent,
-      collectBehaviorData,
-      buildFinalResponse,
       setRealTimeResponse,
       goNext,
     ]
   );
 
-  /**
-   * Moves to the next attribute or finishes the Concept Fit block.
-   */
   const goToNextAttributeOrFinish = useCallback(
     (nextAnswers: ConceptFitAttributeAnswer[]) => {
       if (isLastAttribute) {
@@ -209,16 +229,11 @@ const ConceptFitResponse = ({
         return;
       }
 
-      onResetTimer();
-
       setCurrentIndex((prev) => prev + 1);
     },
-    [isLastAttribute, finishConceptFit, onResetTimer]
+    [isLastAttribute, finishConceptFit]
   );
 
-  /**
-   * Records the selected side for the current attribute.
-   */
   const handleSelect = useCallback(
     (side: ConceptFitAnswerSide) => {
       if (!questionID || !currentAttribute) return;
@@ -278,9 +293,6 @@ const ConceptFitResponse = ({
     ]
   );
 
-  /**
-   * Handles manual next behavior for desktop users.
-   */
   const handleManualNext = useCallback(() => {
     if (!currentAttribute) return;
 
@@ -299,7 +311,6 @@ const ConceptFitResponse = ({
         return;
       }
 
-      onResetTimer();
       setCurrentIndex((prev) => prev + 1);
       return;
     }
@@ -312,12 +323,8 @@ const ConceptFitResponse = ({
     isLastAttribute,
     finishConceptFit,
     goToNextAttributeOrFinish,
-    onResetTimer,
   ]);
 
-  /**
-   * Supports keyboard shortcuts for desktop Concept Fit usage.
-   */
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       const key = event.key.toLowerCase();
@@ -370,10 +377,18 @@ const ConceptFitResponse = ({
           useCompactMobileImageLayout ? "gap-2" : "gap-4",
         ].join(" ")}
       >
-        <div className="flex w-full items-center justify-start px-2">
-          <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-black text-slate-400 shadow-sm">
-            {currentIndex + 1} of {attributes.length}
+        <div className="flex w-full items-center justify-between px-2">
+          <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-black text-slate-400 shadow-sm md:px-3 md:text-xs">
+            <span className="md:hidden">
+              {currentIndex + 1}/{attributes.length}
+            </span>
+
+            <span className="hidden md:inline">
+              {currentIndex + 1} of {attributes.length}
+            </span>
           </span>
+
+          <Countdown timeLimitMs={timeLimitMs} resetKey={timerResetKey} />
         </div>
 
         <div
@@ -422,17 +437,6 @@ const ConceptFitResponse = ({
         </div>
 
         {error && <InputError error={error} />}
-
-        {!isMobile && (
-          <div className="mt-2 flex w-full justify-end pr-2">
-            <button
-              onClick={handleManualNext}
-              className="min-w-[90px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"
-            >
-              {isLastAttribute ? "Finish" : "Next"}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

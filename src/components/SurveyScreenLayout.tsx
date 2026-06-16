@@ -61,7 +61,7 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
     canGoNext: canScrollNext,
     isEnd,
     cooldownMs: 600,
-    wheelThreshold: 100,
+    wheelThreshold: 180,
     touchThreshold: 48,
     onNavigate: (dir) => {
       setNavPulse(dir);
@@ -93,19 +93,16 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
     mobileQuery: "(pointer:coarse)",
   });
 
-  // useEffect(() => {
-  //   if (surveyID) quizSessionStarted(surveyID);
-  // }, [surveyID]);
+useEffect(() => {
+  const el = scrollRef.current;
+  if (!el) return;
 
-  // const sessions = data?.sessions ?? [];
-
-  //   usePreloadNeighbors(questions, currentQuestionIndex, 1);
-
-  //   if (!questions.length) {
-  //     return (
-  //       <div className="flex h-screen w-full items-center justify-center">Error Loading Survey.</div>
-  //     );
-  //   }
+  el.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: "auto",
+  });
+}, [currentQuestionID]);
 
   const hasEndScreen = useMemo(
     () => flowEligible.some((q) => q.type === END_SCREEN_TYPE),

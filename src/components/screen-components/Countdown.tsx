@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const IATCountdown = ({
+export const Countdown = ({
   timeLimitMs,
   resetKey,
 }: {

@@ -10,6 +10,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const InputResponseNumber = ({
   inputPlaceholder,
@@ -47,6 +48,10 @@ const InputResponseNumber = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
+    if (value !== number) {
+      clearHydration();
+    }
+
     markTouched(question?.questionID!);
 
     const native = e.nativeEvent as InputEvent | undefined;
@@ -74,6 +79,17 @@ const InputResponseNumber = ({
     const trimmed = number?.trim();
     const result = numberResponseSchema.safeParse({ number: trimmed });
 
+    if (!question?.questionID || !deviceID) {
+      setError("Missing identifiers. Please reload and try again.");
+      return;
+    }
+
+    if (hydrated) {
+      markAnswered(question.questionID);
+      onSubmitAnswer(trimmed);
+      return;
+    }
+
     if (isRequired && trimmed === "") {
       setError("Your response is required for this question");
       return;
@@ -81,11 +97,6 @@ const InputResponseNumber = ({
 
     if (!result.success) {
       setError(result.error.format().number?._errors[0] ?? "Invalid input");
-      return;
-    }
-
-    if (!question?.questionID || !deviceID) {
-      setError("Missing identifiers. Please reload and try again.");
       return;
     }
 
@@ -115,6 +126,8 @@ const InputResponseNumber = ({
 
     onSubmitAnswer(trimmed!);
   };
+
+  useRegisterQuestionSubmit(isRequired || (number ?? "").trim() !== "", handleSubmit);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 

@@ -124,17 +124,17 @@ export const getIATOptionGroup = (settings: any): IATGroup | null => {
 
 export const getIATRoundTargets = (
   round: IATRoundType,
-  uiConfig: ReturnType<typeof getParticipantIATUiConfig>
+  uiConfig: ReturnType<typeof getParticipantIATUiConfig>,
 ) => {
   if (round === "REVERSED") {
     return {
       left: {
-        brand: uiConfig.iatBrandA.label,
-        theme: uiConfig.iatThemeB.label,
-      },
-      right: {
         brand: uiConfig.iatBrandB.label,
         theme: uiConfig.iatThemeA.label,
+      },
+      right: {
+        brand: uiConfig.iatBrandA.label,
+        theme: uiConfig.iatThemeB.label,
       },
     };
   }
@@ -151,10 +151,9 @@ export const getIATRoundTargets = (
   };
 };
 
-export const getExpectedSideForIATStimulus = (group: IATGroup, round: IATRoundType): IATSide => {
-  if (round === "REVERSED") {
-    return group === "THEME_A" ? "right" : "left";
-  }
-
+export const getExpectedSideForIATStimulus = (
+  group: IATGroup,
+  _round: IATRoundType,
+): IATSide => {
   return group === "THEME_A" ? "left" : "right";
 };

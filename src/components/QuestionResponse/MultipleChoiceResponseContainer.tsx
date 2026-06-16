@@ -12,6 +12,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import type { OptionType } from "@/types/optionTypes";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceContainerProps) => {
   const { options } = question || {};
@@ -88,6 +89,8 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
   );
 
   const handleSubmit = useCallback(async () => {
+    const selectedValues = selectedOptions?.map((o) => o.value);
+
     if (isRequired && selectedOptions?.length === 0) {
       setError("Your response is required for this question");
       return;
@@ -98,16 +101,18 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
       return;
     }
 
+    if (hydrated) {
+      markAnswered(question.questionID);
+      onSubmitAnswer(selectedValues);
+      return;
+    }
+
     handleFirstInteraction();
     handleClick();
     markSubmission();
     markAnsweredEvent();
 
     const behaviorData = collectBehaviorData();
-    console.log("📦 MultipleChoiceScreen behavior data:", behaviorData);
-    console.log("Selected Options:", selectedOptions);
-
-    const selectedValues = selectedOptions?.map((o) => o.value);
 
     markAnswered(question.questionID);
 
@@ -138,6 +143,8 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
     mutateAsync,
     onSubmitAnswer,
   ]);
+
+  useRegisterQuestionSubmit(isRequired || selectedOptions.length > 0, handleSubmit);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 

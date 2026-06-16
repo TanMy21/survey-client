@@ -4,7 +4,7 @@ import { useQuestionRequired } from "./useQuestionRequired";
 import { useDeviceId } from "./useDeviceID";
 import { useSubmitResponseSkipped } from "./useSurvey";
 import { useBehavior } from "@/context/BehaviorTrackerContext";
-import { SKIPPABLE_TYPES, UUID_RE } from "@/utils/questionConfig";
+import { NON_SKIP_ON_ADVANCE_TYPES, SKIPPABLE_TYPES, UUID_RE } from "@/utils/questionConfig";
 import { useEffect, useMemo } from "react";
 
 export function useSkipOnAdvance(surveyID: string) {
@@ -18,6 +18,9 @@ export function useSkipOnAdvance(surveyID: string) {
   // Decide for each type  to attach interceptor or not
   const shouldAttach = useMemo(() => {
     if (!currentQuestion) return false;
+
+    if (NON_SKIP_ON_ADVANCE_TYPES.has(currentQuestion.type)) return false;
+
     if (!SKIPPABLE_TYPES.has(currentQuestion.type)) return false;
     if (!UUID_RE.test(currentQuestionID)) return false; // ignore injected screen like consent
     if (isRequired) return false; // if question is required

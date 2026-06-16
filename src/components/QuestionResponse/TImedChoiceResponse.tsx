@@ -6,10 +6,14 @@ import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 import type { BinaryResponseContainerProps } from "@/types/responseTypes";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { TimedChoiceOptionCard } from "./TimedChoiceOptionCard";
 import { getTimedChoiceOptionImage } from "@/utils/utils";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
+import { Countdown } from "../screen-components/Countdown";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProps) => {
   const { questionID, questionPreferences, options = [] } = question;
@@ -22,13 +26,14 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
   const displayMode = uiConfig.timedChoiceDisplayMode || "TEXT";
   const showImages = displayMode === "IMAGE" || displayMode === "TEXT_IMAGE";
 
-  const sortedOptions = [...options].sort((a, b) => (a.order || 0) - (b.order || 0)).slice(0, 2);
+  const sortedOptions = useMemo(() => {
+    return [...options].sort((a, b) => (a.order || 0) - (b.order || 0)).slice(0, 2);
+  }, [options]);
 
   const firstOption = sortedOptions[0];
   const secondOption = sortedOptions[1];
 
   const firstOptionValue = firstOption?.value || firstOption?.text || "Option A";
-
   const secondOptionValue = secondOption?.value || secondOption?.text || "Option B";
 
   const firstOptionText = firstOption?.text || "Option A";
@@ -41,15 +46,26 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const [selectedOptionID, setSelectedOptionID] = useState<string | null>(null);
   const [selectedAtMs, setSelectedAtMs] = useState<number | null>(null);
+  const [shouldAutoSubmit, setShouldAutoSubmit] = useState(false);
 
   const startedAtRef = useRef(Date.now());
-  const hasLoggedTimeoutRef = useRef(false);
+  const isSubmittingRef = useRef(false);
 
   const firstRef = useRef<HTMLDivElement | null>(null);
   const secondRef = useRef<HTMLDivElement | null>(null);
 
   const isRequired = useQuestionRequired(question);
-  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
+
+  const {
+    markTouched,
+    markAnswered,
+    setRealTimeResponse,
+    getRealTimeResponse,
+    persistedResponses,
+  } = useResponseRegistry();
+
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const { onSubmitAnswer } = useFlowRuntime();
 
   const {
@@ -61,41 +77,59 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
     collectBehaviorData,
   } = useBehavior();
 
+  const timerResetKey = `${questionID}-${timeLimitMs}`;
+
   /**
-   * Starts the countdown timing window for this question.
+   * Starts the timing window and hydrates selected UI if participant
+   * returns to this question on the same device/session.
    */
   useEffect(() => {
     startedAtRef.current = Date.now();
-    hasLoggedTimeoutRef.current = false;
-    setSelectedValue(null);
-    setSelectedOptionID(null);
+
+    /**
+     * Hydrated response should only show selected UI.
+     * It should not trigger auto-submit again.
+     */
+    setShouldAutoSubmit(false);
+    setError(null);
     setSelectedAtMs(null);
-  }, [questionID, timeLimitMs]);
+    isSubmittingRef.current = false;
+
+    const liveResponse = getRealTimeResponse(questionID);
+    const persistedResponse = persistedResponses?.[questionID] ?? null;
+
+    const savedResponse = liveResponse ?? persistedResponse;
+
+    if (!savedResponse) {
+      setSelectedValue(null);
+      setSelectedOptionID(null);
+      return;
+    }
+
+    const savedPayload = savedResponse.value;
+
+    const savedValue =
+      typeof savedPayload === "string" ? savedPayload : (savedPayload?.selectedValue ?? null);
+
+    if (!savedValue) {
+      setSelectedValue(null);
+      setSelectedOptionID(null);
+      return;
+    }
+
+    const matchedOption = sortedOptions.find((option) => {
+      const optionValue = option.value || option.text;
+      return optionValue === savedValue;
+    });
+
+    setSelectedValue(savedValue);
+    setSelectedOptionID(savedResponse.optionID || matchedOption?.optionID || null);
+  }, [questionID, timeLimitMs, getRealTimeResponse, persistedResponses, sortedOptions]);
 
   /**
-   * Logs timeout for now.
-   * Later this can submit a timeout response if needed.
+   * Captures the second/ms at which participant selected the option.
+   * This remains independent from the visual countdown.
    */
-  useEffect(() => {
-    const timeoutID = window.setTimeout(() => {
-      if (selectedValue || hasLoggedTimeoutRef.current) return;
-
-      hasLoggedTimeoutRef.current = true;
-
-      console.log("⏱️ TimedChoice timeout:", {
-        surveyID,
-        questionID,
-        qType: question.type,
-        timeLimitMs,
-        selected: false,
-      });
-    }, timeLimitMs);
-
-    return () => {
-      window.clearTimeout(timeoutID);
-    };
-  }, [selectedValue, surveyID, questionID, question.type, timeLimitMs]);
-
   const getSelectionTiming = useCallback(() => {
     const elapsedMs = Date.now() - startedAtRef.current;
     const remainingMs = Math.max(0, timeLimitMs - elapsedMs);
@@ -123,17 +157,8 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
       setSelectedValue(nextValue);
       setSelectedOptionID(optionID);
       setSelectedAtMs(timing.selectedAtMs);
+      setShouldAutoSubmit(true);
       setError(null);
-
-      console.log("⚡ TimedChoice option selected:", {
-        surveyID,
-        questionID,
-        qType: question.type,
-        optionID,
-        value: nextValue,
-        selectedAtSecondFromStart: timing.selectedAtSecondFromStart,
-        countdownSecondRemaining: timing.countdownSecondRemaining,
-      });
     },
     [
       handleFirstInteraction,
@@ -143,12 +168,12 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
       selectedValue,
       handleOptionChange,
       getSelectionTiming,
-      surveyID,
-      question.type,
     ]
   );
 
   const handleSubmit = useCallback(async () => {
+    if (isSubmittingRef.current || isPending) return;
+
     if (isRequired && !selectedValue) {
       setError("Your response is required for this question");
       return;
@@ -156,9 +181,7 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
 
     if (!questionID || !selectedValue) return;
 
-    markAnswered(questionID);
-    markSubmission();
-    markAnsweredEvent();
+    isSubmittingRef.current = true;
 
     const behavior = collectBehaviorData();
 
@@ -166,45 +189,68 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
 
     const remainingMs = Math.max(0, timeLimitMs - elapsedMs);
 
-    /**
-     * Temporary only.
-     * Backend submission will be added later.
-     */
-    console.log("📦 TimedChoice behavior data:", behavior);
-    console.log("TimedChoice selected response:", {
-      surveyID,
-      questionID,
-      qType: question.type,
-      optionID: selectedOptionID,
-      response: selectedValue,
-      selectedAtMs: elapsedMs,
-      selectedAtSecondFromStart: Number((elapsedMs / 1000).toFixed(2)),
-      countdownMsRemaining: remainingMs,
-      countdownSecondRemaining: Number((remainingMs / 1000).toFixed(2)),
+    const timedChoiceResponse = {
+      selectedValue,
       displayMode,
-    });
+      timeLimitMs,
+      timing: {
+        responseTimeMs: elapsedMs,
+        responseTimeSeconds: Number((elapsedMs / 1000).toFixed(2)),
+        countdownRemainingMs: remainingMs,
+        countdownRemainingSeconds: Number((remainingMs / 1000).toFixed(2)),
+        isOverTime: elapsedMs > timeLimitMs,
+      },
+      answeredAt: new Date().toISOString(),
+    };
 
-    setRealTimeResponse(questionID, selectedValue, null);
+    try {
+      await mutateAsync({
+        surveyID,
+        deviceID,
+        questionID,
+        optionID: selectedOptionID,
+        qType: question.type,
+        response: timedChoiceResponse,
+        behavior,
+      });
 
-    setError(null);
-    onSubmitAnswer(selectedValue);
+      markAnswered(questionID);
+      markSubmission();
+      markAnsweredEvent();
+
+      setRealTimeResponse(questionID, timedChoiceResponse, selectedOptionID);
+      setShouldAutoSubmit(false);
+      setError(null);
+
+      onSubmitAnswer(selectedValue);
+    } catch (error) {
+      console.error("TimedChoice submit error:", error);
+      isSubmittingRef.current = false;
+      setShouldAutoSubmit(false);
+      setError("Could not save your response. Please try again.");
+    }
   }, [
     isRequired,
     selectedValue,
     questionID,
-    markAnswered,
-    markSubmission,
-    markAnsweredEvent,
+    isPending,
     collectBehaviorData,
     selectedAtMs,
     timeLimitMs,
-    surveyID,
-    question.type,
-    selectedOptionID,
     displayMode,
+    mutateAsync,
+    surveyID,
+    deviceID,
+    selectedOptionID,
+    question.type,
+    markAnswered,
+    markSubmission,
+    markAnsweredEvent,
     setRealTimeResponse,
     onSubmitAnswer,
   ]);
+
+  useRegisterQuestionSubmit(isRequired || !!selectedValue, handleSubmit);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
@@ -216,7 +262,7 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
   }, [selectedValue, firstOptionValue, secondOptionValue]);
 
   useAutoSubmitPulse({
-    active: selectedValue !== null,
+    active: shouldAutoSubmit && selectedValue !== null && !isPending,
     delayMs: 900,
     feedbackMs: 160,
     onSubmit: handleSubmit,
@@ -233,14 +279,18 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
     };
 
   return (
-    <div className="mx-auto flex h-full w-full flex-col items-center justify-center gap-2 p-2 sm:w-4/5">
+    <div className="mx-auto flex h-full w-full flex-col items-center justify-center gap-3 px-2 py-3 sm:w-4/5 md:px-3 md:py-2">
       <div
         role="group"
         tabIndex={0}
         onKeyDown={handleKeyDown}
         aria-label="Timed choice response container"
-        className="flex h-full w-[98%] flex-col gap-2 md:w-4/5"
+        className="flex h-full w-[98%] flex-col gap-3 outline-none md:w-4/5"
       >
+        <div className="flex w-full items-center justify-end px-2">
+          <Countdown timeLimitMs={timeLimitMs} resetKey={timerResetKey} />
+        </div>
+
         <div className="mx-auto grid h-full w-[98%] grid-cols-1 gap-6 sm:w-[86%] md:grid-cols-2">
           <div
             ref={firstRef}
@@ -289,8 +339,10 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
 
         <div className="mt-4 flex w-full justify-end pr-6">
           <button
+            type="button"
             onClick={handleSubmit}
-            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"
+            disabled={isPending}
+            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f] disabled:cursor-not-allowed disabled:opacity-60"
           >
             OK
           </button>

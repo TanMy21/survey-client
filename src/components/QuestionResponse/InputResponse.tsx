@@ -8,6 +8,7 @@ import { InputError } from "../alert/ResponseErrorAlert";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitEmailResponse } from "@/hooks/useSurvey";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const InputResponse = ({
   surveyID,
@@ -60,9 +61,6 @@ const InputResponse = ({
 
     const behavior = collectBehaviorData();
 
-    console.log("📦 EmailContactScreen behavior data:", behavior);
-    console.log("Input submitted:", result);
-
     mutate(
       {
         surveyID,
@@ -81,6 +79,10 @@ const InputResponse = ({
       }
     );
   };
+
+
+  useRegisterQuestionSubmit(isRequired || emailContact.trim() !== "", handleSubmit);
+
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 

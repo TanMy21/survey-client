@@ -12,6 +12,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProps) => {
   const isMobile = useIsMobile();
@@ -31,6 +32,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
   const {
     value: selectedOptions,
     setValue: setSelectedOptions,
+    clearHydration,
     hydrated,
   } = useHydratedResponse<{ optionID: string; value: string }[]>({
     question: question!,
@@ -60,6 +62,8 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
       handleFirstInteraction();
       handleClick();
 
+      if (hydrated) clearHydration();
+
       markTouched(question?.questionID!);
 
       const opt = options.find((o) => o.optionID === optionID);
@@ -82,9 +86,20 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
     },
     [options, handleClick, handleFirstInteraction, error]
   );
+
   const handleSubmit = useCallback(async () => {
     if (isRequired && selectedOptions?.length === 0) {
       setError("Your response is required for this question");
+      return;
+    }
+
+    const behaviorData = collectBehaviorData();
+
+    const selectedValues = selectedOptions?.map((o) => o.value);
+
+    if (hydrated && question) {
+      markAnswered(question.questionID);
+      onSubmitAnswer(selectedValues);
       return;
     }
 
@@ -93,12 +108,6 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
 
     markSubmission();
     markAnsweredEvent();
-
-    const behaviorData = collectBehaviorData();
-    console.log("📦 MediaScreen behavior data:", behaviorData);
-
-    const selectedValues = selectedOptions?.map((o) => o.value);
-    console.log("Selected Media Options:", selectedValues);
 
     markAnswered(question?.questionID!);
 
@@ -124,6 +133,8 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
     collectBehaviorData,
     onSubmitAnswer,
   ]);
+
+  useRegisterQuestionSubmit(isRequired || selectedOptions.length > 0, handleSubmit);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 

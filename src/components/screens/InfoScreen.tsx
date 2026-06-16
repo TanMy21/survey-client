@@ -1,4 +1,5 @@
 import { useSurveyFlow } from "@/context/useSurveyFlow";
+import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import type { QuestionProps } from "@/types/questionTypes";
 import DOMPurify from "dompurify";
@@ -9,6 +10,7 @@ import CenteredStack from "../layout/CenteredStack";
 const InfoScreen = ({ question }: QuestionProps) => {
   const isMobile = useIsMobile();
   const { setCanProceed } = useSurveyFlow();
+  const { goNext } = useFlowRuntime();
 
   const description = question?.description || "";
 
@@ -19,6 +21,28 @@ const InfoScreen = ({ question }: QuestionProps) => {
   useEffect(() => {
     setCanProceed(true);
   }, [setCanProceed]);
+
+  useEffect(() => {
+  const handleSpaceNext = (event: KeyboardEvent) => {
+    const isSpace =
+      event.code === "Space" ||
+      event.key === " " ||
+      event.key === "Spacebar";
+
+    if (!isSpace || event.repeat) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    goNext();
+  };
+
+  window.addEventListener("keydown", handleSpaceNext, true);
+
+  return () => {
+    window.removeEventListener("keydown", handleSpaceNext, true);
+  };
+}, [goNext]);
 
   const safeHTML = useMemo(() => {
     return DOMPurify.sanitize(description, {

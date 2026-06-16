@@ -5,6 +5,7 @@ import type { SurveyNavigatorCompactProps } from "@/types/surveyTypes";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 import { ReportSurveyModal } from "./modal/ReportSurveyModal";
+import { useQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const SurveyNavigatorCompact = ({
   disableNext,
@@ -12,9 +13,19 @@ const SurveyNavigatorCompact = ({
   shareID,
 }: SurveyNavigatorCompactProps) => {
   const { currentQuestion, canGoPrev, onPrev, goNext, isTerminal } = useFlowRuntime();
+  const { requestSubmit, hasSubmitHandler } = useQuestionSubmit();
   const isEnd = currentQuestion.type === "END_SCREEN";
   const hideNext = isTerminal;
   const [reportModalOpen, setReportModalOpen] = useState(false);
+
+  const handleNext = () => {
+    if (hasSubmitHandler) {
+      requestSubmit();
+      return;
+    }
+
+    goNext();
+  };
 
   const pulseVariant = {
     rest: { scale: 1, boxShadow: "0 0 0px rgba(37,99,235,0)" },
@@ -62,8 +73,8 @@ const SurveyNavigatorCompact = ({
               !hideNext && (
                 <motion.button
                   className="h-11 w-11 rounded-full p-2 text-gray-700 transition hover:text-black disabled:opacity-40"
-                  disabled={disableNext}
-                  onClick={goNext}
+                  disabled={disableNext && !hasSubmitHandler}
+                  onClick={handleNext}
                   aria-label="Next"
                   variants={pulseVariant}
                   animate={navPulse === "next" ? "pulse" : "rest"}

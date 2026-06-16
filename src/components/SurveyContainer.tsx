@@ -11,6 +11,7 @@ import { buildParticipantMeta } from "@/utils/fingerprint";
 import { ResponseRegistryProvider } from "@/context/ResponseRegistry";
 import { getSurveyUnavailableVariant } from "@/utils/getSurveyUnavailabel";
 import { SurveyUnavailableScreen } from "./screens/SurveyUnavailabelScreen";
+import { QuestionSubmitProvider } from "@/context/QuestionNavigationContext";
 
 const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
   const deviceID = getOrCreateDeviceId();
@@ -77,7 +78,10 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
   return (
     <FlowRuntimeProvider payload={survey}>
       <ResponseRegistryProvider persistedResponses={survey.responses}>
-        <SurveyScreenLayout surveyID={survey.surveyID} shareID={shareID} />
+        {" "}
+        <QuestionSubmitProvider>
+          <SurveyScreenLayout surveyID={survey.surveyID} shareID={shareID} />
+        </QuestionSubmitProvider>
       </ResponseRegistryProvider>
     </FlowRuntimeProvider>
   );

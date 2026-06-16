@@ -16,6 +16,8 @@ export function useScrollNav({
   const accumRef = useRef(0);
   const lastFiredRef = useRef(0);
   const touchStartY = useRef<number | null>(null);
+  const wheelLockedRef = useRef(false);
+  const wheelUnlockTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const el = container.current;
@@ -23,8 +25,23 @@ export function useScrollNav({
 
     const now = () => performance.now();
     const onCooldown = () => now() - lastFiredRef.current < cooldownMs;
+
+    const unlockWheelAfterIdle = () => {
+      if (wheelUnlockTimerRef.current !== null) {
+        window.clearTimeout(wheelUnlockTimerRef.current);
+      }
+
+      wheelUnlockTimerRef.current = window.setTimeout(() => {
+        wheelLockedRef.current = false;
+        accumRef.current = 0;
+      }, 350);
+    };
+
     const fire = (dir: "next" | "prev") => {
       lastFiredRef.current = now();
+      wheelLockedRef.current = true;
+      accumRef.current = 0;
+
       if (dir === "next") {
         goNext();
       } else {
@@ -44,6 +61,12 @@ export function useScrollNav({
 
     const onWheel = (e: WheelEvent) => {
       if (isInputLike(e.target)) return;
+
+      if (wheelLockedRef.current) {
+        unlockWheelAfterIdle();
+        return;
+      }
+
       if (onCooldown()) return;
 
       const atTop = el.scrollTop <= 0;
@@ -100,6 +123,10 @@ export function useScrollNav({
     el.addEventListener("touchend", onTouchEnd, { passive: true });
 
     return () => {
+      if (wheelUnlockTimerRef.current !== null) {
+        window.clearTimeout(wheelUnlockTimerRef.current);
+      }
+
       el.removeEventListener("wheel", onWheel);
       el.removeEventListener("touchstart", onTouchStart);
       el.removeEventListener("touchend", onTouchEnd);

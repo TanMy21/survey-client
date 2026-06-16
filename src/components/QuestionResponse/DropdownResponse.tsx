@@ -9,6 +9,9 @@ import type { SingleChoiceListProps } from "@/types/responseTypes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { InputError } from "../alert/ResponseErrorAlert";
 import { ChevronDown } from "lucide-react";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
   const { options } = question || {};
@@ -32,12 +35,15 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
   const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
-
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const submitInFlightRef = useRef(false);
 
   const {
     handleFirstInteraction,
@@ -56,11 +62,19 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
   const selectedOptionValue = selectedOption?.value;
   const selectedOptionText = selectedOption?.text;
 
-  /**
-   * Submits the selected dropdown answer.
-   * Keeps the original validation, behavior tracking, and flow submission.
-   */
   const handleSubmit = useCallback(async () => {
+    if (!question || !selectedOptionID || !selectedOptionValue) {
+      return;
+    }
+
+    if (hydrated && question) {
+      markAnswered(question.questionID);
+      onSubmitAnswer(selectedOptionValue);
+      return;
+    }
+
+    if (submitInFlightRef.current) return;
+
     if (isRequired && !selectedOptionValue) {
       setError("Your response is required for this question");
       return;
@@ -70,75 +84,77 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
       return;
     }
 
-    handleFirstInteraction();
-    handleClick();
-    markAnswered(question.questionID);
-    markSubmission();
-    markAnsweredEvent();
+    submitInFlightRef.current = true;
+    setIsSubmitting(true);
 
-    const behavior = collectBehaviorData();
+    try {
+      handleFirstInteraction();
+      handleClick();
+      markAnswered(question.questionID);
+      markSubmission();
+      markAnsweredEvent();
 
-    /**
-     * Temporary only.
-     * Backend submission will be added later.
-     */
-    console.log("📦 DropDownResponse behavior data:", behavior);
-    console.log("Dropdown selected option:", {
-      surveyID,
-      questionID: question.questionID,
-      qType: question.type,
-      optionID: selectedOptionID,
-      value: selectedOptionValue,
-      text: selectedOptionText,
-    });
+      const behavior = collectBehaviorData();
 
-    setRealTimeResponse(question.questionID, selectedOptionValue, null);
+      await mutateAsync({
+        surveyID,
+        questionID: question.questionID,
+        qType: question.type,
+        optionID: selectedOptionID,
+        response: selectedOptionValue,
+        deviceID,
+        behavior,
+      });
 
-    setError(null);
-    onSubmitAnswer(selectedOptionValue);
+      setRealTimeResponse(question.questionID, selectedOptionValue, null);
+
+      setError(null);
+      onSubmitAnswer(selectedOptionValue);
+    } catch (error) {
+      console.error("Dropdown submit error:", error);
+      setError("Could not save your response. Please try again.");
+    } finally {
+      submitInFlightRef.current = false;
+      setIsSubmitting(false);
+    }
   }, [
     isRequired,
     selectedOptionValue,
     question?.questionID,
     question?.type,
     selectedOptionID,
-    selectedOptionText,
     surveyID,
+    deviceID,
     handleFirstInteraction,
     handleClick,
     markAnswered,
     markSubmission,
     markAnsweredEvent,
     collectBehaviorData,
+    mutateAsync,
     setRealTimeResponse,
     onSubmitAnswer,
   ]);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
-  /**
-   * Selects an option from the custom dropdown.
-   * Keeps the original touch, click, option-change, and hydration behavior.
-   */
   const handleSelect = (optionID: string) => {
     handleFirstInteraction();
     markTouched(question?.questionID!);
+    handleClick();
 
     if (selectedOptionID !== optionID) {
       handleOptionChange();
+      clearHydration();
     }
 
-    handleClick();
     setSelectedOptionID(optionID);
-    clearHydration();
     setIsDropdownOpen(false);
 
     if (error) setError(null);
   };
 
-  /**
-   * Closes the dropdown when clicking outside the custom select.
-   */
+  // Dropdown close
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (!dropdownRef.current?.contains(event.target as Node)) {
@@ -153,28 +169,27 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
     };
   }, []);
 
-  /**
-   * Handles backtrack behavior and focuses the custom select trigger.
-   */
   useEffect(() => {
     handleBacktrack();
     triggerRef.current?.focus();
   }, [handleBacktrack]);
-
-  useAutoSubmitPulse({
-    active: !!selectedOptionID && !hydrated,
-    delayMs: 2000,
-    feedbackMs: 180,
-    onSubmit: handleSubmit,
-    getPulseTargets: () => [triggerRef.current],
-    vibrate: true,
-  });
 
   useEffect(() => {
     if (hydrated && selectedOptionID) {
       markAnswered(question?.questionID!);
     }
   }, [hydrated, selectedOptionID, question?.questionID, markAnswered]);
+
+  useAutoSubmitPulse({
+    active: !!selectedOptionID && !hydrated,
+    delayMs: 1500,
+    feedbackMs: 160,
+    onSubmit: handleSubmit,
+    getPulseTargets: () => [triggerRef.current],
+    vibrate: true,
+  });
+
+  useRegisterQuestionSubmit(isRequired || !!selectedOptionID, handleSubmit);
 
   return (
     <div className="flex w-full origin-bottom flex-col sm:w-[60%]">
@@ -229,7 +244,6 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
               <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-3xl border border-slate-200 bg-white p-2 shadow-[0_18px_45px_rgba(15,23,42,0.14)]">
                 <div
                   role="listbox"
-                  // Keeps menu scrollable but visually hides the scrollbar.
                   className="max-h-[240px] overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
                   {visibleOptions.map((option) => {
@@ -274,8 +288,9 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
 
         <div className="mt-2 flex w-[112%] justify-end pr-6">
           <button
+            disabled={isSubmitting || isPending}
             onClick={handleSubmit}
-            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"
+            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500"
           >
             OK
           </button>

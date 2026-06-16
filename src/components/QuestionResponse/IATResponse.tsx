@@ -17,11 +17,12 @@ import {
   getParticipantIATUiConfig,
 } from "@/utils/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { IATCountdown } from "../screen-components/IATCountdown";
+import { Countdown } from "../screen-components/Countdown";
 import { IATStimulusCard } from "./IATStimulusCard";
 import { IATCategoryTargetCard } from "./IATCategoryCard";
-import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { ArrowLeftRight } from "lucide-react";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { useSubmitResponse } from "@/hooks/useSurvey";
 
 const IATResponse = ({
   question,
@@ -30,7 +31,7 @@ const IATResponse = ({
   question: QuestionProps["question"];
   surveyID: string;
 }) => {
-  const { questionID, questionPreferences, options = [] } = question || {};
+  const { questionID, questionPreferences, options = [], type } = question || {};
 
   const uiConfig = getParticipantIATUiConfig(questionPreferences?.uiConfig);
 
@@ -76,14 +77,10 @@ const IATResponse = ({
   const advanceTimeoutRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const { markTouched, markAnswered } = useResponseRegistry();
+  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
+  const deviceID = useDeviceId();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const { goNext } = useFlowRuntime();
-
-  const isRequired = useQuestionRequired(question);
-
-  const skipAllowed =
-    !isRequired ||
-    Boolean(uiConfig.allowSkip || uiConfig.iatAllowSkip || (question as any)?.allowSkip);
 
   const {
     handleFirstInteraction,
@@ -186,12 +183,12 @@ const IATResponse = ({
           {
             round: "REVERSED",
             left: {
-              brand: uiConfig.iatBrandA.label,
-              theme: uiConfig.iatThemeB.label,
-            },
-            right: {
               brand: uiConfig.iatBrandB.label,
               theme: uiConfig.iatThemeA.label,
+            },
+            right: {
+              brand: uiConfig.iatBrandA.label,
+              theme: uiConfig.iatThemeB.label,
             },
           },
         ],
@@ -222,7 +219,7 @@ const IATResponse = ({
   );
 
   const finishIAT = useCallback(
-    (
+    async (
       finalAnswers: IATAnswer[],
       skipped = false,
       skipMeta?: {
@@ -234,7 +231,7 @@ const IATResponse = ({
         currentStimulusText?: string;
       }
     ) => {
-      if (!questionID || hasFinishedRef.current) return;
+      if (!questionID || !deviceID || hasFinishedRef.current) return;
 
       hasFinishedRef.current = true;
 
@@ -245,10 +242,28 @@ const IATResponse = ({
       const behavior = collectBehaviorData();
       const responseObject = buildFinalResponse(finalAnswers, skipped, skipMeta);
 
-      console.log("📦 IAT final response:", responseObject);
-      console.log("📦 IAT behavior data:", behavior);
+      try {
+        await mutateAsync({
+          surveyID,
+          deviceID,
+          questionID,
+          optionID: null,
+          qType: type!,
+          response: responseObject,
+          behavior,
+        });
 
-      goNext();
+        markAnswered(questionID);
+        markSubmission();
+        markAnsweredEvent();
+
+        setRealTimeResponse(questionID, responseObject as any, null);
+
+        goNext();
+      } catch (error) {
+        console.error("IAT submit error:", error);
+        hasFinishedRef.current = false;
+      }
     },
     [
       questionID,
@@ -258,6 +273,11 @@ const IATResponse = ({
       collectBehaviorData,
       buildFinalResponse,
       goNext,
+      surveyID,
+      deviceID,
+      type,
+      mutateAsync,
+      setRealTimeResponse,
     ]
   );
 
@@ -353,31 +373,6 @@ const IATResponse = ({
     ]
   );
 
-  const handleSkip = useCallback(() => {
-    if (!skipAllowed) return;
-
-    const skipMeta = {
-      skippedAtRound: round,
-      skippedAtRoundIndex: roundIndex,
-      skippedAtStimulusIndex: stimulusIndex + 1,
-      skippedAtTrialNumber: currentTrialNumber,
-      currentStimulusOptionID: currentStimulus?.optionID,
-      currentStimulusText: currentStimulus?.text,
-    };
-
-    finishIAT(answers, true, skipMeta);
-  }, [
-    skipAllowed,
-    round,
-    roundIndex,
-    stimulusIndex,
-    currentTrialNumber,
-    currentStimulus?.optionID,
-    currentStimulus?.text,
-    finishIAT,
-    answers,
-  ]);
-
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       const key = event.key.toLowerCase();
@@ -456,14 +451,14 @@ const IATResponse = ({
             </p>
           </div>
 
-          <IATCountdown timeLimitMs={timeLimitMs} resetKey={resetKey} />
+          <Countdown timeLimitMs={timeLimitMs} resetKey={resetKey} />
         </div>
 
         <div className="w-full">
           <div className="hidden w-full grid-cols-[1fr_minmax(180px,260px)_1fr] items-center gap-4 md:grid">
             <IATCategoryTargetCard
               side="left"
-              toneSide={round === "REVERSED" ? "right" : "left"}
+              toneSide="left"
               keyLabel={uiConfig.iatLeftKey}
               brand={roundTargets.left.brand}
               association={roundTargets.left.theme}
@@ -475,7 +470,7 @@ const IATResponse = ({
 
             <IATCategoryTargetCard
               side="right"
-              toneSide={round === "REVERSED" ? "left" : "right"}
+              toneSide="right"
               keyLabel={uiConfig.iatRightKey}
               brand={roundTargets.right.brand}
               association={roundTargets.right.theme}
@@ -484,13 +479,15 @@ const IATResponse = ({
             />
           </div>
 
+          {/* Mobile view  */}
+
           <div className="flex w-full flex-col gap-8 md:hidden">
             <IATStimulusCard stimulus={currentStimulus.text} />
 
             <div className="grid grid-cols-2 gap-3">
               <IATCategoryTargetCard
                 side="left"
-                toneSide={round === "REVERSED" ? "right" : "left"}
+                toneSide="left"
                 keyLabel={uiConfig.iatLeftKey}
                 brand={roundTargets.left.brand}
                 association={roundTargets.left.theme}
@@ -501,7 +498,7 @@ const IATResponse = ({
 
               <IATCategoryTargetCard
                 side="right"
-                toneSide={round === "REVERSED" ? "left" : "right"}
+                toneSide="right"
                 keyLabel={uiConfig.iatRightKey}
                 brand={roundTargets.right.brand}
                 association={roundTargets.right.theme}
@@ -511,18 +508,6 @@ const IATResponse = ({
               />
             </div>
           </div>
-        </div>
-
-        <div className="mt-4 hidden w-full items-center justify-end px-2 md:flex">
-          {skipAllowed && (
-            <button
-              type="button"
-              onClick={handleSkip}
-              className="min-w-[82px] rounded-[20px] bg-[#005BC4] px-4 py-2 text-sm font-black text-white transition hover:bg-[#004a9f]"
-            >
-              Next
-            </button>
-          )}
         </div>
       </div>
     </div>

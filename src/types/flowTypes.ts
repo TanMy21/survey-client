@@ -67,6 +67,7 @@ export interface NextDecision {
 
 export const NON_ORDERED_TYPES = new Set([
   "WELCOME_SCREEN",
+  "INFO_SCREEN",
   "INSTRUCTIONS",
   "EMAIL_CONTACT",
   "CONSENT",
