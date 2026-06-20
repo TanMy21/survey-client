@@ -1,36 +1,20 @@
 import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
 import type { QuestionProps } from "@/types/questionTypes";
-import { MoveRight } from "lucide-react";
+import { Clock3, MoveRight } from "lucide-react";
 import { useEffect } from "react";
 import CenteredStack from "../layout/CenteredStack";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import ScreenRoot from "../layout/ScreenRoot";
 import { ResponseContainer } from "../layout/ResponseContainer";
-import { useDeviceId } from "@/hooks/useDeviceID";
-import { useBehaviorFlush } from "@/api/responseApi";
 import { WelcomeScreenTextandDescription } from "../WelcomeScreenTextandDescription";
 
-const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
+const WelcomeScreen = ({ surveyID, question, completionTimeEstimate }: QuestionProps) => {
   const { questionPreferences } = question || {};
   const { setCanProceed } = useSurveyFlow();
-  const { goNext, registerBeforeNext } = useFlowRuntime();
-  const deviceID = useDeviceId();
-  const {
-    handleFirstInteraction,
-    handleClick,
-    markSubmission,
-    markAnsweredEvent,
-    collectBehaviorData,
-  } = useBehavior();
+  const { goNext } = useFlowRuntime();
 
-  const { flushOnce } = useBehaviorFlush({
-    surveyID,
-    registerBeforeNext,
-    collectBehaviorData,
-    questionID: question!.questionID,
-    deviceID,
-  });
+  const { handleFirstInteraction, handleClick, markSubmission, markAnsweredEvent } = useBehavior();
 
   useEffect(() => {
     setCanProceed(true);
@@ -38,14 +22,20 @@ const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
 
   const buttonText = questionPreferences?.uiConfig?.buttonText || "Next";
 
+  const estimatedMinutes = completionTimeEstimate?.estimatedCompletionTimeMinutes;
+
+  const completionTimeLabel =
+    estimatedMinutes && estimatedMinutes > 1
+      ? `${estimatedMinutes} minutes`
+      : estimatedMinutes === 1
+        ? "1 minute"
+        : null;
+
   const handleNext = async () => {
     handleFirstInteraction();
     handleClick();
     markSubmission();
     markAnsweredEvent();
-    const data = collectBehaviorData();
-    console.log("📦 WelcomeScreen behavior data:", data);
-    await flushOnce();
     goNext();
   };
 
@@ -67,6 +57,18 @@ const WelcomeScreen = ({ surveyID, question }: QuestionProps) => {
             <MoveRight className="h-6 w-6" />
           </div>
         </button>
+
+        {completionTimeLabel && (
+          <div className="mt-8 flex justify-center">
+            <div className="flex items-center gap-1.5 text-xl font-medium text-slate-400">
+              <Clock3 className="h-6 w-6 text-slate-400" />
+              <span>
+                Takes just{" "}
+                <span className="font-semibold text-slate-500">{completionTimeLabel}</span>
+              </span>
+            </div>
+          </div>
+        )}
       </ResponseContainer>
     </ScreenRoot>
   );

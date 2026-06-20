@@ -1,6 +1,7 @@
 import type { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import type { OptionType } from "./optionTypes";
+import type { CompletionTimeEstimate } from "./surveyTypes";
 
 export interface InputErrorProps {
   error?: string | null;
@@ -51,6 +52,7 @@ export interface QuestionProps {
   currentIndex?: number;
   setCurrentQuestionIndex?: React.Dispatch<React.SetStateAction<number>>;
   preloadWindow?: number;
+  completionTimeEstimate?: CompletionTimeEstimate;
 }
 
 export type Model3D = {
@@ -107,7 +109,6 @@ export interface QuestionPreferences {
   questionImageTemplateUrl: string;
   questionImageTemplatePublicId: string;
   questionBackgroundColor: string;
-  required: boolean;
   uiConfig: Record<string, any>;
 }
 

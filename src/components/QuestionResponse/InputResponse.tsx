@@ -9,6 +9,8 @@ import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitEmailResponse } from "@/hooks/useSurvey";
 import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
+import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import { useResponseRegistry } from "@/context/ResponseRegistry";
 
 const InputResponse = ({
   surveyID,
@@ -16,12 +18,26 @@ const InputResponse = ({
   submitButtonText,
   question,
 }: InputResponseProps) => {
-  const [emailContact, setEmailContact] = useState("");
   const [error, setError] = useState<string | null>(null);
   const isRequired = useQuestionRequired(question);
-  const { mutate, isPending } = useSubmitEmailResponse();
-  const { goNext } = useFlowRuntime();
+  const { markAnswered, setRealTimeResponse } = useResponseRegistry();
+  const { mutateAsync, isPending } = useSubmitEmailResponse();
+  const { goNext, onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
+
+  const {
+    value: email,
+    setValue: setText,
+    hydrated,
+    clearHydration,
+  } = useHydratedResponse<string>({
+    question: question!,
+    defaultValue: "",
+    mapPersisted: (p) => {
+      if (typeof p.value === "string") return p.value;
+      return "";
+    },
+  });
 
   const {
     handleFirstInteraction,
@@ -34,11 +50,17 @@ const InputResponse = ({
   } = useBehavior();
 
   const handleSubmit = () => {
-    const trimmed = emailContact.trim();
+    const trimmed = email.trim();
     const result = elementSchema.safeParse({ emailContact: trimmed });
 
     if (isRequired && trimmed === "") {
       setError("Your response is required for this question");
+      return;
+    }
+
+    if (hydrated && question) {
+      markAnswered(question.questionID);
+      onSubmitAnswer(trimmed);
       return;
     }
 
@@ -61,7 +83,7 @@ const InputResponse = ({
 
     const behavior = collectBehaviorData();
 
-    mutate(
+    mutateAsync(
       {
         surveyID,
         deviceID,
@@ -78,16 +100,16 @@ const InputResponse = ({
         },
       }
     );
+
+    setRealTimeResponse(question.questionID, email!, null);
   };
 
-
-  useRegisterQuestionSubmit(isRequired || emailContact.trim() !== "", handleSubmit);
-
+  useRegisterQuestionSubmit(isRequired || email.trim() !== "", handleSubmit);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
   const handleBlur = () => {
-    const trimmed = emailContact.trim();
+    const trimmed = email.trim();
 
     if (trimmed === "") {
       if (isRequired) {
@@ -107,6 +129,10 @@ const InputResponse = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
+    if (value !== email) {
+      clearHydration();
+    }
+
     const native = e.nativeEvent as InputEvent | undefined;
     const inputType = native?.inputType;
 
@@ -119,7 +145,7 @@ const InputResponse = ({
       }
     }
 
-    setEmailContact(value);
+    setText(value);
   };
 
   return (
@@ -129,7 +155,7 @@ const InputResponse = ({
         <input
           type="text"
           placeholder={inputPlaceholder}
-          value={emailContact}
+          value={email || ""}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           onClick={handleClick}

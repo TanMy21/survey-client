@@ -13,8 +13,7 @@ const EndScreen = ({ surveyID, question }: QuestionProps) => {
   const handleClickEnd = () => {
     handleClick();
     markSubmission();
-    const data = collectBehaviorData();
-    console.log("📦 EndScreen behavior data:", data);
+    collectBehaviorData();
   };
 
   return (

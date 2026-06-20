@@ -27,9 +27,6 @@ function mockQuestionPreferences(questionID: string): QuestionPreferences {
     questionImageTemplateUrl: "",
     questionImageTemplatePublicId: "",
 
-    // Required
-    required: false,
-
     // UI config
     uiConfig: {},
   };

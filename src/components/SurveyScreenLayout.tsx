@@ -19,7 +19,7 @@ import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSessionActivitySync } from "@/hooks/useSessionActivitySync";
 import { BehaviorEventProvider } from "@/context/BehaviorEventProvider";
 
-const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
+const SurveyScreenLayout = ({ surveyID, shareID, completionTimeEstimate }: SurveyContainerProps) => {
   const {
     currentQuestion,
     currentQuestionID,
@@ -93,16 +93,16 @@ const SurveyScreenLayout = ({ surveyID, shareID }: SurveyContainerProps) => {
     mobileQuery: "(pointer:coarse)",
   });
 
-useEffect(() => {
-  const el = scrollRef.current;
-  if (!el) return;
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
 
-  el.scrollTo({
-    top: 0,
-    left: 0,
-    behavior: "auto",
-  });
-}, [currentQuestionID]);
+    el.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto",
+    });
+  }, [currentQuestionID]);
 
   const hasEndScreen = useMemo(
     () => flowEligible.some((q) => q.type === END_SCREEN_TYPE),
@@ -202,6 +202,7 @@ useEffect(() => {
                   question={currentQuestion}
                   surveyID={shareID}
                   currentIndex={currentDisplayIndex!}
+                  completionTimeEstimate={completionTimeEstimate}
                 />
               </BehaviorTrackerProvider>
             </SlideMotion>

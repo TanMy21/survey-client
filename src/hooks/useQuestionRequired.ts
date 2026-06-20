@@ -4,8 +4,7 @@ import { useEffect } from "react";
 
 export const useQuestionRequired = (question?: Question) => {
   const { setCanProceed } = useSurveyFlow();
-  const isRequired = !!question?.questionPreferences?.required;
-
+  const isRequired = !!question?.required;
   useEffect(() => {
     setCanProceed(!isRequired);
   }, [isRequired, setCanProceed]);

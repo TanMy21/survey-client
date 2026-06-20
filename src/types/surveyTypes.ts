@@ -29,6 +29,7 @@ export interface ISurvey {
 export interface SurveyContainerProps {
   surveyID?: string;
   shareID?: string;
+  completionTimeEstimate?: CompletionTimeEstimate;
 }
 
 export type FlowContextType = {
@@ -57,4 +58,15 @@ export type SurveyUnavailableVariant =
 
 export type SurveyUnavailableScreenProps = {
   variant: SurveyUnavailableVariant;
+};
+
+
+ 
+export type CompletionTimeEstimate = {
+  estimatedCompletionTimeSeconds: number;
+  estimatedCompletionTimeMinutes: number;
+  source: "OBSERVED_AVERAGE" | "QUESTION_COUNT_FALLBACK";
+  answerableQuestionCount: number;
+  participantCount: number;
+  observedCompletedSessionCount: number;
 };

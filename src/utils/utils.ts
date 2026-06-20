@@ -1,5 +1,6 @@
-import { DEFAULT_IAT_TIME_LIMIT_MS } from "@/constants/screenConstants";
+import { DEFAULT_IAT_TIME_LIMIT_MS, MEDIA_OPTION_BADGES } from "@/constants/screenConstants";
 import type { IATGroup, IATRoundType, IATSide } from "@/types/questionTypes";
+import DOMPurify from "dompurify";
 
 export const useHaptics = () => {
   const vibrate = (pattern: number | number[] = 12) => {
@@ -124,7 +125,7 @@ export const getIATOptionGroup = (settings: any): IATGroup | null => {
 
 export const getIATRoundTargets = (
   round: IATRoundType,
-  uiConfig: ReturnType<typeof getParticipantIATUiConfig>,
+  uiConfig: ReturnType<typeof getParticipantIATUiConfig>
 ) => {
   if (round === "REVERSED") {
     return {
@@ -151,9 +152,84 @@ export const getIATRoundTargets = (
   };
 };
 
-export const getExpectedSideForIATStimulus = (
-  group: IATGroup,
-  _round: IATRoundType,
-): IATSide => {
+export const getExpectedSideForIATStimulus = (group: IATGroup, _round: IATRoundType): IATSide => {
   return group === "THEME_A" ? "left" : "right";
+};
+
+export const sanitizeRichTextHtml = (html?: string | null): string => {
+  if (!html) {
+    return "";
+  }
+
+  return DOMPurify.sanitize(html, {
+    USE_PROFILES: { html: true },
+    ADD_TAGS: ["img"],
+    ADD_ATTR: [
+      "style",
+      "src",
+      "alt",
+      "title",
+      "href",
+      "target",
+      "rel",
+      "data-editor-image-id",
+      "data-public-id",
+    ],
+  });
+};
+
+export const getMediaOptionBadge = (order: number): string => {
+  if (!Number.isInteger(order) || order < 1 || order > MEDIA_OPTION_BADGES.length) {
+    return "?";
+  }
+
+  return MEDIA_OPTION_BADGES[order - 1];
+};
+
+export const getFiniteNumber = (value: unknown): number | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return undefined;
+};
+
+export const getNumberRangeError = ({
+  value,
+  minValue,
+  maxValue,
+}: {
+  value: string;
+  minValue?: number;
+  maxValue?: number;
+}): string | null => {
+  const trimmed = value.trim();
+
+  if (trimmed === "") {
+    return null;
+  }
+
+  const parsedValue = Number(trimmed);
+
+  if (!Number.isFinite(parsedValue)) {
+    return "Please enter a valid number.";
+  }
+
+  if (minValue !== undefined && parsedValue < minValue) {
+    return `Please enter a value of at least ${minValue}.`;
+  }
+
+  if (maxValue !== undefined && parsedValue > maxValue) {
+    return `Please enter a value no greater than ${maxValue}.`;
+  }
+
+  return null;
 };

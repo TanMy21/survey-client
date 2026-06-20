@@ -241,10 +241,25 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-3xl border border-slate-200 bg-white p-2 shadow-[0_18px_45px_rgba(15,23,42,0.14)]">
+              <div
+                // Prevents scroll gestures inside the dropdown from reaching parent question navigation.
+                onWheelCapture={(event) => event.stopPropagation()}
+                onTouchMoveCapture={(event) => event.stopPropagation()}
+                className="absolute top-full left-0 z-50 mt-2 w-full rounded-3xl border border-[#0074EB]/15 bg-white p-2 shadow-[0_18px_45px_rgba(0,116,235,0.14)]"
+              >
                 <div
                   role="listbox"
-                  className="max-h-[240px] overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  // `overscroll-contain` stops scroll chaining when the list reaches top/bottom.
+                  className={[
+                    "max-h-[240px] overflow-y-auto overscroll-contain pr-1",
+                    "[scrollbar-width:thin]",
+                    "[scrollbar-color:#0074EB_transparent]",
+                    "[&::-webkit-scrollbar]:w-1.5",
+                    "[&::-webkit-scrollbar-track]:bg-transparent",
+                    "[&::-webkit-scrollbar-thumb]:rounded-full",
+                    "[&::-webkit-scrollbar-thumb]:bg-[#0074EB]",
+                    "[&::-webkit-scrollbar-thumb:hover]:bg-[#005BC4]",
+                  ].join(" ")}
                 >
                   {visibleOptions.map((option) => {
                     const isSelected = option.optionID === selectedOptionID;
@@ -268,8 +283,8 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
                         className={[
                           "w-full rounded-2xl px-3 py-3 text-left text-[15px] font-semibold transition",
                           isSelected
-                            ? "bg-[#7C3AED]/10 text-[#6D28D9]"
-                            : "text-slate-700 hover:bg-slate-100",
+                            ? "bg-[#0074EB]/10 text-[#005BC4]"
+                            : "text-slate-700 hover:bg-[#0074EB]/8 hover:text-[#005BC4]",
                         ].join(" ")}
                       >
                         {option.text}

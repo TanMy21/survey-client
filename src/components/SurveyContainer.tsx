@@ -75,12 +75,18 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
     );
   }
 
+  console.log("Survey: ", survey);
+
   return (
     <FlowRuntimeProvider payload={survey}>
       <ResponseRegistryProvider persistedResponses={survey.responses}>
         {" "}
         <QuestionSubmitProvider>
-          <SurveyScreenLayout surveyID={survey.surveyID} shareID={shareID} />
+          <SurveyScreenLayout
+            surveyID={survey.surveyID}
+            shareID={shareID}
+            completionTimeEstimate={survey.completionTimeEstimate}
+          />
         </QuestionSubmitProvider>
       </ResponseRegistryProvider>
     </FlowRuntimeProvider>

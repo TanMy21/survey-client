@@ -78,12 +78,12 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
                 className="w-fit whitespace-normal italic"
                 style={{
                   fontSize: `${actualDescriptionFontSize}px`,
-                  color: descriptionFontColor,
+                  color: descriptionFontColor || "black",
                   fontFamily:
                     "BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
                 }}
               >
-                {description}
+                {htmlToPlainText(description)}
               </p>
             </div>
           </div>

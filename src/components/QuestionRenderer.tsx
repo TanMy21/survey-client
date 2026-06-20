@@ -2,7 +2,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import type { QuestionProps, QuestionTypeKey } from "@/types/questionTypes";
 import { questionComponents } from "@/utils/questionConfig";
 
-const QuestionRenderer = ({ question, surveyID, currentIndex }: QuestionProps) => {
+const QuestionRenderer = ({ question, surveyID, currentIndex, completionTimeEstimate }: QuestionProps) => {
   const isMobile = useIsMobile();
   const Component = questionComponents[question?.type as QuestionTypeKey];
   return (
@@ -15,6 +15,7 @@ const QuestionRenderer = ({ question, surveyID, currentIndex }: QuestionProps) =
         question={question}
         surveyID={surveyID}
         currentIndex={currentIndex}
+        completionTimeEstimate={completionTimeEstimate}
       />
     </div>
   );

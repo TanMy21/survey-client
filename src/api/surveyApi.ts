@@ -8,6 +8,9 @@ export const fetchSurvey = async (shareID: string, deviceID: string) => {
 
     const data = await response.json().catch(() => null);
 
+
+    
+
     if (!response.ok) {
       const error = new Error(data?.message || "Error loading survey.") as SurveyFetchError;
 
