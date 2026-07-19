@@ -16,7 +16,7 @@ import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProps) => {
   const isMobile = useIsMobile();
-  const isRequired = useQuestionRequired(question);
+
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
@@ -56,6 +56,8 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
   const submitRef = useRef<() => void | Promise<void>>(() => {});
 
   const stableSubmit = useCallback(() => submitRef.current(), []);
+
+  const isRequired = useQuestionRequired(question, selectedOptions.length > 0);
 
   const toggleSelect = useCallback(
     (optionID: string) => {
@@ -103,6 +105,8 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
       return;
     }
 
+    if (!deviceID) return;
+
     handleFirstInteraction();
     handleClick();
 
@@ -132,6 +136,14 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
     markSubmission,
     collectBehaviorData,
     onSubmitAnswer,
+    deviceID,
+    question,
+    surveyID,
+    markAnswered,
+    markAnsweredEvent,
+    setRealTimeResponse,
+    handleFirstInteraction,
+    handleClick,
   ]);
 
   useRegisterQuestionSubmit(isRequired || selectedOptions.length > 0, handleSubmit);

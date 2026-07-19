@@ -19,10 +19,9 @@ const InputResponse = ({
   question,
 }: InputResponseProps) => {
   const [error, setError] = useState<string | null>(null);
-  const isRequired = useQuestionRequired(question);
   const { markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { mutateAsync, isPending } = useSubmitEmailResponse();
-  const { goNext, onSubmitAnswer } = useFlowRuntime();
+  const { goNext } = useFlowRuntime();
   const deviceID = useDeviceId();
 
   const {
@@ -49,6 +48,8 @@ const InputResponse = ({
     collectBehaviorData,
   } = useBehavior();
 
+  const isRequired = useQuestionRequired(question, email.trim() !== "");
+
   const handleSubmit = () => {
     const trimmed = email.trim();
     const result = elementSchema.safeParse({ emailContact: trimmed });
@@ -60,7 +61,7 @@ const InputResponse = ({
 
     if (hydrated && question) {
       markAnswered(question.questionID);
-      onSubmitAnswer(trimmed);
+      goNext();
       return;
     }
 

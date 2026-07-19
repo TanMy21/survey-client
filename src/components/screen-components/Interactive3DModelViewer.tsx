@@ -40,6 +40,7 @@ export const Interactive3DModelViewer = ({
   ambientIntensity = 0.25,
   hemiIntensity = 0.45,
   envResolution = 256,
+  onCollectReady,
   onAttachControls,
   onMeshOver,
   onMeshOut,
@@ -126,6 +127,7 @@ export const Interactive3DModelViewer = ({
             maxPolarAngle={maxPolarAngle}
             initialView={initialView}
             frontIsNegZ={frontIsNegZ}
+            onCollectReady={onCollectReady}
             onAttachControls={onAttachControls}
             onMeshOver={onMeshOver}
             onMeshOut={onMeshOut}

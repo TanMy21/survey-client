@@ -1,11 +1,22 @@
 import type { ThreeDViewProps } from "@/types/responseTypes";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Interactive3DModelViewer } from "../screen-components/Interactive3DModelViewer";
 import ThreeDResponseContainer from "./ThreeDResponseContainer";
 
-const ThreeDMobileViewer = ({ surveyID, url, question, setCurrentQuestionIndex }: ThreeDViewProps) => {
+const ThreeDMobileViewer = ({
+  surveyID,
+  url,
+  question,
+  setCurrentQuestionIndex,
+}: ThreeDViewProps) => {
   const [viewerUrl, setViewerUrl] = useState<string | null>(url ?? null);
   const ready = !!viewerUrl;
+
+  const collectThreeDBehaviorRef = useRef<(() => unknown) | undefined>(undefined);
+
+  const setCollectThreeDBehavior = useCallback((collector: (() => unknown) | undefined) => {
+    collectThreeDBehaviorRef.current = collector;
+  }, []);
 
   useEffect(() => {
     setViewerUrl(url ?? null);
@@ -18,6 +29,7 @@ const ThreeDMobileViewer = ({ surveyID, url, question, setCurrentQuestionIndex }
         <ThreeDResponseContainer
           surveyID={surveyID}
           question={question}
+          collectThreeDBehavior={() => collectThreeDBehaviorRef.current?.()}
           setCurrentQuestionIndex={setCurrentQuestionIndex}
         />
       </div>
@@ -28,6 +40,7 @@ const ThreeDMobileViewer = ({ surveyID, url, question, setCurrentQuestionIndex }
         <Interactive3DModelViewer
           key={viewerUrl}
           src={viewerUrl!}
+          onCollectReady={setCollectThreeDBehavior}
           autoRotate
           autoRotateSpeed={0.4}
         />

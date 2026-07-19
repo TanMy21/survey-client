@@ -165,6 +165,7 @@ const Scene = ({
   maxPolarAngle,
   initialView,
   frontIsNegZ,
+  onCollectReady,
   onAttachControls,
   onMeshOver,
   onMeshOut,
@@ -186,6 +187,12 @@ const Scene = ({
     };
   }, [modelRoot]);
 
+  useEffect(() => {
+    return () => {
+      onCollectReady?.(undefined);
+    };
+  }, [onCollectReady]);
+
   // drive frames only when autoRotate is on
   useFrame(() => {
     if (autoRotate) invalidate();
@@ -202,7 +209,7 @@ const Scene = ({
         questionID={questionID}
         onReady={(api) => {
           analyticsRef.current = api;
-          (window as any).__r3f_collect__ = api.collectR3F;
+          onCollectReady?.(api.collectR3F);
         }}
       />
 

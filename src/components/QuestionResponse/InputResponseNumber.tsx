@@ -13,19 +13,15 @@ import { useResponseRegistry } from "@/context/ResponseRegistry";
 import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 import { getFiniteNumber, getNumberRangeError } from "@/utils/utils";
 
-
- 
 const InputResponseNumber = ({
   inputPlaceholder,
   submitButtonText,
   question,
   surveyID,
 }: InputResponseProps) => {
-  const isRequired = useQuestionRequired(question);
   const [error, setError] = useState<string | null>(null);
 
-  const { markTouched, markAnswered, setRealTimeResponse } =
-    useResponseRegistry();
+  const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
 
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
@@ -52,6 +48,8 @@ const InputResponseNumber = ({
     mapPersisted: (persisted) => String(persisted.value ?? ""),
   });
 
+  const isRequired = useQuestionRequired(question, (number ?? "").trim() !== "");
+
   /**
    * Extracts configured numeric limits from the saved question UI configuration.
    */
@@ -75,10 +73,7 @@ const InputResponseNumber = ({
     });
 
     if (!schemaResult.success) {
-      return (
-        schemaResult.error.format().number?._errors[0] ??
-        "Please enter a valid number."
-      );
+      return schemaResult.error.format().number?._errors[0] ?? "Please enter a valid number.";
     }
 
     return getNumberRangeError({
@@ -153,7 +148,7 @@ const InputResponseNumber = ({
   const handleSubmit = async () => {
     const trimmed = number?.trim() ?? "";
 
-    if (!question?.questionID || !deviceID) {
+    if (!question?.questionID) {
       setError("Missing identifiers. Please reload and try again.");
       return;
     }
@@ -188,6 +183,8 @@ const InputResponseNumber = ({
       return;
     }
 
+    if (!deviceID) return;
+
     handleFirstInteraction();
     handleClick();
     markSubmission();
@@ -213,10 +210,7 @@ const InputResponseNumber = ({
   /**
    * Registers the question's submit handler with the survey flow.
    */
-  useRegisterQuestionSubmit(
-    isRequired || (number ?? "").trim() !== "",
-    handleSubmit,
-  );
+  useRegisterQuestionSubmit(isRequired || (number ?? "").trim() !== "", handleSubmit);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
@@ -227,9 +221,7 @@ const InputResponseNumber = ({
     const trimmed = number?.trim() ?? "";
 
     if (trimmed === "") {
-      setError(
-        isRequired ? "Your response is required for this question." : null,
-      );
+      setError(isRequired ? "Your response is required for this question." : null);
       return;
     }
 

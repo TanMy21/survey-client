@@ -17,6 +17,7 @@ const QuestionImageContainer = ({
             <img
               src={questionImageUrl}
               alt={questionImageAltText}
+              referrerPolicy="no-referrer"
               className="block h-full w-full object-cover"
             />
           )}

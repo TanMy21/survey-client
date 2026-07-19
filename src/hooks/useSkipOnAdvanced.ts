@@ -1,6 +1,5 @@
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
-import { useQuestionRequired } from "./useQuestionRequired";
 import { useDeviceId } from "./useDeviceID";
 import { useSubmitResponseSkipped } from "./useSurvey";
 import { useBehavior } from "@/context/BehaviorTrackerContext";
@@ -12,7 +11,7 @@ export function useSkipOnAdvance(surveyID: string) {
   const { markSkipped, getState } = useResponseRegistry();
   const { collectBehaviorData } = useBehavior();
   const deviceID = useDeviceId();
-  const isRequired = useQuestionRequired(currentQuestion);
+  const isRequired = !!currentQuestion?.required;
   const { mutateAsync: postSkip } = useSubmitResponseSkipped();
 
   // Decide for each type  to attach interceptor or not

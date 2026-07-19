@@ -3,13 +3,10 @@ import type { SurveyFetchError } from "@/types/surveyTypes";
 export const fetchSurvey = async (shareID: string, deviceID: string) => {
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/ses/${shareID}?deviceID=${deviceID}`
+      `${import.meta.env.VITE_BASE_URL}/ses/${encodeURIComponent(shareID)}?deviceID=${encodeURIComponent(deviceID)}`
     );
 
     const data = await response.json().catch(() => null);
-
-
-    
 
     if (!response.ok) {
       const error = new Error(data?.message || "Error loading survey.") as SurveyFetchError;

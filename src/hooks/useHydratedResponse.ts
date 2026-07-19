@@ -14,6 +14,8 @@ export function useHydratedResponse<T>({
   const persisted = realTimeResponse ?? persistedResponses[questionID];
 
   const dirtyRef = useRef(false);
+  const mapPersistedRef = useRef(mapPersisted);
+  mapPersistedRef.current = mapPersisted;
 
   const [value, _setValue] = useState<T>(() => {
     if (persisted) return mapPersisted(persisted);
@@ -28,13 +30,13 @@ export function useHydratedResponse<T>({
     dirtyRef.current = false;
 
     if (persisted) {
-      _setValue(mapPersisted(persisted));
+      _setValue(mapPersistedRef.current(persisted));
       setHydrated(true);
     } else if (defaultValue !== undefined) {
       _setValue(defaultValue);
       setHydrated(false);
     }
-  }, [questionID, , persistedResponses[questionID]]); 
+  }, [questionID, persistedResponses[questionID]]);
 
   /**
    * Optional: handle late-arriving persisted responses
@@ -43,9 +45,9 @@ export function useHydratedResponse<T>({
     if (!persisted) return;
     if (dirtyRef.current) return;
 
-    _setValue(mapPersisted(persisted));
+    _setValue(mapPersistedRef.current(persisted));
     setHydrated(true);
-  }, [persisted, mapPersisted]);
+  }, [persisted]);
 
   /**
    * User-driven updates

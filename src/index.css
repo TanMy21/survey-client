@@ -14,7 +14,7 @@ html {
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  color-scheme: light;
   color: rgba(255, 255, 255, 0.87);
 
 
@@ -174,9 +174,7 @@ button {
     color: #747bff;
   }
 
-  button {
-    background-color: #f9f9f9;
-  }
+   
 }
 
 

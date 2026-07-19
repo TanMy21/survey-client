@@ -25,6 +25,7 @@ export const TimedChoiceOptionCard = ({
           <img
             src={imageUrl}
             alt={altText || text}
+            referrerPolicy="no-referrer"
             className="block max-h-full max-w-full rounded-2xl object-contain"
           />
         </div>

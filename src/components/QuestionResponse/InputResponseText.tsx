@@ -19,7 +19,6 @@ const InputResponseText = ({
   surveyID,
 }: InputResponseProps) => {
   const [error, setError] = useState<string | null>(null);
-  const isRequired = useQuestionRequired(question);
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
@@ -50,6 +49,8 @@ const InputResponseText = ({
     collectBehaviorData,
   } = useBehavior();
 
+  const isRequired = useQuestionRequired(question, text.trim() !== "");
+
   const handleSubmit = async () => {
     const trimmed = text?.trim();
     const result = textResponseSchema.safeParse({ text: trimmed });
@@ -59,13 +60,15 @@ const InputResponseText = ({
       return;
     }
 
-    if (!question?.questionID || !deviceID) return;
+    if (!question?.questionID) return;
 
     if (hydrated && question) {
       markAnswered(question.questionID);
       onSubmitAnswer(trimmed);
       return;
     }
+
+    if (!deviceID) return;
 
     if (!result.success) {
       const errorMessage = z.prettifyError(result.error) || "Invalid input";

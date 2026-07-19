@@ -162,19 +162,34 @@ export const sanitizeRichTextHtml = (html?: string | null): string => {
   }
 
   return DOMPurify.sanitize(html, {
-    USE_PROFILES: { html: true },
-    ADD_TAGS: ["img"],
-    ADD_ATTR: [
-      "style",
+    ALLOWED_TAGS: [
+      "p",
+      "br",
+      "strong",
+      "em",
+      "u",
+      "ul",
+      "ol",
+      "li",
+      "blockquote",
+      "h1",
+      "h2",
+      "h3",
+      "a",
+      "img",
+    ],
+    ALLOWED_ATTR: [
+      "href",
       "src",
       "alt",
       "title",
-      "href",
-      "target",
       "rel",
+      "target",
       "data-editor-image-id",
       "data-public-id",
     ],
+    ALLOWED_URI_REGEXP: /^(?:(?:https|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i,
+    FORBID_ATTR: ["style", "onerror", "onclick", "onload"],
   });
 };
 

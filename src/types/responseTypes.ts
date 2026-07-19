@@ -115,6 +115,7 @@ export interface ThreeDResponseContainerProps {
   question: Question;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
   setCanProceed?: (val: boolean) => void;
+  collectThreeDBehavior?: () => unknown;
 }
 
 export interface RankListProps {
@@ -173,6 +174,8 @@ export interface ThreeDViewProps {
   question: Question;
   showQuestion?: boolean;
   setCurrentQuestionIndex?: (index: (prevIndex: number) => number) => void;
+  collectThreeDBehavior?: () => unknown;
+  setCollectThreeDBehavior?: (collector: (() => unknown) | undefined) => void;
 }
 
 export type RecordConsentPayload = {

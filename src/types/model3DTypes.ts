@@ -20,6 +20,7 @@ export interface SceneProps {
   maxPolarAngle: number;
   initialView: ViewName;
   frontIsNegZ: boolean;
+  onCollectReady?: (collector: (() => unknown) | undefined) => void;
   onAttachControls?: (c: any) => void;
   onMeshOver?: (name: string, e: any) => void;
   onMeshOut?: (name: string, e: any) => void;

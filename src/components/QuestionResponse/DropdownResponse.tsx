@@ -32,7 +32,6 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
     },
   });
 
-  const isRequired = useQuestionRequired(question);
   const { onSubmitAnswer } = useFlowRuntime();
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
@@ -62,6 +61,8 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
   const selectedOptionValue = selectedOption?.value;
   const selectedOptionText = selectedOption?.text;
 
+  const isRequired = useQuestionRequired(question, selectedOptionID !== null);
+
   const handleSubmit = useCallback(async () => {
     if (!question || !selectedOptionID || !selectedOptionValue) {
       return;
@@ -72,6 +73,8 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
       onSubmitAnswer(selectedOptionValue);
       return;
     }
+
+    if (!deviceID) return;
 
     if (submitInFlightRef.current) return;
 
@@ -119,6 +122,8 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
     }
   }, [
     isRequired,
+    hydrated,
+    question,
     selectedOptionValue,
     question?.questionID,
     question?.type,

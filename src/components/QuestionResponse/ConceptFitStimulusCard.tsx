@@ -34,6 +34,7 @@ export const ConceptFitStimulusCard = ({
           <img
             src={imageUrl}
             alt={imageAlt || "Concept preview image"}
+            referrerPolicy="no-referrer"
             className={[
               "block max-w-full object-contain",
               compactMobileImageLayout

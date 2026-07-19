@@ -25,13 +25,12 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
     defaultValue: null,
     mapPersisted: (p) => {
       if (p.optionID) return p.optionID;
-
       // map to optionID
       const match = options?.find((opt) => opt.value === p.value);
       return match ? match.optionID : null;
     },
   });
-  const isRequired = useQuestionRequired(question);
+
   const { onSubmitAnswer } = useFlowRuntime();
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
@@ -50,6 +49,8 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
     collectBehaviorData,
   } = useBehavior();
 
+  const isRequired = useQuestionRequired(question, selectedOptionID !== null);
+
   const handleSubmit = useCallback(async () => {
     const optionValue = options?.find((opt) => opt.optionID === selectedOptionID)?.value;
 
@@ -58,7 +59,7 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
       return;
     }
 
-    if (!question?.questionID || !deviceID || !selectedOptionID || !optionValue) return;
+    if (!question?.questionID || !selectedOptionID || !optionValue) return;
 
     if (hydrated) {
       markAnswered(question.questionID);
@@ -66,14 +67,14 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
       return;
     }
 
+    if (!deviceID) return;
+
     handleFirstInteraction();
     handleClick();
     markAnswered(question.questionID);
     markSubmission();
     markAnsweredEvent();
     const behavior = collectBehaviorData();
-    console.log("📦 SingleChoiceList behavior data:", behavior);
-    console.log("Selected option value:", optionValue);
 
     await mutateAsync({
       surveyID,
@@ -89,7 +90,24 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
 
     setError(null);
     onSubmitAnswer(optionValue);
-  }, [options, selectedOptionID, isRequired, markSubmission, mutateAsync, collectBehaviorData]);
+  }, [
+    options,
+    selectedOptionID,
+    isRequired,
+    question,
+    deviceID,
+    hydrated,
+    surveyID,
+    handleFirstInteraction,
+    handleClick,
+    markAnswered,
+    markSubmission,
+    markAnsweredEvent,
+    collectBehaviorData,
+    mutateAsync,
+    setRealTimeResponse,
+    onSubmitAnswer,
+  ]);
 
   useRegisterQuestionSubmit(isRequired || !!selectedOptionID, handleSubmit);
 

@@ -69,6 +69,7 @@ const HoverImagePreview = ({ src, alt }: HoverImagePreviewProps) => {
             <img
               src={src}
               alt={alt}
+              referrerPolicy="no-referrer"
               className="h-full w-full rounded-md object-contain"
               draggable={false}
             />

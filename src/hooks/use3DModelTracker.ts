@@ -381,7 +381,7 @@ export function use3DModelTracker(questionID: string) {
   };
 
   // Collects current 3D model behavior data before answer submission.
-  // This is called from your response container through window.__r3f_collect__.
+  // This is called by the 3D response container through a React callback ref.
   const collectR3F = () => {
     // Closes open hovers so current hover time is included before submission.
     Object.keys(hoverStart.current).forEach(onMeshOut);

@@ -2,7 +2,7 @@ import { useBehavior } from "@/context/BehaviorTrackerContext";
 import type { OptionType } from "@/types/optionTypes";
 import type { RankListProps } from "@/types/responseTypes";
 import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-pangea/dnd";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import RankListItem from "./RankListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
@@ -12,6 +12,10 @@ import { useResponseRegistry } from "@/context/ResponseRegistry";
 import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const RankList = ({ surveyID, options, question }: RankListProps) => {
+
+
+ 
+
   const {
     value: localOptions,
     clearHydration,
@@ -89,7 +93,7 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
 
     const rankings = rankedData?.map((o) => o.value);
 
-    if (!question?.questionID || !question?.type || !deviceID) {
+    if (!question?.questionID || !question?.type) {
       setError("Missing identifiers. Please reload and try again.");
       return;
     }
@@ -100,6 +104,10 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
       return;
     }
 
+    if (!deviceID) {
+      return;
+    }
+
     handleFirstInteraction();
     handleClick();
     markAnswered(question.questionID);
@@ -107,8 +115,6 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
     markAnsweredEvent();
 
     const behavior = collectBehaviorData();
-    console.log("📦 RankScreen behavior data:", behavior);
-    console.log("User Ranked Options:", rankedData);
 
     try {
       await mutateAsync({

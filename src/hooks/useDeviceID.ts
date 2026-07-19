@@ -1,25 +1,14 @@
-import { LS_DID_KEY } from "@/utils/deviceID";
-import { useEffect, useState } from "react";
-
- 
+import { getOrCreateDeviceId } from "@/utils/deviceID";
+import { useState } from "react";
 
 export function useDeviceId() {
-  const [deviceId, setDeviceId] = useState<string>("");
-
-  useEffect(() => {
+  const [deviceId] = useState(() => {
     try {
-      const stored = localStorage.getItem(LS_DID_KEY);
-      if (stored) {
-        setDeviceId(stored);
-      } else {
-        const newId = crypto.randomUUID();
-        localStorage.setItem(LS_DID_KEY, newId);
-        setDeviceId(newId);
-      }
-    } catch {     
-      setDeviceId("");
+      return getOrCreateDeviceId();
+    } catch {
+      return "";
     }
-  }, []);
+  });
 
   return deviceId;
 }

@@ -85,7 +85,7 @@ export const submitEmailResponse = async ({
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Idempotency-Key": `email-${deviceID}-${questionID}-${email}`,
+      "Idempotency-Key": `email-${deviceID}-${questionID}`,
     },
     credentials: "include",
     body: JSON.stringify({
@@ -110,7 +110,7 @@ async function postBehavior(payload: {
   questionID: string;
   behavior: unknown;
 }) {
-  await fetch(`${import.meta.env.VITE_BASE_URL}/q/beh`, {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/q/beh`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -119,6 +119,13 @@ async function postBehavior(payload: {
     credentials: "include",
     body: JSON.stringify(payload),
   });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(text || `Failed to post behavior (${res.status})`);
+  }
+
+  return res.json().catch(() => null);
 }
 
 export function useBehaviorFlush({

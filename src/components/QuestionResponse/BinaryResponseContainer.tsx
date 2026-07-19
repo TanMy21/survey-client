@@ -17,7 +17,7 @@ import { autoSubmitDelayMs } from "@/constants/screenConstants";
 const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainerProps) => {
   const { questionID, questionPreferences } = question;
   const [error, setError] = useState<string | null>(null);
-  const isRequired = useQuestionRequired(question);
+
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
@@ -47,19 +47,29 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     mapPersisted: (p) => p.value,
   });
 
+  const isRequired = useQuestionRequired(question, selectedValue !== null);
+
+  const getPulseTargets = useCallback(() => {
+    if (selectedValue === buttonTextYes) return [yesRef.current];
+    if (selectedValue === buttonTextNo) return [noRef.current];
+    return [];
+  }, [selectedValue]);
+
   const handleSubmit = useCallback(async () => {
     if (isRequired && selectedValue === null) {
       setError("Your response is required for this question");
       return;
     }
 
-    if (!deviceID || !questionID || !selectedValue) return;
+    if (!questionID || !selectedValue) return;
 
     if (hydrated) {
       markAnswered(questionID);
       onSubmitAnswer(selectedValue);
       return;
     }
+
+    if (!deviceID) return;
 
     markAnswered(questionID);
 
@@ -88,18 +98,19 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     isRequired,
     selectedValue,
     markSubmission,
+    markAnsweredEvent,
+    markAnswered,
+    setRealTimeResponse,
     onSubmitAnswer,
+    deviceID,
+    questionID,
+    question.type,
+    surveyID,
   ]);
 
   useRegisterQuestionSubmit(isRequired || selectedValue != null, handleSubmit);
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
-
-  const getPulseTargets = useCallback(() => {
-    if (selectedValue === buttonTextYes) return [yesRef.current];
-    if (selectedValue === buttonTextNo) return [noRef.current];
-    return [];
-  }, [selectedValue]);
 
   useAutoSubmitPulse({
     active: selectedValue !== null && !hydrated,

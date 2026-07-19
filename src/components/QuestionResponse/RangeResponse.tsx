@@ -15,7 +15,6 @@ import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const isMobile = useIsMobile();
   const { minValue, maxValue } = question.questionPreferences?.uiConfig || {};
-  const isRequired = useQuestionRequired(question);
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
@@ -47,6 +46,10 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
     },
   });
 
+  const hasAnswer = selectedValue !== null && !Number.isNaN(selectedValue);
+
+  const isRequired = useQuestionRequired(question, hasAnswer);
+
   const handleSliderChange = (value: number) => {
     handleFirstInteraction();
     handleClick();
@@ -69,7 +72,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
       return;
     }
 
-    if (!deviceID || !question?.questionID || !question?.type) {
+    if (!question?.questionID || !question?.type) {
       setError("Missing identifiers. Please reload and try again.");
       return;
     }
@@ -80,6 +83,8 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
       return;
     }
 
+    if (!deviceID) return;
+
     handleFirstInteraction();
     handleClick();
     markAnswered(question.questionID);
@@ -87,8 +92,6 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
     markAnsweredEvent();
 
     const behavior = collectBehaviorData();
-    console.log("📦 RangeScreen behavior data:", behavior);
-    console.log("Submitted Range Value:", selectedValue);
 
     await mutateAsync({
       questionID: question.questionID,

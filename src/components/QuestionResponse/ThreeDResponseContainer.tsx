@@ -12,7 +12,11 @@ import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import { useStoreThreeDBehavior } from "@/api/responseApi";
 import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
-const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainerProps) => {
+const ThreeDResponseContainer = ({
+  surveyID,
+  question,
+  collectThreeDBehavior,
+}: ThreeDResponseContainerProps) => {
   const { questionID, type } = question;
   const deviceID = useDeviceId();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +25,6 @@ const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainer
   const { mutateAsync: storeThreeDBehavior } = useStoreThreeDBehavior();
   const { onSubmitAnswer } = useFlowRuntime();
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
-  const isRequired = useQuestionRequired(question);
 
   const {
     value: selectedValue,
@@ -43,25 +46,31 @@ const ThreeDResponseContainer = ({ surveyID, question }: ThreeDResponseContainer
     collectBehaviorData,
   } = useBehavior();
 
+  const isRequired = useQuestionRequired(question, selectedValue !== null);
+
   const submitValue = useCallback(
     async (value: "LIKE" | "DISLIKE") => {
       if (isSubmitting) return;
+      if (!questionID) return;
       if (isRequired && !value) return;
-      if (!deviceID || !questionID) return;
 
       setIsSubmitting(true);
 
       try {
         if (hydrated) {
-          clearHydration();
+          markAnswered(questionID);
+          onSubmitAnswer(value);
+          return;
         }
+
+        if (!deviceID) return;
 
         markAnswered(questionID);
         markSubmission();
         markAnsweredEvent();
 
         const data = collectBehaviorData();
-        const three = (window as any).__r3f_collect__?.();
+        const three = collectThreeDBehavior?.();
 
         await mutateAsync({
           surveyID,

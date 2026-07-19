@@ -54,8 +54,6 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
   const firstRef = useRef<HTMLDivElement | null>(null);
   const secondRef = useRef<HTMLDivElement | null>(null);
 
-  const isRequired = useQuestionRequired(question);
-
   const {
     markTouched,
     markAnswered,
@@ -76,6 +74,8 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
     markAnsweredEvent,
     collectBehaviorData,
   } = useBehavior();
+
+  const isRequired = useQuestionRequired(question, selectedValue !== null);
 
   const timerResetKey = `${questionID}-${timeLimitMs}`;
 

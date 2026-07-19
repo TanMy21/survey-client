@@ -198,6 +198,7 @@ export interface Interactive3DModelViewerProps {
   ambientIntensity?: number;
   hemiIntensity?: number;
   envResolution?: 256 | 512;
+  onCollectReady?: (collector: (() => unknown) | undefined) => void;
   onAttachControls?: (c: any) => void;
   onMeshOver?: (name: string, e?: ThreeEvent<PointerEvent>) => void;
   onMeshOut?: (name: string, e?: ThreeEvent<PointerEvent>) => void;

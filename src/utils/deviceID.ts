@@ -15,10 +15,11 @@ function getCookie(name: string) {
     ?.split("=")[1];
 }
 
- 
-function setCookie(name: string, value: string, days = 3650) {
+function setCookie(name: string, value: string, days = 180) {
   const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-  document.cookie = `${name}=${value}; Path=/; Expires=${expires}; SameSite=Lax`;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+
+  document.cookie = `${name}=${value}; Path=/; Expires=${expires}; SameSite=Lax${secure}`;
 }
 
 /**
@@ -30,10 +31,17 @@ export function getOrCreateDeviceId(): string {
 
   // generate if missing
   if (!id) {
-    id =
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const browserCrypto = globalThis.crypto as Crypto & {
+      randomUUID?: () => string;
+    };
+
+    if (typeof browserCrypto.randomUUID === "function") {
+      id = browserCrypto.randomUUID();
+    } else {
+      const bytes = new Uint8Array(16);
+      browserCrypto.getRandomValues(bytes);
+      id = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+    }
 
     localStorage.setItem(LS_DID_KEY, id);
     setCookie(LS_DID_KEY, id);

@@ -16,7 +16,7 @@ import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceContainerProps) => {
   const { options } = question || {};
-  const isRequired = useQuestionRequired(question);
+
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
@@ -37,6 +37,22 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
     collectBehaviorData,
   } = useBehavior();
 
+  const mapPersistedOptions = useCallback(
+    (p: { value: unknown; optionID: string | null }) => {
+      const persistedValues = p.value;
+
+      if (!Array.isArray(persistedValues)) return [];
+
+      return (options ?? [])
+        .filter((opt: OptionType) => persistedValues.includes(opt.value))
+        .map((opt: OptionType) => ({
+          optionID: opt.optionID,
+          value: opt.value,
+        }));
+    },
+    [options]
+  );
+
   const {
     value: selectedOptions,
     setValue: setSelectedOptions,
@@ -45,16 +61,10 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
   } = useHydratedResponse<{ optionID: string; value: string }[]>({
     question: question!,
     defaultValue: [],
-    mapPersisted: (p) => {
-      if (!Array.isArray(p.value)) return [];
-      return (options ?? [])
-        .filter((opt: OptionType) => p.value.includes(opt.value))
-        .map((opt: OptionType) => ({
-          optionID: opt.optionID,
-          value: opt.value,
-        }));
-    },
+    mapPersisted: mapPersistedOptions,
   });
+
+  const isRequired = useQuestionRequired(question, selectedOptions.length > 0);
 
   const handleOptionToggle = useCallback(
     (optionID: string) => {
@@ -96,7 +106,7 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
       return;
     }
 
-    if (!deviceID || !question?.questionID || !question?.type) {
+    if (!question?.questionID || !question?.type) {
       setError("Missing identifiers. Please reload and try again.");
       return;
     }
@@ -106,6 +116,8 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
       onSubmitAnswer(selectedValues);
       return;
     }
+
+    if (!deviceID) return;
 
     handleFirstInteraction();
     handleClick();
@@ -131,7 +143,7 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
     onSubmitAnswer(selectedValues!);
   }, [
     isRequired,
-    selectedOptions,
+    selectedOptions.length,
     deviceID,
     question?.questionID,
     question?.type,
