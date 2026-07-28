@@ -187,7 +187,7 @@ const SurveyScreenLayout = ({ surveyID, shareID, completionTimeEstimate }: Surve
         <div
           ref={scrollRef}
           style={{ touchAction: "pan-y", padding: isMobile ? "1px" : "2px" }}
-          className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 border-amber-500 pb-24 sm:p-1 sm:pb-20"
+          className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 pb-24 sm:p-1 sm:pb-20"
         >
           <BehaviorEventProvider>
             <SlideMotion direction={"right"} keyProp={currentQuestionID}>

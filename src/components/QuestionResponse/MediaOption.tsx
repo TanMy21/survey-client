@@ -98,7 +98,7 @@ const MediaOption = ({ option, isSelected, onSelect }: MediaOptionProps) => {
           <img
             src={imageSrc}
             alt={option.value}
-            className="h-full w-full object-contain"
+            className="h-full w-full object-fill"
             referrerPolicy="no-referrer"
             draggable={false}
           />

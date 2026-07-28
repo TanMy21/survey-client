@@ -5,7 +5,7 @@ const CenteredStack = ({ children, className = "", marginTopOverride }: Centered
   const isMobile = useIsMobile();
   return (
     <div
-      className={`mx-auto mt-[8%] mb-[2%] flex w-[80%] max-w-[80%] items-start gap-2 border-2 border-black transition-all duration-300 md:gap-3 ${className}`}
+      className={`mx-auto mt-[8%] mb-[2%] flex w-[80%] max-w-[80%] items-start gap-2 transition-all duration-300 md:gap-3 ${className}`}
       style={{
         width: isMobile ? "98%" : "80%",
         maxWidth: isMobile ? "98%" : "80%",

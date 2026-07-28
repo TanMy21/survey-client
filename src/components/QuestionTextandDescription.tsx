@@ -36,7 +36,7 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
           isNonOrderableType ? "items-center" : "items-center"
         }`}
       >
-        <div className="mx-auto flex w-full shrink-0 flex-col items-center justify-center gap-2 border-2 border-green-500 md:flex-row">
+        <div className="mx-auto flex w-full shrink-0 flex-col items-center justify-center gap-2 md:flex-row">
           {!isNonOrderableType &&
             currentDisplayIndex !== null &&
             (isMobile ? (
@@ -72,7 +72,7 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
         </div>
 
         {description && description !== "Description (optional)" && (
-          <div className="my-[8%] flex w-full flex-row items-center justify-center border-2 border-amber-600 md:my-[1%]">
+          <div className="my-[8%] flex w-full flex-row items-center justify-center md:my-[1%]">
             <div>
               <p
                 className="w-fit whitespace-normal italic"

@@ -21,7 +21,7 @@ export const WelcomeScreenTextandDescription = ({ question }: QuestionTextandDes
   return (
     <div className="flex w-full origin-bottom flex-col">
       <div className={`mx-auto flex w-[92%] flex-col items-center justify-center md:w-[98%]`}>
-        <div className="mx-auto flex w-full min-w-0 flex-col items-center justify-center gap-2 border-2 border-green-500 md:flex-row">
+        <div className="mx-auto flex w-full min-w-0 flex-col items-center justify-center gap-2 md:flex-row">
           <div className={`flex w-full min-w-0 flex-row items-center justify-center`}>
             <p
               className={`w-full max-w-none text-center leading-[1.4] font-normal break-normal whitespace-normal`}
