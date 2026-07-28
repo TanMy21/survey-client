@@ -18,8 +18,13 @@ import { useSession } from "@/context/useSessionContext";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSessionActivitySync } from "@/hooks/useSessionActivitySync";
 import { BehaviorEventProvider } from "@/context/BehaviorEventProvider";
+import { preloadUpcomingQuestionComponent } from "@/utils/questionConfig";
 
-const SurveyScreenLayout = ({ surveyID, shareID, completionTimeEstimate }: SurveyContainerProps) => {
+const SurveyScreenLayout = ({
+  surveyID,
+  shareID,
+  completionTimeEstimate,
+}: SurveyContainerProps) => {
   const {
     currentQuestion,
     currentQuestionID,
@@ -147,6 +152,8 @@ const SurveyScreenLayout = ({ surveyID, shareID, completionTimeEstimate }: Surve
 
   const nextImageUrl = nextQuestion?.questionPreferences?.questionImageTemplateUrl;
 
+  const nextQuestionType = nextQuestion?.type;
+
   const { questionImageTemplate, questionImageTemplateUrl, questionBackgroundColor } =
     questionPreferences || {};
   const backgroundStyle = questionImageTemplate
@@ -171,6 +178,18 @@ const SurveyScreenLayout = ({ surveyID, shareID, completionTimeEstimate }: Surve
       image.src = url;
     });
   }, [questionImageTemplateUrl, nextImageUrl]);
+
+  useEffect(() => {
+    if (
+      nextQuestionType !== "MEDIA" &&
+      nextQuestionType !== "RANK" &&
+      nextQuestionType !== "THREE_D"
+    ) {
+      return;
+    }
+
+    preloadUpcomingQuestionComponent(nextQuestionType);
+  }, [nextQuestionType]);
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-white">

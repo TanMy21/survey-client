@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import type { SurveyNavigatorCompactProps } from "@/types/surveyTypes";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
-import { ReportSurveyModal } from "./modal/ReportSurveyModal";
+
 import { useQuestionSubmit } from "@/context/QuestionNavigationContext";
+
+const ReportSurveyModal = lazy(() =>
+  import("./modal/ReportSurveyModal").then((module) => ({
+    default: module.ReportSurveyModal,
+  }))
+);
 
 const SurveyNavigatorCompact = ({
   disableNext,
@@ -88,12 +94,25 @@ const SurveyNavigatorCompact = ({
           </div>
         </div>
       </div>
-      {shareID && (
-        <ReportSurveyModal
-          open={reportModalOpen}
-          shareID={shareID}
-          onClose={handleCloseReportModal}
-        />
+      {shareID && reportModalOpen && (
+        <Suspense
+          fallback={
+            <div
+              className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/35 backdrop-blur-sm"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-white/40 border-t-white" />
+              <span className="sr-only">Loading…</span>
+            </div>
+          }
+        >
+          <ReportSurveyModal
+            open={reportModalOpen}
+            shareID={shareID}
+            onClose={handleCloseReportModal}
+          />
+        </Suspense>
       )}
     </>
   );

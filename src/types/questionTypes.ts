@@ -1,5 +1,5 @@
 import type { ThreeEvent } from "@react-three/fiber";
-import * as THREE from "three";
+import type * as THREE from "three";
 import type { OptionType } from "./optionTypes";
 import type { CompletionTimeEstimate } from "./surveyTypes";
 

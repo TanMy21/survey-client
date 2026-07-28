@@ -1,23 +1,54 @@
+import { lazy } from "react";
+
 import BinaryScreen from "@/components/screens/BinaryScreen";
-import ConceptFitScreen from "@/components/screens/ConceptFitScreen";
 import ConsentScreen from "@/components/screens/ConsentScreen";
 import DropDownScreen from "@/components/screens/DropDownScreen";
 import EmailContactScreen from "@/components/screens/EmailContactScreen";
-import EndScreen from "@/components/screens/EndScreen";
-import IATScreen from "@/components/screens/IATScreen";
 import InfoScreen from "@/components/screens/InfoScreen";
 import InstructionScreen from "@/components/screens/InstructionScreen";
-import MediaScreen from "@/components/screens/MediaScreen";
 import MultipleChoiceScreen from "@/components/screens/MultipleChoiceScreen";
 import NumberScreen from "@/components/screens/NumberScreen";
 import RangeScreen from "@/components/screens/RangeScreen";
-import RankScreen from "@/components/screens/RankScreen";
 import SingleChoiceScreen from "@/components/screens/SingleChoiceScreen";
 import TextScreen from "@/components/screens/TextScreen";
-import ThreeDModelScreen from "@/components/screens/ThreeDModelScreen";
-import TimedScreen from "@/components/screens/TimedScreen";
 import WelcomeScreen from "@/components/screens/WelcomeScreen";
 import type { QuestionProps, QuestionType, QuestionTypeKey } from "@/types/questionTypes";
+
+const ConceptFitScreen = lazy(() => import("@/components/screens/ConceptFitScreen"));
+
+const EndScreen = lazy(() => import("@/components/screens/EndScreen"));
+
+const IATScreen = lazy(() => import("@/components/screens/IATScreen"));
+
+const TimedScreen = lazy(() => import("@/components/screens/TimedScreen"));
+
+const loadRankScreen = () => import("@/components/screens/RankScreen");
+
+const loadThreeDModelScreen = () => import("@/components/screens/ThreeDModelScreen");
+
+const loadMediaScreen = () => import("@/components/screens/MediaScreen");
+
+const RankScreen = lazy(loadRankScreen);
+const ThreeDModelScreen = lazy(loadThreeDModelScreen);
+const MediaScreen = lazy(loadMediaScreen);
+
+const upcomingQuestionLoaders: Partial<Record<QuestionTypeKey, () => Promise<unknown>>> = {
+  MEDIA: loadMediaScreen,
+  RANK: loadRankScreen,
+  THREE_D: loadThreeDModelScreen,
+};
+
+export function preloadUpcomingQuestionComponent(questionType?: QuestionTypeKey | null): void {
+  if (!questionType) return;
+
+  const loader = upcomingQuestionLoaders[questionType];
+
+  if (!loader) return;
+
+  void loader().catch(() => {
+    // Prefetch is best-effort. React.lazy will retry when rendering.
+  });
+}
 
 export const questionComponents: {
   [key in QuestionTypeKey]: React.ComponentType<QuestionProps>;

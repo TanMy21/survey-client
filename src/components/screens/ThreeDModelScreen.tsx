@@ -3,6 +3,9 @@ import type { QuestionProps } from "@/types/questionTypes";
 import ThreeDMobileViewer from "../QuestionResponse/ThreeDMobileViewer";
 import ThreeDViewer from "../QuestionResponse/ThreeDViewer";
 import QuestionTextandDescription from "../QuestionTextandDescription";
+import { setupThreeMeshBVH } from "@/lib/threeMeshBvh";
+
+setupThreeMeshBVH();
 
 const ThreeDModelScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
   const isMobile = useIsMobile();

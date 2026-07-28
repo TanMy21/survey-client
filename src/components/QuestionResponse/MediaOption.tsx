@@ -99,6 +99,8 @@ const MediaOption = ({ option, isSelected, onSelect }: MediaOptionProps) => {
             src={imageSrc}
             alt={option.value}
             className="h-full w-full object-fill"
+            loading="lazy"
+            decoding="async"
             referrerPolicy="no-referrer"
             draggable={false}
           />
@@ -124,6 +126,7 @@ const MediaOption = ({ option, isSelected, onSelect }: MediaOptionProps) => {
                 src={imageSrc}
                 alt={option.value}
                 referrerPolicy="no-referrer"
+                decoding="async"
                 className="h-full w-full object-contain"
                 draggable={false}
               />
