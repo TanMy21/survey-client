@@ -66,7 +66,7 @@ const IATResponse = ({
 
   const [round, setRound] = useState<IATRoundType>("INITIAL");
   const [stimulusIndex, setStimulusIndex] = useState(0);
-  const [answers, setAnswers] = useState<IATAnswer[]>([]);
+  const [_answers, setAnswers] = useState<IATAnswer[]>([]);
   const [selectedSide, setSelectedSide] = useState<IATSide | null>(null);
   const [flashRoundNotice, setFlashRoundNotice] = useState(false);
   const previousRoundRef = useRef<IATRoundType>("INITIAL");
@@ -79,7 +79,7 @@ const IATResponse = ({
 
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
-  const { mutateAsync, isPending } = useSubmitResponse();
+  const { mutateAsync } = useSubmitResponse();
   const { goNext } = useFlowRuntime();
 
   const {

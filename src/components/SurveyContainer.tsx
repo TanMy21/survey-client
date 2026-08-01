@@ -20,7 +20,6 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
 
   const {
     mutateAsync: createSession,
-    data: session,
     isIdle,
     isPending: sessionPending,
     isSuccess: sessionReady,

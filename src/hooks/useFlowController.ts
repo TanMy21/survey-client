@@ -1,5 +1,4 @@
 import {
-  NON_FLOW_TYPES,
   NON_ORDERED_TYPES,
   type AnswerPrimitive,
   type FlowRuntimeState,
@@ -15,10 +14,8 @@ import {
   findLastQuestionID,
   groupConditionsByQuestionID,
   indexByQuestionID,
-  naturalNextAll,
   naturalNextQuestionID,
   pushForward,
-  pushIfNotDuplicate,
   terminalTargetQuestionID,
 } from "@/utils/flow/FlowEngine";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -26,7 +23,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 export function useFlowController(payload: SurveyPayload): UseFlowControllerApi {
   const flowEligible = useMemo(() => buildFlowEligible(payload.questions), [payload.questions]);
   const indexMap = useMemo(() => indexByQuestionID(flowEligible), [flowEligible]);
-  const consentQuestionID = payload.questions.find((q) => q.type === "CONSENT")?.questionID || null;
+  // const consentQuestionID = payload.questions.find((q) => q.type === "CONSENT")?.questionID || null;
 
   // B) NEW: full list for free nav (includes everything, ordered by .order)
   const navAll = useMemo(

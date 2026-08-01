@@ -20,7 +20,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { mutateAsync, isPending } = useSubmitResponse();
+  const { mutateAsync } = useSubmitResponse();
   const {
     handleFirstInteraction,
     handleClick,

@@ -2,7 +2,7 @@ import { useBehavior } from "@/context/BehaviorTrackerContext";
 import type { OptionType } from "@/types/optionTypes";
 import type { RankListProps } from "@/types/responseTypes";
 import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-pangea/dnd";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import RankListItem from "./RankListItem";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useDeviceId } from "@/hooks/useDeviceID";
@@ -12,10 +12,6 @@ import { useResponseRegistry } from "@/context/ResponseRegistry";
 import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const RankList = ({ surveyID, options, question }: RankListProps) => {
-
-
- 
-
   const {
     value: localOptions,
     clearHydration,
@@ -43,7 +39,7 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { mutateAsync, isPending } = useSubmitResponse();
+  const { mutateAsync } = useSubmitResponse();
   const {
     handleFirstInteraction,
     handleClick,

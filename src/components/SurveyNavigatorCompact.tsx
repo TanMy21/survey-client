@@ -18,9 +18,9 @@ const SurveyNavigatorCompact = ({
   navPulse,
   shareID,
 }: SurveyNavigatorCompactProps) => {
-  const { currentQuestion, canGoPrev, onPrev, goNext, isTerminal } = useFlowRuntime();
+  const { canGoPrev, onPrev, goNext, isTerminal } = useFlowRuntime();
   const { requestSubmit, hasSubmitHandler } = useQuestionSubmit();
-  const isEnd = currentQuestion.type === "END_SCREEN";
+  // const isEnd = currentQuestion.type === "END_SCREEN";
   const hideNext = isTerminal;
   const [reportModalOpen, setReportModalOpen] = useState(false);
 

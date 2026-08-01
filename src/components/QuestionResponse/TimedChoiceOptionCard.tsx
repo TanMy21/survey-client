@@ -3,13 +3,11 @@ export const TimedChoiceOptionCard = ({
   imageUrl,
   altText,
   selected,
-  side,
 }: {
   text: string;
   imageUrl?: string;
   altText?: string | null;
   selected: boolean;
-  side: "left" | "right";
 }) => {
   return (
     <div

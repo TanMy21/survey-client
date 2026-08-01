@@ -1,5 +1,4 @@
 import type { Question } from "@/types/questionTypes";
-import { EVALUATORS } from "./ConditionEvaluators";
 import {
   END_SCREEN_TYPE,
   NON_FLOW_TYPES,
@@ -141,9 +140,6 @@ const EVALUATORS_BY_TYPE: Record<string, Record<string, EvalFn>> = {
   // RADIO: { ...COMMON_EVALUATORS },
   // etc...
 };
-
-
-
 
 export function evaluateNextQuestionID(
   state: FlowRuntimeState,

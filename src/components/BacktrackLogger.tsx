@@ -3,7 +3,7 @@ import type { BacktrackLoggerProps } from "@/types/questionTypes";
 import { useEffect, useRef } from "react";
 
 export const BacktrackLogger = ({ questionID, visitedRef }: BacktrackLoggerProps) => {
-  const { handleBacktrack, collectBehaviorData } = useBehavior();
+  const { handleBacktrack } = useBehavior();
   const triggeredRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!questionID) return;
@@ -17,7 +17,7 @@ export const BacktrackLogger = ({ questionID, visitedRef }: BacktrackLoggerProps
     if (hasVisitedBefore && !hasAlreadyTriggered) {
       triggeredRef.current.add(questionID);
       handleBacktrack();
-      const data = collectBehaviorData();
+      // const data = collectBehaviorData();
        
     }
 

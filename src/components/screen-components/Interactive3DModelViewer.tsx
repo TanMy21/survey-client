@@ -36,7 +36,6 @@ export const Interactive3DModelViewer = ({
   initialView = "front",
   frontIsNegZ = true,
   exposure = 1.0,
-  envIntensity = 1.0,
   ambientIntensity = 0.25,
   hemiIntensity = 0.45,
   envResolution = 256,

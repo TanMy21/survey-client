@@ -10,7 +10,7 @@ const ThreeDMobileViewer = ({
   setCurrentQuestionIndex,
 }: ThreeDViewProps) => {
   const [viewerUrl, setViewerUrl] = useState<string | null>(url ?? null);
-  const ready = !!viewerUrl;
+  // const ready = !!viewerUrl;
 
   const collectThreeDBehaviorRef = useRef<(() => unknown) | undefined>(undefined);
 

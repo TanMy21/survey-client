@@ -1,4 +1,4 @@
-import type { Question, QuestionType } from "./questionTypes";
+import type { Question, QuestionTypeKey } from "./questionTypes";
 
 export interface FlowCondition {
   flowConditionID: string;
@@ -84,7 +84,7 @@ export const NON_FLOW_TYPES = new Set([
 
 export const END_SCREEN_TYPE: string = "END_SCREEN";
 
-export const isQuestionScreen = (t: QuestionType) => !NON_ORDERED_TYPES.has(t);
+export const isQuestionScreen = (t: QuestionTypeKey) => !NON_ORDERED_TYPES.has(t);
 
 export interface ScrollNavProps {
   container: React.RefObject<HTMLElement | null>;

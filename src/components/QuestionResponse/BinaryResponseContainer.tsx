@@ -21,7 +21,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { mutateAsync, isPending } = useSubmitResponse();
+  const { mutateAsync  } = useSubmitResponse();
   const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "YES";
   const buttonTextNo = questionPreferences.uiConfig?.buttonTextNo || "NO";
 

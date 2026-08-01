@@ -18,7 +18,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { mutateAsync, isPending } = useSubmitResponse();
+  const { mutateAsync  } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
 
   const {

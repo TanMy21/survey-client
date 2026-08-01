@@ -309,7 +309,6 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
               imageUrl={showImages ? firstImage?.imageUrl : undefined}
               altText={firstImage?.altText}
               selected={selectedValue === firstOptionValue}
-              side="left"
             />
           </div>
 
@@ -330,7 +329,6 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
               imageUrl={showImages ? secondImage?.imageUrl : undefined}
               altText={secondImage?.altText}
               selected={selectedValue === secondOptionValue}
-              side="right"
             />
           </div>
         </div>

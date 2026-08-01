@@ -34,7 +34,7 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
   const { onSubmitAnswer } = useFlowRuntime();
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
-  const { mutateAsync, isPending } = useSubmitResponse();
+  const { mutateAsync } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const optionRefs = useRef<(HTMLDivElement | null)[]>([]);

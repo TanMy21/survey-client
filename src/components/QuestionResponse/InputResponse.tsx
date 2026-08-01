@@ -20,7 +20,7 @@ const InputResponse = ({
 }: InputResponseProps) => {
   const [error, setError] = useState<string | null>(null);
   const { markAnswered, setRealTimeResponse } = useResponseRegistry();
-  const { mutateAsync, isPending } = useSubmitEmailResponse();
+  const { mutateAsync } = useSubmitEmailResponse();
   const { goNext } = useFlowRuntime();
   const deviceID = useDeviceId();
 

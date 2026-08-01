@@ -21,7 +21,7 @@ const InputResponseText = ({
   const [error, setError] = useState<string | null>(null);
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
-  const { mutateAsync, isPending } = useSubmitResponse();
+  const { mutateAsync } = useSubmitResponse();
   const { onSubmitAnswer } = useFlowRuntime();
 
   const {

@@ -14,7 +14,7 @@ const ConsentScreen = ({ surveyID }: QuestionProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const deviceID = useDeviceId();
-  const { mutate, isPending } = useRecordConsent();
+  const { mutate } = useRecordConsent();
 
   useEffect(() => {
     setCanProceed(false);
