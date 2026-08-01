@@ -25,8 +25,6 @@ const ConsentScreen = ({ surveyID }: QuestionProps) => {
 
     const consentedAtClient = new Date().toISOString();
 
-    console.log("Recording consent at:", deviceID);
-
     mutate(
       {
         surveyID,

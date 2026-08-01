@@ -18,7 +18,7 @@ export const BacktrackLogger = ({ questionID, visitedRef }: BacktrackLoggerProps
       triggeredRef.current.add(questionID);
       handleBacktrack();
       const data = collectBehaviorData();
-      console.log("📦 Backtracked behavior data:", data);
+       
     }
 
     if (prevLastVisited !== questionID) {

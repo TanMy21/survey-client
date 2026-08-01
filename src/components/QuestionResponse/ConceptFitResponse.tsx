@@ -177,8 +177,7 @@ const ConceptFitResponse = ({
       const behavior = collectBehaviorData();
       const responseObject = buildFinalResponse(finalAnswers);
 
-      console.log("📦 ConceptFit final response:", responseObject);
-      console.log("📦 ConceptFit behavior data:", behavior);
+     
 
       try {
         await mutateAsync({

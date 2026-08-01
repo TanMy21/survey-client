@@ -75,8 +75,6 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
     );
   }
 
-  console.log("Survey: ", survey);
-
   return (
     <FlowRuntimeProvider payload={survey}>
       <ResponseRegistryProvider persistedResponses={survey.responses}>
