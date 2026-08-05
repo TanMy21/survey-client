@@ -23,6 +23,13 @@ const isSuperset = (sup: string[], sub: string[]) => sub.every((x) => sup.includ
 export const EVALUATORS: FlowEvaluators = {
   BINARY: {
     is: (answer: AnswerPrimitive, rule: any) => normalizeStr(answer) === normalizeStr(rule),
+    "is-not": (answer: AnswerPrimitive, rule: any) => normalizeStr(answer) !== normalizeStr(rule),
+  },
+
+  DROPDOWN: {
+    is: (answer: AnswerPrimitive, rule: any) => normalizeStr(answer) === normalizeStr(rule),
+
+    "is-not": (answer: AnswerPrimitive, rule: any) => normalizeStr(answer) !== normalizeStr(rule),
   },
 
   RADIO: {

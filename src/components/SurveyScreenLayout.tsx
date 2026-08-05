@@ -140,13 +140,25 @@ const SurveyScreenLayout = ({
     () => flowEligible.filter((q) => !NON_FLOW_TYPES.has(q.type)).length,
     [flowEligible]
   );
+
+  const progressQuestions = useMemo(
+    () => flowEligible.filter((question) => question.type !== END_SCREEN_TYPE),
+    [flowEligible]
+  );
+
   const progressPercent = useMemo(() => {
-    const visitedQuestions = visitedStack.filter((qid) => {
-      const q = flowEligible.find((x) => x.questionID === qid);
-      return q && !NON_FLOW_TYPES.has(q.type);
-    }).length;
-    return totalCount > 0 ? (visitedQuestions / totalCount) * 100 : 0;
-  }, [visitedStack, flowEligible, totalCount]);
+    if (isEnd) return 100;
+
+    const currentPosition = progressQuestions.findIndex(
+      (question) => question.questionID === currentQuestionID
+    );
+
+    if (currentPosition < 0 || progressQuestions.length === 0) {
+      return 0;
+    }
+
+    return ((currentPosition + 1) / progressQuestions.length) * 100;
+  }, [currentQuestionID, progressQuestions, isEnd]);
 
   const { questionPreferences } = currentQuestion || {};
 

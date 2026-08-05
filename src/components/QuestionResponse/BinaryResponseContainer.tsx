@@ -12,7 +12,7 @@ import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
-import { autoSubmitDelayMs } from "@/constants/screenConstants";
+import { autoSubmitDelay1Ms } from "@/constants/screenConstants";
 
 const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainerProps) => {
   const { questionID, questionPreferences } = question;
@@ -21,7 +21,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { mutateAsync  } = useSubmitResponse();
+  const { mutateAsync } = useSubmitResponse();
   const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "YES";
   const buttonTextNo = questionPreferences.uiConfig?.buttonTextNo || "NO";
 
@@ -114,7 +114,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
 
   useAutoSubmitPulse({
     active: selectedValue !== null && !hydrated,
-    delayMs: autoSubmitDelayMs,
+    delayMs: autoSubmitDelay1Ms,
     feedbackMs: 180,
     onSubmit: handleSubmit,
     getPulseTargets,

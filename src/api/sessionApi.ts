@@ -1,6 +1,8 @@
-import type { PauseSessionArgs, SessionArgs } from "@/types/sessionTypes";
+import type { PauseSessionArgs, Session, SessionArgs } from "@/types/sessionTypes";
 
-export const createSession = async ({ shareID, deviceID, meta }: SessionArgs) => {
+const inFlightSessionCreations = new Map<string, Promise<Session>>();
+
+const createSessionRequest = async ({ shareID, deviceID, meta }: SessionArgs) => {
   try {
     const sessionCreated = await fetch(`${import.meta.env.VITE_BASE_URL}/ses/create`, {
       method: "POST",
@@ -20,6 +22,22 @@ export const createSession = async ({ shareID, deviceID, meta }: SessionArgs) =>
     console.error("Error creating session: ", error);
     throw error;
   }
+};
+
+export const createSession = (args: SessionArgs) => {
+  const key = JSON.stringify([args.shareID, args.deviceID]);
+  const existingRequest = inFlightSessionCreations.get(key);
+
+  if (existingRequest) return existingRequest;
+
+  const request = createSessionRequest(args).finally(() => {
+    if (inFlightSessionCreations.get(key) === request) {
+      inFlightSessionCreations.delete(key);
+    }
+  });
+
+  inFlightSessionCreations.set(key, request);
+  return request;
 };
 
 export const completeSession = async ({ surveyID, deviceID, shareID }: SessionArgs) => {

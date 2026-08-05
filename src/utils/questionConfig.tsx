@@ -13,10 +13,9 @@ import SingleChoiceScreen from "@/components/screens/SingleChoiceScreen";
 import TextScreen from "@/components/screens/TextScreen";
 import WelcomeScreen from "@/components/screens/WelcomeScreen";
 import type { QuestionProps, QuestionType, QuestionTypeKey } from "@/types/questionTypes";
+import EndScreen from "@/components/screens/EndScreen";
 
 const ConceptFitScreen = lazy(() => import("@/components/screens/ConceptFitScreen"));
-
-const EndScreen = lazy(() => import("@/components/screens/EndScreen"));
 
 const IATScreen = lazy(() => import("@/components/screens/IATScreen"));
 

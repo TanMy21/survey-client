@@ -7,5 +7,6 @@ export const DEFAULT_CONCEPT_FIT_RIGHT_TEXT = "Does not fit";
 export const DEFAULT_IAT_TIME_LIMIT_MS = 3000;
 
 export const autoSubmitDelayMs = 2000;
+export const autoSubmitDelay1Ms = 1000;
 
 export const MEDIA_OPTION_BADGES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"] as const;
