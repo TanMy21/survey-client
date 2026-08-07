@@ -156,17 +156,41 @@ export const getExpectedSideForIATStimulus = (group: IATGroup, _round: IATRoundT
   return group === "THEME_A" ? "left" : "right";
 };
 
+const ALLOWED_RICH_TEXT_FONT_SIZES = new Set([
+  "12px",
+  "14px",
+  "16px",
+  "18px",
+  "20px",
+  "24px",
+  "28px",
+  "32px",
+  "36px",
+  "40px",
+  "44px",
+  "48px",
+  "52px",
+  "56px",
+  "60px",
+  "64px",
+]);
+
+const ALLOWED_RICH_TEXT_ALIGNMENTS = new Set(["left", "center", "right"]);
+
 export const sanitizeRichTextHtml = (html?: string | null): string => {
   if (!html) {
     return "";
   }
 
-  return DOMPurify.sanitize(html, {
+  const clean = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
       "p",
+      "span",
       "br",
       "strong",
+      "b",
       "em",
+      "i",
       "u",
       "ul",
       "ol",
@@ -185,12 +209,43 @@ export const sanitizeRichTextHtml = (html?: string | null): string => {
       "title",
       "rel",
       "target",
+      "style",
       "data-editor-image-id",
       "data-public-id",
     ],
     ALLOWED_URI_REGEXP: /^(?:(?:https|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i,
-    FORBID_ATTR: ["style", "onerror", "onclick", "onload"],
+    FORBID_ATTR: ["onerror", "onclick", "onload"],
+    KEEP_CONTENT: true,
   });
+
+  const doc = new DOMParser().parseFromString(clean, "text/html");
+
+  doc.body.querySelectorAll<HTMLElement>("[style]").forEach((element) => {
+    const textAlign = element.style.textAlign.trim().toLowerCase();
+    const color = element.style.color;
+    const fontSize = element.style.fontSize.trim().toLowerCase();
+
+    // Remove all supplied CSS before restoring only properties supported by the editor.
+    element.removeAttribute("style");
+
+    if (ALLOWED_RICH_TEXT_ALIGNMENTS.has(textAlign)) {
+      element.style.textAlign = textAlign;
+    }
+
+    if (color) {
+      element.style.color = color;
+    }
+
+    if (ALLOWED_RICH_TEXT_FONT_SIZES.has(fontSize)) {
+      element.style.fontSize = fontSize;
+    }
+
+    if (!element.getAttribute("style")) {
+      element.removeAttribute("style");
+    }
+  });
+
+  return doc.body.innerHTML;
 };
 
 export const getMediaOptionBadge = (order: number): string => {

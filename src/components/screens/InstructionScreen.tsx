@@ -20,7 +20,7 @@ const InstructionScreen = ({ question }: QuestionProps) => {
   return (
     <ScreenRoot>
       <CenteredStack>
-        <div className="mt-6 flex w-full justify-center md:mt-8">
+        <div className="mt-6 flex w-full justify-center md:mt-8 border-2 black">
           <div className="w-[92%] max-w-[980px] rounded-[28px] px-5 py-6 md:w-[88%] md:px-10 md:py-8">
             <div
               className="participant-rich-text-content"
