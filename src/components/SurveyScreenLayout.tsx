@@ -5,7 +5,7 @@ import { BacktrackLogger } from "./BacktrackLogger";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { END_SCREEN_TYPE, NON_FLOW_TYPES } from "@/types/flowTypes";
+import { END_SCREEN_TYPE  } from "@/types/flowTypes";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
 import SurveyNavigatorCompact from "./SurveyNavigatorCompact";
 import { useScrollNav } from "@/hooks/useScrollNav";
@@ -30,8 +30,7 @@ const SurveyScreenLayout = ({
     currentQuestionID,
     currentDisplayIndex,
     nextQuestion,
-    visitedStack,
-    flowEligible,
+       flowEligible,
     canGoPrev,
     isTerminal,
   } = useFlowRuntime();
@@ -136,11 +135,6 @@ const SurveyScreenLayout = ({
   }, [currentQuestionID, session, hasEndScreen, isEnd, isTerminal, surveyID, deviceID, shareID]);
 
   // progress
-  const totalCount = useMemo(
-    () => flowEligible.filter((q) => !NON_FLOW_TYPES.has(q.type)).length,
-    [flowEligible]
-  );
-
   const progressQuestions = useMemo(
     () => flowEligible.filter((question) => question.type !== END_SCREEN_TYPE),
     [flowEligible]

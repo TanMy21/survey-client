@@ -1,0 +1,163 @@
+name: Deploy Participant Frontend
+
+on:
+  push:
+    branches:
+      - deploy
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Queue production deployments so two releases cannot switch the current symlink concurrently.
+concurrency:
+  group: participant-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VITE_REACT_APP_NODE_ENV: ${{ vars.VITE_REACT_APP_NODE_ENV }}
+      VITE_BASE_URL: ${{ vars.VITE_BASE_URL }}
+      VITE_APP_URL: ${{ vars.VITE_APP_URL }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Validate public production configuration
+        shell: bash
+        run: |
+          : "${VITE_REACT_APP_NODE_ENV:?Missing GitHub Variable VITE_REACT_APP_NODE_ENV}"
+          : "${VITE_BASE_URL:?Missing GitHub Variable VITE_BASE_URL}"
+          : "${VITE_APP_URL:?Missing GitHub Variable VITE_APP_URL}"
+
+          if [[ "$VITE_REACT_APP_NODE_ENV" != "production" ]]; then
+            echo "VITE_REACT_APP_NODE_ENV must be production."
+            exit 1
+          fi
+
+          if [[ "$VITE_BASE_URL $VITE_APP_URL" == *"localhost"* || "$VITE_BASE_URL $VITE_APP_URL" == *"127.0.0.1"* ]]; then
+            echo "Production frontend configuration must not contain local URLs."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Write production environment
+        shell: bash
+        run: |
+          # This generated file makes the selected public GitHub Variables explicit for Vite.
+          printf '%s\n' \
+            "VITE_REACT_APP_NODE_ENV=$VITE_REACT_APP_NODE_ENV" \
+            "VITE_BASE_URL=$VITE_BASE_URL" \
+            "VITE_APP_URL=$VITE_APP_URL" \
+            > .env.production
+
+      # The repository's lint configuration is currently invalid, so the production TypeScript
+      # check remains enforced through the existing build command without changing application code.
+      - name: Build production application
+        run: npm run build
+
+      - name: Validate production output
+        shell: bash
+        run: |
+          test -f dist/index.html
+          grep -q '"/go/assets/' dist/index.html
+          grep -R -q -F "$VITE_BASE_URL" dist
+          grep -R -q -F "$VITE_APP_URL" dist
+
+          if grep -R -q -F 'http://localhost:8686/api' dist || grep -R -q -F 'http://localhost:5173' dist; then
+            echo "Local Feedflo URLs were found in the production bundle."
+            exit 1
+          fi
+
+          if find dist -type f -name '*.map' -print -quit | grep -q .; then
+            echo "Unexpected source maps were generated."
+            exit 1
+          fi
+
+      - name: Package release
+        shell: bash
+        run: |
+          RELEASE_ID="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA:0:12}"
+          ARCHIVE_NAME="participant-${RELEASE_ID}.tar.gz"
+
+          # Keep the built files inside /go so Nginx can serve both SPA routes and assets safely.
+          mkdir -p package/go
+          cp -a dist/. package/go/
+          tar -czf "$ARCHIVE_NAME" -C package go
+
+          echo "RELEASE_ID=$RELEASE_ID" >> "$GITHUB_ENV"
+          echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> "$GITHUB_ENV"
+
+      - name: Configure SSH
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+        run: |
+          : "${VPS_HOST:?Missing GitHub Secret VPS_HOST}"
+          : "${VPS_USER:?Missing GitHub Secret VPS_USER}"
+          : "${VPS_PORT:?Missing GitHub Secret VPS_PORT}"
+          : "${VPS_SSH_PRIVATE_KEY:?Missing GitHub Secret VPS_SSH_PRIVATE_KEY}"
+
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s' "$VPS_SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          ssh-keyscan -p "$VPS_PORT" -H "$VPS_HOST" >> "$HOME/.ssh/known_hosts"
+
+      - name: Upload release
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          scp -P "$VPS_PORT" "$ARCHIVE_NAME" "$VPS_USER@$VPS_HOST:/tmp/$ARCHIVE_NAME"
+
+      - name: Activate release
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
+            "RELEASE_ID='$RELEASE_ID' ARCHIVE_NAME='$ARCHIVE_NAME' bash -s" <<'REMOTE_SCRIPT'
+          set -euo pipefail
+
+          APP_ROOT="/var/www/feedflo/participant"
+          RELEASE_DIR="$APP_ROOT/releases/$RELEASE_ID"
+          ARCHIVE_PATH="/tmp/$ARCHIVE_NAME"
+
+          test -d "$APP_ROOT/releases"
+          mkdir "$RELEASE_DIR"
+          tar -xzf "$ARCHIVE_PATH" -C "$RELEASE_DIR"
+          test -f "$RELEASE_DIR/go/index.html"
+
+          # Replace the active release atomically without restarting any Node or PM2 process.
+          ln -sfn "$RELEASE_DIR" "$APP_ROOT/current.new"
+          mv -Tf "$APP_ROOT/current.new" "$APP_ROOT/current"
+          rm -f "$ARCHIVE_PATH"
+          REMOTE_SCRIPT
+
+      - name: Verify Participant route
+        shell: bash
+        run: |
+          curl --fail --location --silent --show-error \
+            --retry 3 --retry-delay 5 \
+            "https://feedflo.fyi/go/deployment-check-$GITHUB_SHA" \
+            | grep -q '"/go/assets/'

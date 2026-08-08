@@ -74,7 +74,7 @@ const SurveyContainer = ({ shareID }: SurveyContainerProps) => {
     );
   }
 
-  console.log("SurveyContainer: survey loaded", survey);
+   
 
 
   return (
