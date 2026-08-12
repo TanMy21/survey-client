@@ -9,7 +9,6 @@ import { END_SCREEN_TYPE  } from "@/types/flowTypes";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
 import SurveyNavigatorCompact from "./SurveyNavigatorCompact";
 import { useScrollNav } from "@/hooks/useScrollNav";
-import { useSwipeNav } from "@/hooks/useSwipeNav";
 import { useHaptics } from "@/utils/utils";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import SkipOnAdvanceBridge from "./SkipOnAdvancedBridge";
@@ -72,29 +71,6 @@ const SurveyScreenLayout = ({
       vibrate(8);
       setTimeout(() => setNavPulse(null), 720);
     },
-  });
-
-  useSwipeNav({
-    container: scrollRef,
-    goNext: () => {
-      guardedGoNext();
-      setNavPulse("next");
-      vibrate(8);
-      setTimeout(() => setNavPulse(null), 720);
-    },
-    goPrev: () => {
-      guardedGoPrev();
-      setNavPulse("prev");
-      vibrate(8);
-      setTimeout(() => setNavPulse(null), 720);
-    },
-    canGoPrev,
-    canGoNext: canScrollNext,
-    isEnd,
-    cooldownMs: 500,
-    swipeThreshold: 56,
-    dirBias: 1.6,
-    mobileQuery: "(pointer:coarse)",
   });
 
   useEffect(() => {
