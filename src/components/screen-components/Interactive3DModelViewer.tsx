@@ -82,7 +82,7 @@ export const Interactive3DModelViewer = ({
 
   return (
     <div
-      className="h-smm:h-[40vh] h-sm:h-[50vh] h-lg:h-[60vh] relative w-full border-2 border-b-emerald-600"
+      className="h-smm:h-[60vh] h-sm:h-[50vh] h-lg:h-[60vh] relative w-full border-2 border-b-emerald-600"
       data-ignore-scrollnav
       style={{
         background,

@@ -25,7 +25,7 @@ const ThreeDMobileViewer = ({
   return (
     <div className="tabp-l:w-full mx-auto flex h-full w-[98%] flex-col gap-4 border-4 border-amber-600">
       {/* Action Buttons */}
-      <div className="flex h-[80px] w-[98%]">
+      <div className="flex h-[80px] w-[98%] border-2 border-b-fuchsia-800">
         <ThreeDResponseContainer
           surveyID={surveyID}
           question={question}
@@ -44,11 +44,6 @@ const ThreeDMobileViewer = ({
           autoRotate
           autoRotateSpeed={0.4}
         />
-        {/* ) : (
-          <div className="grid h-full w-full place-items-center rounded-xl bg-[#fafafa] text-sm text-[#666]">
-            Loading your 3D model …
-          </div>
-        )} */}
       </div>
     </div>
   );
