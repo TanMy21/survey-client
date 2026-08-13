@@ -34,7 +34,7 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
   const { onSubmitAnswer } = useFlowRuntime();
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
-  const { mutateAsync } = useSubmitResponse();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -52,6 +52,8 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
   const isRequired = useQuestionRequired(question, selectedOptionID !== null);
 
   const handleSubmit = useCallback(async () => {
+    if (isPending) return;
+
     const optionValue = options?.find((opt) => opt.optionID === selectedOptionID)?.value;
 
     if (isRequired && !optionValue) {
@@ -107,6 +109,7 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
     mutateAsync,
     setRealTimeResponse,
     onSubmitAnswer,
+    isPending,
   ]);
 
   useRegisterQuestionSubmit(isRequired || !!selectedOptionID, handleSubmit);
@@ -187,9 +190,10 @@ const SingleChoiceList = ({ surveyID, question }: SingleChoiceListProps) => {
         <div className="mt-2 hidden w-[112%] justify-end pr-6 md:flex">
           <button
             onClick={handleSubmit}
-            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"
+            disabled={isPending}
+            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            OK
+            {isPending ? "..." : "OK"}
           </button>
         </div>
       </div>

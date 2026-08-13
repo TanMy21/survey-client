@@ -146,6 +146,8 @@ const InputResponseNumber = ({
    * and configured min/max rules.
    */
   const handleSubmit = async () => {
+    if (isPending) return;
+
     const trimmed = number?.trim() ?? "";
 
     if (!question?.questionID) {

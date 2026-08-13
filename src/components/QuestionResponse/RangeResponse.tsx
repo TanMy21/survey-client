@@ -18,7 +18,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { mutateAsync } = useSubmitResponse();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -67,6 +67,8 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   };
 
   const handleSubmit = async () => {
+    if (isPending) return;
+
     if (isRequired && (selectedValue === null || Number.isNaN(selectedValue))) {
       setError("Your response is required for this question");
       return;
@@ -130,9 +132,10 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
       <div className="mt-4 hidden w-[104%] justify-end pr-6 md:flex">
         <button
           onClick={handleSubmit}
-          className="w-[80px] rounded-[24px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"
+          disabled={isPending}
+          className="w-[80px] rounded-[24px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Ok
+          {isPending ? "..." : "Ok"}
         </button>
       </div>
     </div>

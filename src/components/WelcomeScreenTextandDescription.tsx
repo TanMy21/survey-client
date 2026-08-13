@@ -40,21 +40,23 @@ export const WelcomeScreenTextandDescription = ({ question }: QuestionTextandDes
           </div>
         </div>
 
-        <div className="my-[8%] flex w-full flex-row items-center justify-center md:my-[1%]">
-          <div>
-            <p
-              className="w-fit whitespace-normal italic"
-              style={{
-                fontSize: `${actualDescriptionFontSize}px`,
-                color: descriptionFontColor,
-                fontFamily:
-                  "BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
-              }}
-            >
-              {description === "Description (optional)" ? null : description}
-            </p>
+        {description && description !== "Description (optional)" && (
+          <div className="mt-3 flex w-full flex-row items-center justify-center">
+            <div>
+              <p
+                className="w-fit whitespace-normal italic"
+                style={{
+                  fontSize: `${actualDescriptionFontSize}px`,
+                  color: descriptionFontColor,
+                  fontFamily:
+                    "BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
+                }}
+              >
+                {description}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

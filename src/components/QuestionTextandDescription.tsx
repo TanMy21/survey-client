@@ -28,6 +28,7 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
 
   const nonOrderableTypes = ["WELCOME_SCREEN", "INSTRUCTIONS", "EMAIL_CONTACT", "END_SCREEN"];
   const isNonOrderableType = nonOrderableTypes.includes(type!);
+  const isEmailContact = type === "EMAIL_CONTACT";
 
   return (
     <div className="flex w-full origin-bottom flex-col">
@@ -51,7 +52,7 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
 
           <div
             className={`flex w-full flex-row items-center ${
-              isNonOrderableType ? "justify-center" : "justify-start"
+              isNonOrderableType && !isEmailContact ? "justify-center" : "justify-start"
             }`}
           >
             <p
@@ -72,7 +73,11 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
         </div>
 
         {description && description !== "Description (optional)" && (
-          <div className="my-[8%] flex w-full flex-row items-center justify-center md:my-[1%]">
+          <div
+            className={`my-[8%] flex w-full flex-row items-center md:my-[1%] ${
+              isEmailContact ? "justify-start" : "justify-center"
+            }`}
+          >
             <div>
               <p
                 className="w-fit whitespace-normal italic"

@@ -20,7 +20,7 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { mutateAsync } = useSubmitResponse();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const optionRefMap = useRef<Record<string, HTMLDivElement | null>>({});
@@ -99,6 +99,8 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
   );
 
   const handleSubmit = useCallback(async () => {
+    if (isPending) return;
+
     const selectedValues = selectedOptions?.map((o) => o.value);
 
     if (isRequired && selectedOptions?.length === 0) {
@@ -154,6 +156,7 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
     collectBehaviorData,
     mutateAsync,
     onSubmitAnswer,
+    isPending,
   ]);
 
   useRegisterQuestionSubmit(isRequired || selectedOptions.length > 0, handleSubmit);
@@ -210,9 +213,10 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
         <div className="mt-2 hidden w-[88%] justify-end pr-6 md:flex">
           <button
             onClick={handleSubmit}
-            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"
+            disabled={isPending}
+            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            OK
+            {isPending ? "..." : "OK"}
           </button>
         </div>
       </div>

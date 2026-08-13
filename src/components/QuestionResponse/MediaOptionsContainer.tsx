@@ -20,7 +20,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { mutateAsync } = useSubmitResponse();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const {
     handleFirstInteraction,
     handleClick,
@@ -90,6 +90,8 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
   );
 
   const handleSubmit = useCallback(async () => {
+    if (isPending) return;
+
     if (isRequired && selectedOptions?.length === 0) {
       setError("Your response is required for this question");
       return;
@@ -144,6 +146,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
     setRealTimeResponse,
     handleFirstInteraction,
     handleClick,
+    isPending,
   ]);
 
   useRegisterQuestionSubmit(isRequired || selectedOptions.length > 0, handleSubmit);
@@ -222,9 +225,10 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
       <div className="mx-auto mt-6 hidden w-full justify-end pr-6 md:flex">
         <button
           onClick={handleSubmit}
-          className="mr-8 min-w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-semibold text-white transition hover:bg-[#004a9f]"
+          disabled={isPending}
+          className="mr-8 min-w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-semibold text-white transition hover:bg-[#004a9f] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          OK
+          {isPending ? "..." : "OK"}
         </button>
       </div>
     </div>

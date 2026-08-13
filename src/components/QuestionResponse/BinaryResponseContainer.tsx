@@ -21,7 +21,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
   const deviceID = useDeviceId();
-  const { mutateAsync } = useSubmitResponse();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const buttonTextYes = questionPreferences.uiConfig?.buttonTextYes || "YES";
   const buttonTextNo = questionPreferences.uiConfig?.buttonTextNo || "NO";
 
@@ -56,6 +56,8 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
   }, [selectedValue]);
 
   const handleSubmit = useCallback(async () => {
+    if (isPending) return;
+
     if (isRequired && selectedValue === null) {
       setError("Your response is required for this question");
       return;
@@ -106,6 +108,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     questionID,
     question.type,
     surveyID,
+    isPending,
   ]);
 
   useRegisterQuestionSubmit(isRequired || selectedValue != null, handleSubmit);
@@ -227,9 +230,10 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
         <div className="mt-4 hidden w-full justify-end pr-6 md:flex">
           <button
             onClick={handleSubmit}
-            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"
+            disabled={isPending}
+            className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            OK
+            {isPending ? "..." : "OK"}
           </button>
         </div>
       </div>

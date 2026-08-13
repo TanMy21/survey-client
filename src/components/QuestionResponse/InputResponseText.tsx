@@ -21,7 +21,7 @@ const InputResponseText = ({
   const [error, setError] = useState<string | null>(null);
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const deviceID = useDeviceId();
-  const { mutateAsync } = useSubmitResponse();
+  const { mutateAsync, isPending } = useSubmitResponse();
   const { onSubmitAnswer } = useFlowRuntime();
 
   const {
@@ -52,6 +52,8 @@ const InputResponseText = ({
   const isRequired = useQuestionRequired(question, text.trim() !== "");
 
   const handleSubmit = async () => {
+    if (isPending) return;
+
     const trimmed = text?.trim();
     const result = textResponseSchema.safeParse({ text: trimmed });
 
@@ -186,9 +188,10 @@ const InputResponseText = ({
         <div className="mx-auto mt-4 hidden h-[25%] w-[96%] flex-col items-end pr-[4%] md:flex md:w-[60%]">
           <button
             onClick={handleSubmit}
-            className="w-[80px] rounded-4xl bg-[#005BC4] px-2 py-1 text-base font-bold text-white capitalize transition hover:bg-[#004aad] md:px-4 md:py-2"
+            disabled={isPending}
+            className="w-[80px] rounded-4xl bg-[#005BC4] px-2 py-1 text-base font-bold text-white capitalize transition hover:bg-[#004aad] disabled:cursor-not-allowed disabled:opacity-60 md:px-4 md:py-2"
           >
-            {submitButtonText}
+            {isPending ? "..." : submitButtonText}
           </button>
         </div>
       </div>

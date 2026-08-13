@@ -20,7 +20,7 @@ const InputResponse = ({
 }: InputResponseProps) => {
   const [error, setError] = useState<string | null>(null);
   const { markAnswered, setRealTimeResponse } = useResponseRegistry();
-  const { mutateAsync } = useSubmitEmailResponse();
+  const { mutateAsync, isPending } = useSubmitEmailResponse();
   const { goNext } = useFlowRuntime();
   const deviceID = useDeviceId();
 
@@ -51,6 +51,8 @@ const InputResponse = ({
   const isRequired = useQuestionRequired(question, email.trim() !== "");
 
   const handleSubmit = () => {
+    if (isPending) return;
+
     const trimmed = email.trim();
     const result = elementSchema.safeParse({ emailContact: trimmed });
 
@@ -150,8 +152,8 @@ const InputResponse = ({
   };
 
   return (
-    <div className="flex w-4/5 origin-bottom flex-col">
-      <div className="mx-auto flex h-[60%] w-[100%] flex-col">
+    <div className="flex w-[92%] origin-bottom flex-col">
+      <div className="flex h-[60%] w-full flex-col">
         {/* Input field */}
         <input
           type="text"
@@ -163,7 +165,7 @@ const InputResponse = ({
           onFocus={handleFirstInteraction}
           onPaste={handlePaste}
           onChange={handleChange}
-          className={`lg:w-4/5lg:text-3xl mx-auto block h-12 w-full border-0 border-b border-gray-300 px-3 text-base text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none sm:h-14 sm:w-4/5 sm:text-lg md:h-16 md:w-3/5 md:text-2xl lg:h-20`}
+          className="block h-12 w-full border-0 border-b border-gray-300 px-0 text-left text-base text-black placeholder-[#A6A4B7] hover:border-gray-300 focus:border-gray-600 focus:outline-none sm:h-14 sm:text-lg md:h-16 md:text-2xl lg:h-20 lg:text-3xl"
         />
 
         {/* Error message */}
@@ -173,9 +175,10 @@ const InputResponse = ({
         <div className="mx-auto mt-4 hidden h-[25%] w-[96%] flex-col items-end pr-[4%] md:flex md:w-[60%]">
           <button
             onClick={handleSubmit}
-            className={`w-[80px] rounded-4xl bg-[#005BC4] px-2 py-1 text-base font-bold text-white capitalize transition hover:bg-[#005BC4] md:px-4 md:py-2`}
+            disabled={isPending}
+            className="w-[80px] rounded-4xl bg-[#005BC4] px-2 py-1 text-base font-bold text-white capitalize transition hover:bg-[#005BC4] disabled:cursor-not-allowed disabled:opacity-60 md:px-4 md:py-2"
           >
-            {submitButtonText}
+            {isPending ? "..." : submitButtonText}
           </button>
         </div>
       </div>
