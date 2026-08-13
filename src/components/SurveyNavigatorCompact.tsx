@@ -81,16 +81,17 @@ const SurveyNavigatorCompact = ({
               // !isEnd &&
               !hideNext && (
                 <motion.button
-                  className="h-11 w-11 rounded-full p-2 text-gray-700 transition hover:text-black disabled:opacity-40"
+                  className="h-11 min-w-11 rounded-full bg-[#005BC4] px-5 py-2 text-sm font-bold text-white transition hover:bg-[#004a9f] disabled:opacity-40 md:w-11 md:bg-transparent md:px-2 md:text-gray-700 md:hover:bg-transparent md:hover:text-black"
                   disabled={disableNext && !hasSubmitHandler}
                   onClick={handleNext}
-                  aria-label="Next"
+                  aria-label={hasSubmitHandler ? "Submit response" : "Next"}
                   variants={pulseVariant}
                   animate={navPulse === "next" ? "pulse" : "rest"}
                   transition={{ type: "spring", stiffness: 400, damping: 18 }}
                   whileTap={{ scale: 0.94 }}
                 >
-                  <ChevronRight className="h-6 w-6 sm:h-7 sm:w-7" />
+                  <span className="md:hidden">{hasSubmitHandler ? "OK" : "Next"}</span>
+                  <ChevronRight className="hidden h-7 w-7 md:block" />
                 </motion.button>
               )
             }

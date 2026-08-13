@@ -174,7 +174,7 @@ const SurveyScreenLayout = ({
   }, [nextQuestionType]);
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
+    <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-white md:h-screen">
       <div className="fixed top-0 left-0 z-50 h-1 w-full bg-gray-200">
         <div
           className="h-full bg-blue-500 transition-all duration-300"
@@ -188,7 +188,7 @@ const SurveyScreenLayout = ({
         <div
           ref={scrollRef}
           style={{ touchAction: "pan-y", padding: isMobile ? "1px" : "2px" }}
-          className="scrollbar-hidden flex flex-grow flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto border-2 pb-6 md:flex-row md:items-center md:justify-center md:p-1 md:pb-20"
+          className="scrollbar-hidden flex min-h-0 flex-grow flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto border-2 pb-6 md:flex-row md:items-center md:justify-center md:p-1 md:pb-20"
         >
           <BehaviorEventProvider>
             <SlideMotion direction={"right"} keyProp={currentQuestionID}>
