@@ -151,6 +151,11 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
   useEffect(() => {
+    if (isMobile) {
+      containerRef.current?.focus({ preventScroll: true });
+      return;
+    }
+
     containerRef.current?.focus();
   }, []);
 
