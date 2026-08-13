@@ -188,7 +188,7 @@ const SurveyScreenLayout = ({
         <div
           ref={scrollRef}
           style={{ touchAction: "pan-y", padding: isMobile ? "1px" : "2px" }}
-          className="scrollbar-hidden flex flex-grow flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto border-2 pb-2 md:flex-row md:items-center md:justify-center md:p-1 md:pb-20"
+          className="scrollbar-hidden flex flex-grow flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto border-2 pb-6 md:flex-row md:items-center md:justify-center md:p-1 md:pb-20"
         >
           <BehaviorEventProvider>
             <SlideMotion direction={"right"} keyProp={currentQuestionID}>
@@ -208,9 +208,9 @@ const SurveyScreenLayout = ({
               </BehaviorTrackerProvider>
             </SlideMotion>
           </BehaviorEventProvider>
-          <SurveyNavigatorCompact disableNext={!canProceed} navPulse={navPulse} shareID={shareID} />
         </div>
       </div>
+      <SurveyNavigatorCompact disableNext={!canProceed} navPulse={navPulse} shareID={shareID} />
     </div>
   );
 };

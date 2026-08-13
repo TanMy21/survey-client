@@ -50,7 +50,7 @@ const SurveyNavigatorCompact = ({
     <>
       <div
         data-ignore-scrollnav="true"
-        className="pointer-events-none relative z-[60] mt-6 w-full shrink-0 md:fixed md:inset-x-0 md:bottom-0 md:mt-0 md:h-16"
+        className="pointer-events-none relative z-[60] w-full shrink-0 border-t border-slate-200/70 bg-white/95 pt-2 backdrop-blur-sm md:fixed md:inset-x-0 md:bottom-0 md:h-16 md:border-0 md:bg-transparent md:pt-0 md:backdrop-blur-none"
       >
         <div className="relative flex min-h-16 w-full items-center justify-center pb-[max(env(safe-area-inset-bottom),0.75rem)] md:h-full md:min-h-0 md:justify-end md:pb-[max(env(safe-area-inset-bottom),0.5rem)]">
           {shareID && (
