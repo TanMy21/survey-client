@@ -183,7 +183,7 @@ const InputResponseText = ({
         {error && <InputError error={error} />}
 
         {/* Submit Button */}
-        <div className="mx-auto mt-4 flex h-[25%] w-[96%] flex-col items-end pr-[4%] md:w-[60%]">
+        <div className="mx-auto mt-4 hidden h-[25%] w-[96%] flex-col items-end pr-[4%] md:flex md:w-[60%]">
           <button
             onClick={handleSubmit}
             className="w-[80px] rounded-4xl bg-[#005BC4] px-2 py-1 text-base font-bold text-white capitalize transition hover:bg-[#004aad] md:px-4 md:py-2"

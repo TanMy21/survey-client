@@ -207,7 +207,7 @@ const MultipleChoiceResponseContainer = ({ surveyID, question }: MultipleChoiceC
           {error && <InputError error={error} />}
         </div>
 
-        <div className="mt-2 flex w-[88%] justify-end pr-6">
+        <div className="mt-2 hidden w-[88%] justify-end pr-6 md:flex">
           <button
             onClick={handleSubmit}
             className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"

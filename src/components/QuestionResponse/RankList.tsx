@@ -171,7 +171,7 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
             </Droppable>
           </DragDropContext>
 
-          <div className="mt-2 flex w-[92%] justify-end pr-6">
+          <div className="mt-2 hidden w-[92%] justify-end pr-6 md:flex">
             <button
               onClick={handleSubmit}
               className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-semibold text-white transition hover:bg-[#004a9f]"

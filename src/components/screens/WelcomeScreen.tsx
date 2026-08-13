@@ -8,6 +8,7 @@ import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import ScreenRoot from "../layout/ScreenRoot";
 import { ResponseContainer } from "../layout/ResponseContainer";
 import { WelcomeScreenTextandDescription } from "../WelcomeScreenTextandDescription";
+import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const WelcomeScreen = ({ surveyID, question, completionTimeEstimate }: QuestionProps) => {
   const { questionPreferences } = question || {};
@@ -39,6 +40,8 @@ const WelcomeScreen = ({ surveyID, question, completionTimeEstimate }: QuestionP
     goNext();
   };
 
+  useRegisterQuestionSubmit(true, handleNext);
+
   return (
     <ScreenRoot>
       <CenteredStack>
@@ -47,7 +50,7 @@ const WelcomeScreen = ({ surveyID, question, completionTimeEstimate }: QuestionP
       <ResponseContainer>
         <button
           onClick={handleNext}
-          className="group flex items-center justify-center gap-2 rounded-full bg-[#005BC4] px-6 py-3 text-lg font-bold text-white transition-all duration-300 ease-in-out hover:bg-[#004aa0] focus:ring-2 focus:ring-[#005BC4] focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none"
+          className="group hidden items-center justify-center gap-2 rounded-full bg-[#005BC4] px-6 py-3 text-lg font-bold text-white transition-all duration-300 ease-in-out hover:bg-[#004aa0] focus:ring-2 focus:ring-[#005BC4] focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none md:flex"
         >
           <span className="transition-all duration-300 ease-in-out group-hover:mr-1">
             {buttonText}

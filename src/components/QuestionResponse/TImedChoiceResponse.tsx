@@ -335,7 +335,7 @@ const TimedChoiceResponse = ({ question, surveyID }: BinaryResponseContainerProp
 
         {error && <InputError error={error} />}
 
-        <div className="mt-4 flex w-full justify-end pr-6">
+        <div className="mt-4 hidden w-full justify-end pr-6 md:flex">
           <button
             type="button"
             onClick={handleSubmit}

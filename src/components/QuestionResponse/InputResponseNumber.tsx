@@ -269,7 +269,7 @@ const InputResponseNumber = ({
           </div>
         )}
 
-        <div className="mx-auto mt-4 flex h-[25%] w-[96%] flex-col items-end pr-[4%] md:w-[60%]">
+        <div className="mx-auto mt-4 hidden h-[25%] w-[96%] flex-col items-end pr-[4%] md:flex md:w-[60%]">
           <button
             type="button"
             onClick={handleSubmit}

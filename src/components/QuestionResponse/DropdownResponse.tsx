@@ -314,7 +314,7 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
           {error && <InputError error={error} />}
         </div>
 
-        <div className="mt-2 flex w-[112%] justify-end pr-6">
+        <div className="mt-2 hidden w-[112%] justify-end pr-6 md:flex">
           <button
             disabled={isSubmitting || isPending}
             onClick={handleSubmit}

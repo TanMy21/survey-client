@@ -129,17 +129,17 @@ export const ReportSurveyModal = ({ open, shareID, onClose }: ReportSurveyModalP
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/35 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[90] flex h-[100dvh] items-center justify-center bg-slate-950/35 p-2 backdrop-blur-sm md:h-auto md:px-4 md:py-0"
       onMouseDown={handleClose}
       role="dialog"
       aria-modal="true"
       aria-label="Report this survey"
     >
       <div
-        className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-2xl"
+        className="flex max-h-full w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl md:block md:max-h-none md:overflow-visible"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div className="flex items-start justify-between border-b border-slate-100 px-5 py-4">
+        <div className="flex shrink-0 items-start justify-between border-b border-slate-100 px-5 py-4">
           <div>
             <h2 className="text-lg font-semibold text-slate-950">Report this survey</h2>
             {!submitted && (
@@ -161,7 +161,7 @@ export const ReportSurveyModal = ({ open, shareID, onClose }: ReportSurveyModalP
         </div>
 
         {submitted ? (
-          <div className="px-5 py-8 text-center">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-8 text-center md:overflow-visible">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
               <CheckCircle2 className="h-7 w-7" />
             </div>
@@ -183,7 +183,7 @@ export const ReportSurveyModal = ({ open, shareID, onClose }: ReportSurveyModalP
             </button>
           </div>
         ) : (
-          <div className="space-y-5 px-5 py-5">
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-5 py-5 md:overflow-visible">
             <div>
               <p className="text-sm font-medium text-slate-800">What seems wrong?</p>
 

@@ -224,7 +224,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
 
         {error && <InputError error={error} />}
 
-        <div className="mt-4 flex w-full justify-end pr-6">
+        <div className="mt-4 hidden w-full justify-end pr-6 md:flex">
           <button
             onClick={handleSubmit}
             className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f]"

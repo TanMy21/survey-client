@@ -219,7 +219,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
           );
         })}
       </div>
-      <div className="mx-auto mt-6 flex w-full justify-end pr-6">
+      <div className="mx-auto mt-6 hidden w-full justify-end pr-6 md:flex">
         <button
           onClick={handleSubmit}
           className="mr-8 min-w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-semibold text-white transition hover:bg-[#004a9f]"
