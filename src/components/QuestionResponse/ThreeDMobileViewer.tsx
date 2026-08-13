@@ -23,9 +23,9 @@ const ThreeDMobileViewer = ({
   }, [url]);
 
   return (
-    <div className="tabp-l:w-full mx-auto flex h-full w-[98%] flex-col gap-4 border-4 border-amber-600">
+    <div className="tabp-l:w-full mx-auto flex h-auto w-[98%] flex-col gap-4">
       {/* Action Buttons */}
-      <div className="flex h-[80px] w-[98%] border-2 border-b-fuchsia-800">
+      <div className="flex h-[80px] w-[98%]">
         <ThreeDResponseContainer
           surveyID={surveyID}
           question={question}
@@ -35,7 +35,7 @@ const ThreeDMobileViewer = ({
       </div>
 
       {/* 3D Viewer */}
-      <div className="flex h-[40vh] w-full border-2 border-b-blue-800">
+      <div className="flex w-full">
         {/* {ready ? ( */}
         <Interactive3DModelViewer
           key={viewerUrl}
