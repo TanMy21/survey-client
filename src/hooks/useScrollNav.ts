@@ -15,7 +15,12 @@ export function useScrollNav({
 }: ScrollNavProps) {
   const accumRef = useRef(0);
   const lastFiredRef = useRef(0);
-  const touchStartY = useRef<number | null>(null);
+  const touchStartRef = useRef<{
+    x: number;
+    y: number;
+    atTop: boolean;
+    atBottom: boolean;
+  } | null>(null);
   const wheelLockedRef = useRef(false);
   const wheelUnlockTimerRef = useRef<number | null>(null);
 
@@ -91,30 +96,52 @@ export function useScrollNav({
     };
 
     const onTouchStart = (e: TouchEvent) => {
+      touchStartRef.current = null;
       if (isInputLike(e.target)) return;
-      touchStartY.current = e.touches[0]?.clientY ?? null;
+      if (e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      if (!touch) return;
+
+      touchStartRef.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        atTop: el.scrollTop <= 0,
+        atBottom: Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight,
+      };
     };
 
     const onTouchEnd = (e: TouchEvent) => {
-      if (isInputLike(e.target)) return;
-      if (onCooldown()) return;
-      const startY = touchStartY.current;
-      touchStartY.current = null;
-      if (startY == null) return;
+      const start = touchStartRef.current;
+      touchStartRef.current = null;
 
-      const endY = e.changedTouches[0]?.clientY ?? startY;
-      const dy = endY - startY;
+      if (isInputLike(e.target) || !start) return;
+      if (onCooldown()) return;
+
+      const touch = e.changedTouches[0];
+      if (!touch) return;
+
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+
+      // Ignore horizontal and diagonal gestures. Touch navigation should only
+      // respond to a clearly vertical swipe.
+      if (Math.abs(dy) <= Math.abs(dx) * 1.25) return;
 
       const atTop = el.scrollTop <= 0;
       const atBottom = Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight;
 
       if (dy < -touchThreshold) {
-        if (canGoNext && !isEnd && atBottom) fire("next");
+        // Reaching the bottom during this gesture only scrolls the content.
+        // A separate upward swipe that starts at the bottom expresses intent
+        // to move to the next question.
+        if (canGoNext && !isEnd && start.atBottom && atBottom) fire("next");
         return;
       }
 
       if (dy > touchThreshold) {
-        if (canGoPrev && atTop) fire("prev");
+        // Likewise, require a separate downward swipe beginning at the top.
+        if (canGoPrev && start.atTop && atTop) fire("prev");
       }
     };
 
