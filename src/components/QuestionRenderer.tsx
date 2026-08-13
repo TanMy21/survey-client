@@ -14,7 +14,7 @@ const QuestionRenderer = ({
   const Component = questionComponents[question?.type as QuestionTypeKey];
   return (
     <div
-      className="mx-auto min-h-screen w-[92%] p-1 sm:w-[98%] sm:p-1 md:p-4"
+      className="mx-auto w-[92%] p-1 sm:w-[98%] sm:p-1 md:min-h-screen md:p-4"
       style={{ width: isMobile ? "98%" : "92%" }}
     >
       <Suspense

@@ -5,7 +5,7 @@ import { BacktrackLogger } from "./BacktrackLogger";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useSurveyFlow } from "@/context/useSurveyFlow";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { END_SCREEN_TYPE  } from "@/types/flowTypes";
+import { END_SCREEN_TYPE } from "@/types/flowTypes";
 import type { SurveyContainerProps } from "@/types/surveyTypes";
 import SurveyNavigatorCompact from "./SurveyNavigatorCompact";
 import { useScrollNav } from "@/hooks/useScrollNav";
@@ -29,7 +29,7 @@ const SurveyScreenLayout = ({
     currentQuestionID,
     currentDisplayIndex,
     nextQuestion,
-       flowEligible,
+    flowEligible,
     canGoPrev,
     isTerminal,
   } = useFlowRuntime();
@@ -184,11 +184,11 @@ const SurveyScreenLayout = ({
       {/* gap */}
       <div className="h-1" />
 
-      <div className="flex min-h-screen w-full flex-col" style={backgroundStyle}>
+      <div className="flex min-h-0 w-full flex-1 flex-col" style={backgroundStyle}>
         <div
           ref={scrollRef}
           style={{ touchAction: "pan-y", padding: isMobile ? "1px" : "2px" }}
-          className="scrollbar-hidden flex flex-grow items-center justify-center overflow-x-hidden overflow-y-auto border-2 pb-24 sm:p-1 sm:pb-20"
+          className="scrollbar-hidden flex flex-grow flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto border-2 pb-2 md:flex-row md:items-center md:justify-center md:p-1 md:pb-20"
         >
           <BehaviorEventProvider>
             <SlideMotion direction={"right"} keyProp={currentQuestionID}>
@@ -208,10 +208,9 @@ const SurveyScreenLayout = ({
               </BehaviorTrackerProvider>
             </SlideMotion>
           </BehaviorEventProvider>
+          <SurveyNavigatorCompact disableNext={!canProceed} navPulse={navPulse} shareID={shareID} />
         </div>
       </div>
-
-      <SurveyNavigatorCompact disableNext={!canProceed} navPulse={navPulse} shareID={shareID} />
     </div>
   );
 };

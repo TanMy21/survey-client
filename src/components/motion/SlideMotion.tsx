@@ -30,7 +30,7 @@ export const SlideMotion = ({ children, direction, keyProp }: SlideMotionProps) 
         animate="center"
         exit="exit"
         transition={{ duration: 0.3 }}
-        className="h-full w-full"
+        className="h-auto w-full md:h-full"
       >
         {children}
       </motion.div>

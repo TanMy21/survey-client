@@ -3,18 +3,21 @@ import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
 import { useResponseRegistry } from "@/context/ResponseRegistry";
 import { useAutoSubmitPulse } from "@/hooks/useAutoSubmit";
 import { useHydratedResponse } from "@/hooks/useHydratedResponse";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import { useSubmitOnEnter } from "@/hooks/useSubmitOnEnter";
 import type { SingleChoiceListProps } from "@/types/responseTypes";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { InputError } from "../alert/ResponseErrorAlert";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { useDeviceId } from "@/hooks/useDeviceID";
 import { useSubmitResponse } from "@/hooks/useSurvey";
 import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
   const { options } = question || {};
+  const isMobile = useIsMobile();
 
   const {
     value: selectedOptionID,
@@ -41,6 +44,7 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const submitInFlightRef = useRef(false);
 
@@ -162,7 +166,8 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
   // Dropdown close
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!dropdownRef.current?.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (!dropdownRef.current?.contains(target) && !menuRef.current?.contains(target)) {
         setIsDropdownOpen(false);
       }
     };
@@ -195,6 +200,37 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
   });
 
   useRegisterQuestionSubmit(isRequired || !!selectedOptionID, handleSubmit);
+
+  const optionButtons = visibleOptions.map((option) => {
+    const isSelected = option.optionID === selectedOptionID;
+
+    return (
+      <button
+        key={option.optionID}
+        type="button"
+        role="option"
+        aria-selected={isSelected}
+        onClick={() => handleSelect(option.optionID)}
+        onKeyDown={(event) => {
+          event.stopPropagation();
+
+          if (event.key === "Escape") {
+            event.preventDefault();
+            setIsDropdownOpen(false);
+            triggerRef.current?.focus();
+          }
+        }}
+        className={[
+          "w-full rounded-2xl px-3 py-3 text-left text-[15px] font-semibold transition",
+          isSelected
+            ? "bg-[#0074EB]/10 text-[#005BC4]"
+            : "text-slate-700 hover:bg-[#0074EB]/8 hover:text-[#005BC4]",
+        ].join(" ")}
+      >
+        {option.text}
+      </button>
+    );
+  });
 
   return (
     <div className="flex w-full origin-bottom flex-col sm:w-[60%]">
@@ -245,8 +281,9 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
               />
             </button>
 
-            {isDropdownOpen && (
+            {isDropdownOpen && !isMobile && (
               <div
+                ref={menuRef}
                 // Prevents scroll gestures inside the dropdown from reaching parent question navigation.
                 onWheelCapture={(event) => event.stopPropagation()}
                 onTouchMoveCapture={(event) => event.stopPropagation()}
@@ -266,36 +303,7 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
                     "[&::-webkit-scrollbar-thumb:hover]:bg-[#005BC4]",
                   ].join(" ")}
                 >
-                  {visibleOptions.map((option) => {
-                    const isSelected = option.optionID === selectedOptionID;
-
-                    return (
-                      <button
-                        key={option.optionID}
-                        type="button"
-                        role="option"
-                        aria-selected={isSelected}
-                        onClick={() => handleSelect(option.optionID)}
-                        onKeyDown={(event) => {
-                          event.stopPropagation();
-
-                          if (event.key === "Escape") {
-                            event.preventDefault();
-                            setIsDropdownOpen(false);
-                            triggerRef.current?.focus();
-                          }
-                        }}
-                        className={[
-                          "w-full rounded-2xl px-3 py-3 text-left text-[15px] font-semibold transition",
-                          isSelected
-                            ? "bg-[#0074EB]/10 text-[#005BC4]"
-                            : "text-slate-700 hover:bg-[#0074EB]/8 hover:text-[#005BC4]",
-                        ].join(" ")}
-                      >
-                        {option.text}
-                      </button>
-                    );
-                  })}
+                  {optionButtons}
                 </div>
               </div>
             )}
@@ -316,6 +324,47 @@ const DropDownResponse = ({ surveyID, question }: SingleChoiceListProps) => {
           </button>
         </div>
       </div>
+
+      {isDropdownOpen &&
+        isMobile &&
+        createPortal(
+          <div className="fixed inset-0 z-[80] flex items-end" role="presentation">
+            <div
+              className="absolute inset-0 bg-slate-950/30 backdrop-blur-[1px]"
+              onMouseDown={() => setIsDropdownOpen(false)}
+              aria-hidden="true"
+            />
+            <div
+              ref={menuRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Select an option"
+              className="relative flex max-h-[70dvh] w-full flex-col rounded-t-3xl bg-white px-3 pt-3 pb-[max(env(safe-area-inset-bottom),1rem)] shadow-[0_-18px_45px_rgba(15,23,42,0.18)]"
+            >
+              <div className="mb-2 flex items-center justify-between px-2">
+                <span className="text-base font-semibold text-slate-900">Select an option</span>
+                <button
+                  type="button"
+                  aria-label="Close options"
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    triggerRef.current?.focus();
+                  }}
+                  className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div
+                role="listbox"
+                className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 [scrollbar-color:#0074EB_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#0074EB] [&::-webkit-scrollbar-track]:bg-transparent"
+              >
+                {optionButtons}
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

@@ -48,18 +48,21 @@ const SurveyNavigatorCompact = ({
 
   return (
     <>
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] h-16">
-        <div className="flex h-full w-full items-center justify-center pb-[max(env(safe-area-inset-bottom),0.5rem)] sm:justify-end">
+      <div
+        data-ignore-scrollnav="true"
+        className="pointer-events-none relative z-[60] mt-6 w-full shrink-0 md:fixed md:inset-x-0 md:bottom-0 md:mt-0 md:h-16"
+      >
+        <div className="relative flex min-h-16 w-full items-center justify-center pb-[max(env(safe-area-inset-bottom),0.75rem)] md:h-full md:min-h-0 md:justify-end md:pb-[max(env(safe-area-inset-bottom),0.5rem)]">
           {shareID && (
             <button
               type="button"
               onClick={handleOpenReportModal}
-              className="pointer-events-auto absolute bottom-5 left-4 text-sm font-medium text-slate-500/70 transition hover:text-slate-700 sm:bottom-6 sm:left-6"
+              className="pointer-events-auto absolute top-1/2 left-4 -translate-y-1/2 text-sm font-medium text-slate-500/70 transition hover:text-slate-700 md:top-auto md:bottom-6 md:left-6 md:translate-y-0"
             >
               Report
             </button>
           )}
-          <div className="pointer-events-auto mr-0 mb-2 flex items-center gap-2 rounded-full bg-white/70 p-1 shadow-md backdrop-blur-sm sm:mr-[8%]">
+          <div className="pointer-events-auto flex items-center gap-2 rounded-full bg-white/70 p-1 shadow-md backdrop-blur-sm md:mr-[8%] md:mb-2">
             {canGoPrev && (
               <motion.button
                 className="h-11 w-11 rounded-full p-2 text-gray-700 transition hover:text-black"
