@@ -5,7 +5,7 @@ import QuestionTextandDescription from "../QuestionTextandDescription";
 import ScreenRoot from "../layout/ScreenRoot";
 import CenteredStack from "../layout/CenteredStack";
 import { ResponseContainer } from "../layout/ResponseContainer";
-import sucessVideo from "../loader/check_500.webm";
+import sucessVideo from "../loader/check.webm";
 
 const EndScreen = ({ surveyID, question }: QuestionProps) => {
   const { handleClick, markSubmission, collectBehaviorData } = useBehavior();
