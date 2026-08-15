@@ -2,7 +2,7 @@ import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import type { RangeResponseProps } from "@/types/responseTypes";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ProgressiveSlider from "./ProgressiveSlider";
 import ScaleCounter from "./ScaleCounter";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
@@ -50,21 +50,68 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
 
   const isRequired = useQuestionRequired(question, hasAnswer);
 
-  const handleSliderChange = (value: number) => {
-    handleFirstInteraction();
-    handleClick();
-    markTouched(question.questionID);
-    setSelectedValue((prev) => {
-      if (prev !== value) {
-        handleOptionChange();
-        clearHydration();
-      }
-      return value;
-    });
+  const handleSliderChange = useCallback(
+    (value: number) => {
+      handleFirstInteraction();
+      handleClick();
+      markTouched(question.questionID);
+      setSelectedValue((prev) => {
+        if (prev !== value) {
+          handleOptionChange();
+          clearHydration();
+        }
+        return value;
+      });
 
-    if (hydrated) clearHydration();
-    if (error) setError(null);
-  };
+      if (hydrated) clearHydration();
+      if (error) setError(null);
+    },
+    [
+      clearHydration,
+      error,
+      handleClick,
+      handleFirstInteraction,
+      handleOptionChange,
+      hydrated,
+      markTouched,
+      question.questionID,
+      setSelectedValue,
+    ]
+  );
+
+  useEffect(() => {
+    const handleNumberKey = (event: KeyboardEvent) => {
+      if (event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      if (!/^[1-9]$/.test(event.key)) return;
+      if (document.querySelector('[aria-modal="true"]')) return;
+
+      const target = event.target;
+      if (target instanceof HTMLElement) {
+        const tag = target.tagName.toLowerCase();
+        const isRangeInput = target instanceof HTMLInputElement && target.type === "range";
+
+        if (
+          (!isRangeInput && (tag === "input" || tag === "textarea" || tag === "select")) ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+      }
+
+      const value = Number(event.key);
+      const minimum = Number(minValue);
+      const maximum = Number(maxValue);
+
+      if (!Number.isFinite(minimum) || !Number.isFinite(maximum)) return;
+      if (value < minimum || value > maximum) return;
+
+      event.preventDefault();
+      handleSliderChange(value);
+    };
+
+    window.addEventListener("keydown", handleNumberKey);
+    return () => window.removeEventListener("keydown", handleNumberKey);
+  }, [handleSliderChange, maxValue, minValue]);
 
   const handleSubmit = async () => {
     if (isPending) return;
