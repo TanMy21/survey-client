@@ -20,6 +20,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const deviceID = useDeviceId();
   const { mutateAsync, isPending } = useSubmitResponse();
   const [error, setError] = useState<string | null>(null);
+  const [autoSubmitArmed, setAutoSubmitArmed] = useState(false);
 
   const {
     handleFirstInteraction,
@@ -52,9 +53,12 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
 
   const handleSliderChange = useCallback(
     (value: number) => {
+      if (isPending) return;
+
       handleFirstInteraction();
       handleClick();
       markTouched(question.questionID);
+      setAutoSubmitArmed(true);
       setSelectedValue((prev) => {
         if (prev !== value) {
           handleOptionChange();
@@ -73,47 +77,14 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
       handleFirstInteraction,
       handleOptionChange,
       hydrated,
+      isPending,
       markTouched,
       question.questionID,
       setSelectedValue,
     ]
   );
 
-  useEffect(() => {
-    const handleNumberKey = (event: KeyboardEvent) => {
-      if (event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-      if (!/^[1-9]$/.test(event.key)) return;
-      if (document.querySelector('[aria-modal="true"]')) return;
-
-      const target = event.target;
-      if (target instanceof HTMLElement) {
-        const tag = target.tagName.toLowerCase();
-        const isRangeInput = target instanceof HTMLInputElement && target.type === "range";
-
-        if (
-          (!isRangeInput && (tag === "input" || tag === "textarea" || tag === "select")) ||
-          target.isContentEditable
-        ) {
-          return;
-        }
-      }
-
-      const value = Number(event.key);
-      const minimum = Number(minValue);
-      const maximum = Number(maxValue);
-
-      if (!Number.isFinite(minimum) || !Number.isFinite(maximum)) return;
-      if (value < minimum || value > maximum) return;
-
-      event.preventDefault();
-      handleSliderChange(value);
-    };
-
-    window.addEventListener("keydown", handleNumberKey);
-    return () => window.removeEventListener("keydown", handleNumberKey);
-  }, [handleSliderChange, maxValue, minValue]);
-
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (isPending) return;
 
     if (isRequired && (selectedValue === null || Number.isNaN(selectedValue))) {
@@ -155,9 +126,86 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
     setRealTimeResponse(question.questionID, selectedValue!, null);
 
     onSubmitAnswer(selectedValue);
-  };
+  }, [
+    collectBehaviorData,
+    deviceID,
+    handleClick,
+    handleFirstInteraction,
+    hydrated,
+    isPending,
+    isRequired,
+    markAnswered,
+    markAnsweredEvent,
+    markSubmission,
+    mutateAsync,
+    onSubmitAnswer,
+    question,
+    selectedValue,
+    setRealTimeResponse,
+    surveyID,
+  ]);
 
-  useRegisterQuestionSubmit(true, handleSubmit);
+  const handleImmediateSubmit = useCallback(() => {
+    setAutoSubmitArmed(false);
+    return handleSubmit();
+  }, [handleSubmit]);
+
+  useEffect(() => {
+    if (!autoSubmitArmed || isPending) return;
+
+    const timer = window.setTimeout(() => {
+      setAutoSubmitArmed(false);
+      void handleSubmit();
+    }, 1000);
+
+    return () => window.clearTimeout(timer);
+  }, [autoSubmitArmed, handleSubmit, isPending, selectedValue]);
+
+  useEffect(() => {
+    const handleKeyboardResponse = (event: KeyboardEvent) => {
+      if (event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      if (document.querySelector('[aria-modal="true"]')) return;
+
+      const target = event.target;
+      if (target instanceof HTMLElement) {
+        const tag = target.tagName.toLowerCase();
+        const isRangeInput = target instanceof HTMLInputElement && target.type === "range";
+
+        if (
+          (!isRangeInput && (tag === "input" || tag === "textarea" || tag === "select")) ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+
+        // A focused button already handles Enter through its native click event.
+        if (event.key === "Enter" && tag === "button") return;
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+        void handleImmediateSubmit();
+        return;
+      }
+
+      if (!/^[1-9]$/.test(event.key)) return;
+
+      const value = Number(event.key);
+      const minimum = Number(minValue);
+      const maximum = Number(maxValue);
+
+      if (!Number.isFinite(minimum) || !Number.isFinite(maximum)) return;
+      if (value < minimum || value > maximum) return;
+
+      event.preventDefault();
+      handleSliderChange(value);
+    };
+
+    window.addEventListener("keydown", handleKeyboardResponse);
+    return () => window.removeEventListener("keydown", handleKeyboardResponse);
+  }, [handleImmediateSubmit, handleSliderChange, maxValue, minValue]);
+
+  useRegisterQuestionSubmit(true, handleImmediateSubmit);
 
   useEffect(() => {
     if (hydrated && selectedValue != null) {
@@ -178,7 +226,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
       )}
       <div className="mt-4 hidden w-[104%] justify-end pr-6 md:flex">
         <button
-          onClick={handleSubmit}
+          onClick={handleImmediateSubmit}
           disabled={isPending}
           className="w-[80px] rounded-[24px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f] disabled:cursor-not-allowed disabled:opacity-60"
         >

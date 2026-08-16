@@ -47,6 +47,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
     mapPersisted: (p) => p.value,
   });
 
+  const hasSelection = selectedValue != null && selectedValue !== "";
   const isRequired = useQuestionRequired(question, selectedValue !== null);
 
   const getPulseTargets = useCallback(() => {
@@ -115,14 +116,20 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
 
   const handleKeyDown = useSubmitOnEnter(handleSubmit);
 
-  useAutoSubmitPulse({
-    active: selectedValue !== null && !hydrated,
+  const { cancel: cancelAutoSubmit } = useAutoSubmitPulse({
+    active: hasSelection && !hydrated && !isPending,
     delayMs: autoSubmitDelay1Ms,
     feedbackMs: 180,
     onSubmit: handleSubmit,
     getPulseTargets,
     vibrate: true,
+    deps: [selectedValue],
   });
+
+  const handleImmediateSubmit = useCallback(() => {
+    cancelAutoSubmit();
+    return handleSubmit();
+  }, [cancelAutoSubmit, handleSubmit]);
 
   const selectYes = () => {
     handleFirstInteraction();
@@ -229,7 +236,7 @@ const BinaryResponseContainer = ({ question, surveyID }: BinaryResponseContainer
 
         <div className="mt-4 hidden w-full justify-end pr-6 md:flex">
           <button
-            onClick={handleSubmit}
+            onClick={handleImmediateSubmit}
             disabled={isPending}
             className="w-[80px] rounded-[20px] bg-[#005BC4] px-4 py-2 font-bold text-white transition hover:bg-[#004a9f] disabled:cursor-not-allowed disabled:opacity-60"
           >

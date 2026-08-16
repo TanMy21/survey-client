@@ -19,11 +19,11 @@ const SurveyNavigatorCompact = ({
   shareID,
 }: SurveyNavigatorCompactProps) => {
   const { canGoPrev, onPrev, goNext, isTerminal, currentQuestion } = useFlowRuntime();
-  const { requestSubmit, hasSubmitHandler } = useQuestionSubmit();
+  const { requestSubmit, hasSubmitHandler, isSubmitPending } = useQuestionSubmit();
   // const isEnd = currentQuestion.type === "END_SCREEN";
   const hideNext = isTerminal;
   const isWelcome = currentQuestion.type === "WELCOME_SCREEN";
-  const mobileNextLabel = isWelcome ? "Start" : hasSubmitHandler ? "OK" : "Next";
+  const mobileNextLabel = isWelcome ? "Start" : "OK";
   const [reportModalOpen, setReportModalOpen] = useState(false);
 
   const handleNext = () => {
@@ -84,11 +84,9 @@ const SurveyNavigatorCompact = ({
               !hideNext && (
                 <motion.button
                   className="h-11 min-w-11 rounded-full bg-[#005BC4] px-5 py-2 text-sm font-bold text-white transition hover:bg-[#004a9f] disabled:opacity-40 md:w-11 md:bg-transparent md:px-2 md:text-gray-700 md:hover:bg-transparent md:hover:text-black"
-                  disabled={disableNext && !hasSubmitHandler}
+                  disabled={isSubmitPending || (disableNext && !hasSubmitHandler)}
                   onClick={handleNext}
-                  aria-label={
-                    isWelcome ? "Start survey" : hasSubmitHandler ? "Submit response" : "Next"
-                  }
+                  aria-label={isWelcome ? "Start" : hasSubmitHandler ? "Submit" : "Next"}
                   variants={pulseVariant}
                   animate={navPulse === "next" ? "pulse" : "rest"}
                   transition={{ type: "spring", stiffness: 400, damping: 18 }}

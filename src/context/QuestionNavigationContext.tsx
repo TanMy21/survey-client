@@ -4,8 +4,10 @@ type SubmitFn = (() => void) | null;
 
 type Ctx = {
   setSubmitHandler: (fn: SubmitFn) => void;
+  setSubmitPending: (pending: boolean) => void;
   requestSubmit: () => void;
   hasSubmitHandler: boolean;
+  isSubmitPending: boolean;
 };
 
 const QuestionNavigationContext = createContext<Ctx | undefined>(undefined);
@@ -18,8 +20,12 @@ export function useQuestionSubmit(): Ctx {
   return ctx;
 }
 
- export function useRegisterQuestionSubmit(enabled: boolean, handler: () => void | Promise<void>) {
-  const { setSubmitHandler } = useQuestionSubmit();
+export function useRegisterQuestionSubmit(
+  enabled: boolean,
+  handler: () => void | Promise<void>,
+  isPending = false
+) {
+  const { setSubmitHandler, setSubmitPending } = useQuestionSubmit();
   const handlerRef = useRef(handler);
 
   useEffect(() => {
@@ -30,12 +36,21 @@ export function useQuestionSubmit(): Ctx {
     if (!enabled) return setSubmitHandler(null);
     return setSubmitHandler(() => handlerRef.current());
   }, [enabled, setSubmitHandler]);
+
+  useEffect(() => {
+    setSubmitPending(enabled && isPending);
+
+    return () => {
+      setSubmitPending(false);
+    };
+  }, [enabled, isPending, setSubmitPending]);
 }
 
 export const QuestionSubmitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const submitRef = useRef<SubmitFn>(null);
   const tokenRef = useRef<symbol | null>(null);
   const [hasSubmitHandler, setHasSubmitHandler] = useState(false);
+  const [isSubmitPending, setSubmitPending] = useState(false);
 
   const setSubmitHandler = useCallback((fn: SubmitFn) => {
     const token = Symbol("question-submit");
@@ -56,7 +71,15 @@ export const QuestionSubmitProvider: React.FC<{ children: React.ReactNode }> = (
   }, []);
 
   return (
-    <QuestionNavigationContext.Provider value={{ setSubmitHandler, requestSubmit, hasSubmitHandler }}>
+    <QuestionNavigationContext.Provider
+      value={{
+        setSubmitHandler,
+        setSubmitPending,
+        requestSubmit,
+        hasSubmitHandler,
+        isSubmitPending,
+      }}
+    >
       {children}
     </QuestionNavigationContext.Provider>
   );
