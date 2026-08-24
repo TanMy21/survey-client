@@ -225,14 +225,6 @@ export function use3DModelTracker(questionID: string) {
         orbit.current.passiveChangeCount++;
       }
 
-      if (isUserControllingRef.current) {
-        // Counts only user-driven camera changes.
-        orbit.current.manualChangeCount++;
-      } else {
-        // Counts auto-rotate/programmatic changes separately.
-        orbit.current.passiveChangeCount++;
-      }
-
       const currentDistance = state.distance;
       const previousDistance = previousCameraDistanceRef.current;
 
