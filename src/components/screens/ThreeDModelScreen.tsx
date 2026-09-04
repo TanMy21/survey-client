@@ -4,10 +4,17 @@ import ThreeDMobileViewer from "../QuestionResponse/ThreeDMobileViewer";
 import ThreeDViewer from "../QuestionResponse/ThreeDViewer";
 import QuestionTextandDescription from "../QuestionTextandDescription";
 import { setupThreeMeshBVH } from "@/lib/threeMeshBvh";
+import { useSession } from "@/context/useSessionContext";
+import { useDeviceId } from "@/hooks/useDeviceID";
+import { Model3DTelemetryProvider } from "@/context/Model3DTelemetryContext";
 
 setupThreeMeshBVH();
 
-const ThreeDModelScreen = ({ surveyID, question, setCurrentQuestionIndex }: QuestionProps) => {
+const ThreeDModelScreenContent = ({
+  surveyID,
+  question,
+  setCurrentQuestionIndex,
+}: QuestionProps) => {
   const isMobile = useIsMobile();
 
   const url = question?.Model3D?.fileUrl;
@@ -42,4 +49,30 @@ const ThreeDModelScreen = ({ surveyID, question, setCurrentQuestionIndex }: Ques
   );
 };
 
-export default ThreeDModelScreen;
+export default function ThreeDModelScreen(props: QuestionProps) {
+  const { session } = useSession();
+  const deviceID = useDeviceId();
+
+  const questionID = props.question?.questionID;
+  const model3DID = props.question?.Model3D?.model3DID;
+  const sessionID = session?.sessionID;
+
+  const identity =
+    sessionID && questionID && model3DID && deviceID
+      ? {
+          sessionID,
+          questionID,
+          model3DID,
+          deviceID,
+        }
+      : null;
+
+  return (
+    <Model3DTelemetryProvider
+      key={[sessionID, questionID, model3DID, deviceID].join(":")}
+      identity={identity}
+    >
+      <ThreeDModelScreenContent {...props} />
+    </Model3DTelemetryProvider>
+  );
+}

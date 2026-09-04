@@ -91,7 +91,6 @@ const ConsentScreen = ({ surveyID }: QuestionProps) => {
         role="region"
       >
         <p className="flex items-center gap-1.5 text-[10px] leading-4 tracking-[0.16em] text-[#626982] uppercase">
-          <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-[#6952ff]" aria-hidden="true" />
           Consent
         </p>
 
@@ -142,7 +141,7 @@ const ConsentScreen = ({ surveyID }: QuestionProps) => {
             aria-hidden="true"
           />
           <p className="text-[12px] leading-5 text-[#626982]">
-            Data may be linked to an email you provide.
+            Data may be linked to an email you provide.{" "}
             <a
               href="#"
               className="rounded text-[#6246ea] underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-[#6952ff] focus-visible:outline-none"

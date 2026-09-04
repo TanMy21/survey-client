@@ -1,11 +1,10 @@
 import { useBehavior } from "@/context/BehaviorTrackerContext";
 import type { ThreeDViewProps } from "@/types/responseTypes";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Interactive3DModelViewer } from "../screen-components/Interactive3DModelViewer";
 import ThreeDResponseContainer from "./ThreeDResponseContainer";
 
 const ThreeDViewer = ({ surveyID, url, question, setCurrentQuestionIndex }: ThreeDViewProps) => {
-  const [viewerUrl, setViewerUrl] = useState<string | null>(url ?? null);
   const { handleInputMethodSwitch } = useBehavior();
 
   const collectThreeDBehaviorRef = useRef<(() => unknown) | undefined>(undefined);
@@ -13,10 +12,6 @@ const ThreeDViewer = ({ surveyID, url, question, setCurrentQuestionIndex }: Thre
   const setCollectThreeDBehavior = useCallback((collector: (() => unknown) | undefined) => {
     collectThreeDBehaviorRef.current = collector;
   }, []);
-
-  useEffect(() => {
-    setViewerUrl(url ?? null);
-  }, [url]);
 
   useEffect(() => {
     const onPointerDown = (e: PointerEvent) => {
@@ -31,15 +26,13 @@ const ThreeDViewer = ({ surveyID, url, question, setCurrentQuestionIndex }: Thre
       {/* 3D Model Section */}
       <div className="flex max-h-[800px] w-[75%]">
         <div className="m-auto flex h-[100%] w-[80%]" data-ignore-scrollnav>
-          {viewerUrl && (
-            <Interactive3DModelViewer
-              questionID={question.questionID}
-              onCollectReady={setCollectThreeDBehavior}
-              src={viewerUrl}
-              autoRotate
-              autoRotateSpeed={0.4}
-            />
-          )}
+          <Interactive3DModelViewer
+            questionID={question.questionID}
+            onCollectReady={setCollectThreeDBehavior}
+            src={url ?? ""}
+            autoRotate
+            autoRotateSpeed={0.4}
+          />
         </div>
       </div>
 

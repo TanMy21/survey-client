@@ -1,3 +1,4 @@
+import { useModel3DTelemetry } from "@/context/Model3DTelemetryContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import type { CachedModelProps } from "@/types/questionTypes";
 import { Bounds, Html, useBounds, useGLTF } from "@react-three/drei";
@@ -44,8 +45,13 @@ export function CachedModel({
   onFit,
 }: CachedModelProps) {
   const isMobile = useIsMobile();
+  const { visit, attemptNumber } = useModel3DTelemetry();
   // Pull from drei's GLTF cache (no re-decode after first load)
   const gltf = useGLTF(url, true) as unknown as { scene: THREE.Object3D };
+
+  useEffect(() => {
+    visit.modelLoaded(attemptNumber);
+  }, [visit, attemptNumber, gltf.scene]);
 
   // Clone the cached scene so each usage has its own instance
   const root = useMemo(() => SkeletonUtils.clone(gltf.scene), [gltf.scene]);

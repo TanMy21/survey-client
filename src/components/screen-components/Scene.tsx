@@ -7,6 +7,8 @@ import { Suspense, useEffect, useRef } from "react";
 import type { Object3D } from "three";
 import * as THREE from "three";
 import { CachedModel } from "./CachedModel";
+import { useModel3DTelemetry } from "@/context/Model3DTelemetryContext";
+import { classify3DError, Model3DErrorBoundary } from "./Model3DErrorBoundary";
 
 function tuneCameraForBounds(cam: THREE.PerspectiveCamera, box: THREE.Box3) {
   const size = box.getSize(new THREE.Vector3());
@@ -148,6 +150,16 @@ function disposeBVHForModel(root: THREE.Object3D) {
   });
 }
 
+function EnvironmentReady() {
+  const { visit, attemptNumber } = useModel3DTelemetry();
+
+  useEffect(() => {
+    visit.environmentReady(attemptNumber);
+  }, [visit, attemptNumber]);
+
+  return null;
+}
+
 const Scene = ({
   isMobile,
   validSrc,
@@ -156,7 +168,7 @@ const Scene = ({
   background,
   exposure,
   ambientIntensity,
-  hemiIntensity, 
+  hemiIntensity,
   autoRotate,
   autoRotateSpeed,
   minDistance,
@@ -174,8 +186,10 @@ const Scene = ({
   analyticsRef,
   setModelRoot,
   modelRoot,
+  onTechnicalError,
 }: SceneProps) => {
   const invalidate = useThree((s) => s.invalidate);
+  const { visit, attemptNumber } = useModel3DTelemetry();
 
   // Clean up BVH data when model changes or component unmounts, to free memory.
   useEffect(() => {
@@ -216,47 +230,64 @@ const Scene = ({
       <ambientLight intensity={ambientIntensity} />
       <hemisphereLight intensity={hemiIntensity} groundColor="white" />
 
-      <Suspense fallback={null}>
-        {hdrEnvUrl ? (
-          <Environment files={hdrEnvUrl} background={false} resolution={isMobile ? 256 : 512} />
-        ) : (
-          <Environment preset="city" background={false} resolution={256} />
-        )}
+      <Model3DErrorBoundary
+        onError={(error) => {
+          visit.error(attemptNumber, classify3DError(error, "ENVIRONMENT"));
 
-        <CachedModel
-          url={validSrc}
-          onReady={(obj: Object3D) => {
-            buildBVHForModel(obj);
-            setModelRoot(obj);
-            invalidate();
-          }}
-          onPointerOver={(e: any) => onMeshOver?.(e.object.name || e.object.uuid, e)}
-          onPointerOut={(e: any) => onMeshOut?.(e.object.name || e.object.uuid, e)}
-          onClick={(e: any) => {
-            e.stopPropagation();
+          onTechnicalError("Some 3D lighting could not load. You can retry.");
+        }}
+      >
+        <Suspense fallback={null}>
+          {hdrEnvUrl ? (
+            <Environment files={hdrEnvUrl} background={false} resolution={isMobile ? 256 : 512} />
+          ) : (
+            <Environment preset="city" background={false} resolution={256} />
+          )}
 
-            // Stores exact clicked point/mesh/material/faceIndex for future heatmaps.
-            analyticsRef.current?.recordSurfaceClick?.(e);
+          <EnvironmentReady />
+        </Suspense>
+      </Model3DErrorBoundary>
 
-            //  simple mesh click count.
-            analyticsRef.current?.onMeshClick?.(e.object.name || e.object.uuid, e);
+      <Model3DErrorBoundary
+        onError={(error) => {
+          visit.error(attemptNumber, classify3DError(error, "MODEL"));
 
-            //  external click callback behavior.
-            onMeshClick?.(e.object.name || e.object.uuid, e);
-          }}
-          onFit={() => {
-            analyticsRef.current?.onFit();
-            onFit?.();
-          }}
-        />
+          onTechnicalError("The 3D model could not load. Please retry.");
+        }}
+      >
+        <Suspense fallback={null}>
+          <CachedModel
+            url={validSrc}
+            onReady={(obj: Object3D) => {
+              buildBVHForModel(obj);
+              setModelRoot(obj);
+              invalidate();
+            }}
+            onPointerOver={(e: any) => onMeshOver?.(e.object.name || e.object.uuid, e)}
+            onPointerOut={(e: any) => onMeshOut?.(e.object.name || e.object.uuid, e)}
+            onClick={(e: any) => {
+              e.stopPropagation();
 
-        <InitialViewApplier
-          object={modelRoot}
-          initialView={initialView}
-          frontIsNegZ={frontIsNegZ}
-          controlsRef={controlsRef}
-        />
-      </Suspense>
+              analyticsRef.current?.recordSurfaceClick?.(e);
+
+              analyticsRef.current?.onMeshClick?.(e.object.name || e.object.uuid, e);
+
+              onMeshClick?.(e.object.name || e.object.uuid, e);
+            }}
+            onFit={() => {
+              analyticsRef.current?.onFit();
+              onFit?.();
+            }}
+          />
+
+          <InitialViewApplier
+            object={modelRoot}
+            initialView={initialView}
+            frontIsNegZ={frontIsNegZ}
+            controlsRef={controlsRef}
+          />
+        </Suspense>
+      </Model3DErrorBoundary>
 
       <OrbitControls
         ref={(c) => {

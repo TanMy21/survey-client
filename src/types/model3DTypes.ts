@@ -25,6 +25,7 @@ export interface SceneProps {
   onMeshOver?: (name: string, e: any) => void;
   onMeshOut?: (name: string, e: any) => void;
   onMeshClick?: (name: string, e: any) => void;
+  onTechnicalError: (message: string) => void;
   onFit?: () => void;
   controlsRef: MutableRefObject<any>;
   analyticsRef: MutableRefObject<AnalyticsBridgeApi | null>;
