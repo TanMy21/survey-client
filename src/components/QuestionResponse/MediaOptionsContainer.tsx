@@ -16,6 +16,10 @@ import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProps) => {
   const isMobile = useIsMobile();
+  const sortedOptions = useMemo(
+    () => [...options].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+    [options]
+  );
 
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
@@ -208,7 +212,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
           isMobile ? "grid-cols-1" : "sm:grid-cols-2 md:grid-cols-3"
         } smm:w-full mx-auto gap-4 sm:gap-3 md:w-[100%] md:gap-6 xl:w-4/5`}
       >
-        {options.map((option) => {
+        {sortedOptions.map((option) => {
           const isSelected = selectedSet.has(option.optionID);
           return (
             <div key={option.optionID} ref={assignOptionRef(option.optionID)}>

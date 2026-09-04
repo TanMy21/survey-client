@@ -1,5 +1,6 @@
 import { useBehavior } from "@/context/BehaviorTrackerContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useIsMobileDevice } from "@/hooks/useIsMobileDevice";
 import { useQuestionRequired } from "@/hooks/useQuestionRequired";
 import type { RangeResponseProps } from "@/types/responseTypes";
 import { useCallback, useEffect, useState } from "react";
@@ -14,6 +15,7 @@ import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   const isMobile = useIsMobile();
+  const isMobileDevice = useIsMobileDevice();
   const { minValue, maxValue } = question.questionPreferences?.uiConfig || {};
   const { markTouched, markAnswered, setRealTimeResponse } = useResponseRegistry();
   const { onSubmitAnswer } = useFlowRuntime();
@@ -58,7 +60,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
       handleFirstInteraction();
       handleClick();
       markTouched(question.questionID);
-      setAutoSubmitArmed(true);
+      setAutoSubmitArmed(!isMobileDevice);
       setSelectedValue((prev) => {
         if (prev !== value) {
           handleOptionChange();
@@ -77,6 +79,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
       handleFirstInteraction,
       handleOptionChange,
       hydrated,
+      isMobileDevice,
       isPending,
       markTouched,
       question.questionID,
@@ -151,7 +154,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
   }, [handleSubmit]);
 
   useEffect(() => {
-    if (!autoSubmitArmed || isPending) return;
+    if (isMobileDevice || !autoSubmitArmed || isPending) return;
 
     const timer = window.setTimeout(() => {
       setAutoSubmitArmed(false);
@@ -159,7 +162,7 @@ const RangeResponse = ({ surveyID, question }: RangeResponseProps) => {
     }, 1000);
 
     return () => window.clearTimeout(timer);
-  }, [autoSubmitArmed, handleSubmit, isPending, selectedValue]);
+  }, [autoSubmitArmed, handleSubmit, isMobileDevice, isPending, selectedValue]);
 
   useEffect(() => {
     const handleKeyboardResponse = (event: KeyboardEvent) => {

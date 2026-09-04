@@ -1,4 +1,5 @@
 import { useBehavior } from "@/context/BehaviorTrackerContext";
+import { useIsMobileDevice } from "@/hooks/useIsMobileDevice";
 import type { OptionType } from "@/types/optionTypes";
 import type { RankListProps } from "@/types/responseTypes";
 import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-pangea/dnd";
@@ -12,6 +13,7 @@ import { useResponseRegistry } from "@/context/ResponseRegistry";
 import { useRegisterQuestionSubmit } from "@/context/QuestionNavigationContext";
 
 const RankList = ({ surveyID, options, question }: RankListProps) => {
+  const isMobileDevice = useIsMobileDevice();
   const {
     value: localOptions,
     clearHydration,
@@ -143,7 +145,10 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
   }, [hydrated, localOptions, question?.questionID, markAnswered]);
 
   return (
-    <div className="flex w-full origin-bottom flex-col sm:w-3/5">
+    <div
+      data-ignore-scrollnav={isMobileDevice ? "true" : undefined}
+      className="flex w-full origin-bottom flex-col sm:w-3/5"
+    >
       <div className="mx-auto flex w-full flex-col items-center justify-center gap-2 px-0 md:w-4/5 md:px-2">
         <div className="mx-auto flex w-full flex-col items-center p-1 md:w-full">
           <DragDropContext onDragEnd={handleDragEnd}>
