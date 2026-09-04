@@ -57,10 +57,10 @@ export function useScrollNav({
     };
 
     const isInputLike = (target: EventTarget | null) => {
-      if (!(target instanceof HTMLElement)) return false;
+      if (!(target instanceof Element)) return false;
       const tag = target.tagName.toLowerCase();
       if (tag === "input" || tag === "textarea" || tag === "select") return true;
-      if (target.isContentEditable) return true;
+      if (target instanceof HTMLElement && target.isContentEditable) return true;
       return !!target.closest('[data-ignore-scrollnav="true"],[data-ignore-scrollnav]');
     };
 
