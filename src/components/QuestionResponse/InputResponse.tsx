@@ -152,7 +152,7 @@ const InputResponse = ({
   };
 
   return (
-    <div className="flex w-[92%] origin-bottom flex-col">
+    <div className="flex w-[92%] origin-bottom flex-col md:ml-[1%] md:w-[98%] md:max-w-[560px] md:self-start">
       <div className="flex h-[60%] w-full flex-col">
         {/* Input field */}
         <input
@@ -169,10 +169,10 @@ const InputResponse = ({
         />
 
         {/* Error message */}
-        {error && <InputError error={error} />}
+        {error && <InputError error={error} className="md:!mx-0 md:!w-full md:!px-0" />}
 
         {/* Submit Button container */}
-        <div className="mx-auto mt-4 hidden h-[25%] w-[96%] flex-col items-end pr-[4%] md:flex md:w-[60%]">
+        <div className="mx-auto mt-4 hidden h-[25%] w-[96%] flex-col items-end pr-[4%] md:mx-0 md:flex md:w-full md:pr-0">
           <button
             onClick={handleSubmit}
             disabled={isPending}

@@ -12,7 +12,7 @@ const EmailContactScreen = ({ surveyID, question }: QuestionProps) => {
         <CenteredStack className="!mb-0" marginTopOverride="0">
           <QuestionTextandDescription surveyID={surveyID} question={question} />
         </CenteredStack>
-        <ResponseContainer className="!mt-0 !mb-0">
+        <ResponseContainer className="!mt-0 !mb-0 md:!px-0">
           <InputResponse
             inputPlaceholder={"Enter your email..."}
             submitButtonText={"OK"}

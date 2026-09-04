@@ -75,10 +75,6 @@ const RankList = ({ surveyID, options, question }: RankListProps) => {
 
     setLocalOptions(reorderedWithOrder);
 
-    // await updateOptionOrder({ options: reorderedWithOrder })
-    //   .unwrap()
-    //   .then()
-    //   .catch((err) => console.error("Order update error:", err));
     if (error) setError(null);
   };
 
