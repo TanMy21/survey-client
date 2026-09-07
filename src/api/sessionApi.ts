@@ -1,4 +1,4 @@
-import type { PauseSessionArgs, Session, SessionArgs } from "@/types/sessionTypes";
+import type { ActiveSessionArgs, PauseSessionArgs, Session, SessionArgs } from "@/types/sessionTypes";
 
 const inFlightSessionCreations = new Map<string, Promise<Session>>();
 
@@ -83,15 +83,13 @@ export async function pauseSession({ surveyID, deviceID, currentQuestionID }: Pa
 export async function markActiveApi({
   surveyID,
   deviceID,
-}: {
-  surveyID: string;
-  deviceID: string;
-}) {
+  currentQuestionID,
+}: ActiveSessionArgs) {
   const response = await fetch(`${import.meta.env.VITE_BASE_URL}/ses/active`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ surveyID, deviceID }),
+    body: JSON.stringify({ surveyID, deviceID, currentQuestionID }),
   });
 
   if (!response.ok) {

@@ -39,3 +39,9 @@ export interface PauseSessionArgs {
   deviceID: string;
   currentQuestionID: string;
 }
+
+export interface ActiveSessionArgs {
+  surveyID: string;
+  deviceID: string;
+  currentQuestionID?: string;
+}

@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { useMarkActive, usePauseSession } from "./useSession";
 import { LS_DID_KEY } from "@/utils/deviceID";
 import { useFlowRuntime } from "@/context/FlowRuntimeProvider";
-import { END_SCREEN_TYPE, NON_FLOW_TYPES } from "@/types/flowTypes";
+import { END_SCREEN_TYPE, isQuestionScreen, NON_FLOW_TYPES } from "@/types/flowTypes";
 
 export function useSessionActivitySync(surveyID: string) {
   const { session } = useSession();
@@ -31,8 +31,26 @@ export function useSessionActivitySync(surveyID: string) {
   const pauseCheckTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    currentQuestionIDRef.current = currentQuestion?.questionID ?? null;
-  }, [currentQuestion?.questionID]);
+    const questionID = currentQuestion?.questionID ?? null;
+    currentQuestionIDRef.current = questionID;
+
+    if (
+      !session ||
+      session.sessionState === "COMPLETED" ||
+      !deviceID ||
+      !questionID ||
+      !currentQuestion ||
+      !isQuestionScreen(currentQuestion.type)
+    ) {
+      return;
+    }
+
+    void markActive({
+      surveyID,
+      deviceID,
+      currentQuestionID: questionID,
+    });
+  }, [currentQuestion?.questionID, currentQuestion?.type, session, surveyID, deviceID, markActive]);
 
   /**
    * Track when we are on a QUESTION vs NON-QUESTION screen.
@@ -162,14 +180,27 @@ export function useSessionActivitySync(surveyID: string) {
 
     // On tab close
     const handleUnload = () => {
-      try {
-        navigator.sendBeacon(
-          `${import.meta.env.VITE_BASE_URL}/ses/pause`,
-          JSON.stringify({ surveyID, deviceID })
-        );
-      } catch {
-        // ignore sendBeacon errors
+      const currentQuestionID = currentQuestionIDRef.current;
+
+      if (deviceID && currentQuestionID) {
+        try {
+          const body = new Blob(
+            [
+              JSON.stringify({
+                surveyID,
+                deviceID,
+                currentQuestionID,
+              }),
+            ],
+            { type: "application/json" }
+          );
+
+          navigator.sendBeacon(`${import.meta.env.VITE_BASE_URL}/ses/pause`, body);
+        } catch {
+          // Question-view tracking already preserves the latest position.
+        }
       }
+
       broadcast("HIDDEN");
     };
 
