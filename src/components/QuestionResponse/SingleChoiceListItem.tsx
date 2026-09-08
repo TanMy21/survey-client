@@ -11,6 +11,7 @@ const SingleChoiceListItem = ({ response, selected, onSelect }: SingleChoiceList
           type="radio"
           checked={selected}
           onChange={onSelect}
+          onClick={(event) => event.stopPropagation()}
           className="h-5 w-5 appearance-none rounded-full border-2 border-[#CFD3D9] bg-transparent checked:border-[6px] checked:border-[#005BC4] hover:bg-transparent focus:outline-none"
         />
       </div>
