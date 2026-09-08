@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 
-import { useIsMobile } from "@/hooks/useIsMobile";
 import type { QuestionProps, QuestionTypeKey } from "@/types/questionTypes";
 import { questionComponents } from "@/utils/questionConfig";
 
@@ -10,13 +9,9 @@ const QuestionRenderer = ({
   currentIndex,
   completionTimeEstimate,
 }: QuestionProps) => {
-  const isMobile = useIsMobile();
   const Component = questionComponents[question?.type as QuestionTypeKey];
   return (
-    <div
-      className="mx-auto w-[92%] p-1 sm:w-[98%] sm:p-1 md:min-h-screen md:p-4"
-      style={{ width: isMobile ? "98%" : "92%" }}
-    >
+    <div className="flex min-h-0 w-full flex-1 flex-col">
       <Suspense
         fallback={
           <div

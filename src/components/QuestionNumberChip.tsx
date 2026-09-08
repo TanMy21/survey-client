@@ -2,12 +2,12 @@ import type { QuestionNumberProps } from "@/types/questionTypes";
 
 const QuestionNumberChip = ({ currentDisplayIndex }: QuestionNumberProps) => {
   return (
-    <div className="md:self-start">
+    <div className="self-center">
       <span
-        className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-xl font-medium text-blue-700"
+        className="inline-flex h-7 w-7 min-w-7 items-center justify-center rounded-full bg-[#0074EB] text-sm font-bold text-white"
         aria-label={`Question ${currentDisplayIndex}`}
       >
-        Q{currentDisplayIndex}
+        {currentDisplayIndex}
       </span>
     </div>
   );

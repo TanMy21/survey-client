@@ -199,7 +199,7 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
   }, [handleSubmit]);
 
   return (
-    <div className="grid w-full gap-2 px-1 [@media(min-width:1200px)]:w-[120%]">
+    <div className="grid w-full gap-2 px-1">
       {/* Error message */}
       <div className="mx-auto mt-2 flex h-[12%] w-[52%] flex-col items-center justify-start xl:top-[50%]">
         {error && <InputError error={error} />}

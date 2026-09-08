@@ -43,9 +43,9 @@ const WelcomeScreen = ({ surveyID, question, completionTimeEstimate }: QuestionP
   useRegisterQuestionSubmit(true, handleNext);
 
   return (
-    <ScreenRoot className="min-h-[calc(100dvh-5.5rem)] md:min-h-screen">
+    <ScreenRoot>
       <div className="flex w-full flex-col items-center justify-center gap-4">
-        <CenteredStack className="!mb-0 justify-center" marginTopOverride="0">
+        <CenteredStack className="!mb-0 justify-center">
           <WelcomeScreenTextandDescription surveyID={surveyID} question={question} />
         </CenteredStack>
         <ResponseContainer className="!mt-0 !mb-0">

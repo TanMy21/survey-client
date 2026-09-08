@@ -31,68 +31,63 @@ const QuestionTextandDescription = ({ question }: QuestionTextandDescriptionProp
   const isEmailContact = type === "EMAIL_CONTACT";
 
   return (
-    <div className="flex w-full origin-bottom flex-col">
+    <div className="flex w-full min-w-0 flex-col">
       <div
-        className={`mx-auto flex w-[92%] flex-col justify-center md:w-[98%] ${
-          isNonOrderableType ? "items-center" : "items-center"
+        className={`flex w-full min-w-0 ${
+          isMobile ? "flex-col items-start gap-[14px]" : "flex-row items-start gap-3"
         }`}
       >
-        <div className="mx-auto flex w-full shrink-0 flex-col items-center justify-center gap-2 md:flex-row">
-          {!isNonOrderableType &&
-            currentDisplayIndex !== null &&
-            (isMobile ? (
-              <QuestionNumberChip currentDisplayIndex={currentDisplayIndex} />
-            ) : (
-              <QuestionNumberCircle
-                circleSize={circleSize}
-                orderFontSize={orderFontSize}
-                currentDisplayIndex={currentDisplayIndex}
-              />
-            ))}
+        {!isNonOrderableType &&
+          currentDisplayIndex !== null &&
+          (isMobile ? (
+            <QuestionNumberChip currentDisplayIndex={currentDisplayIndex} />
+          ) : (
+            <QuestionNumberCircle
+              circleSize={circleSize}
+              orderFontSize={orderFontSize}
+              currentDisplayIndex={currentDisplayIndex}
+            />
+          ))}
 
-          <div
-            className={`flex w-full flex-row items-center ${
-              isNonOrderableType && !isEmailContact ? "justify-center" : "justify-start"
-            }`}
+        <div className="min-w-0 flex-1">
+          <p
+            className={`w-full max-w-[80ch] leading-[1.4] font-normal break-words ${isNonOrderableType ? "whitespace-normal" : "text-start whitespace-normal"}`}
+            style={{
+              fontSize: `${actualTitleFontSize}px`,
+              color: titleFontColor || "black",
+              fontFamily:
+                "BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
+              letterSpacing: "0.01em",
+              wordSpacing: "0.05em",
+              hyphens: "auto",
+            }}
           >
-            <p
-              className={`w-full max-w-[80ch] leading-[1.4] font-normal break-words ${isNonOrderableType ? "whitespace-normal" : "text-start whitespace-normal"}`}
-              style={{
-                fontSize: `${actualTitleFontSize}px`,
-                color: titleFontColor || "black",
-                fontFamily:
-                  "BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
-                letterSpacing: "0.01em",
-                wordSpacing: "0.05em",
-                hyphens: "auto",
-              }}
+            {htmlToPlainText(text)}
+          </p>
+
+          {description && description !== "Description (optional)" && (
+            <div
+              className={`my-[8%] flex w-full flex-row items-center md:my-[1%] ${
+                isEmailContact ? "justify-start" : "justify-center"
+              }`}
             >
-              {htmlToPlainText(text)}
-            </p>
-          </div>
-        </div>
-
-        {description && description !== "Description (optional)" && (
-          <div
-            className={`my-[8%] flex w-full flex-row items-center md:my-[1%] ${
-              isEmailContact ? "justify-start" : "justify-center"
-            }`}
-          >
-            <div>
-              <p
-                className="w-fit whitespace-normal italic"
-                style={{
-                  fontSize: `${actualDescriptionFontSize}px`,
-                  color: descriptionFontColor || "black",
-                  fontFamily:
-                    "BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
-                }}
-              >
-                {htmlToPlainText(description)}
-              </p>
+              <div>
+                <p
+                  className="w-fit whitespace-normal italic"
+                  style={{
+                    fontSize: `${actualDescriptionFontSize}px`,
+                    color: descriptionFontColor || "black",
+                    textAlign: isEmailContact ? "left" : "center",
+                    fontFamily:
+                      "BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
+                  }}
+                >
+                  {htmlToPlainText(description)}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

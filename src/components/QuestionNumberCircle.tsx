@@ -15,9 +15,12 @@ const QuestionNumberCircle = ({
           backgroundColor: "#0074EB",
         }}
       >
-        <p className="font-bold text-white" style={{ fontSize: orderFontSize || 20 }}>
+        <div
+          className="mt-1 flex h-7 w-7 min-w-7 shrink-0 items-center justify-center rounded-full bg-[#0074EB] text-sm font-bold text-white"
+          style={{ fontSize: orderFontSize || 20 }}
+        >
           {currentDisplayIndex}
-        </p>
+        </div>
       </div>
     </div>
   );

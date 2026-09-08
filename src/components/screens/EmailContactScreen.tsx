@@ -7,9 +7,9 @@ import { ResponseContainer } from "../layout/ResponseContainer";
 
 const EmailContactScreen = ({ surveyID, question }: QuestionProps) => {
   return (
-    <ScreenRoot className="min-h-[calc(100dvh-5.5rem)] md:min-h-screen">
+    <ScreenRoot>
       <div className="flex w-full flex-col items-center justify-center gap-4">
-        <CenteredStack className="!mb-0" marginTopOverride="0">
+        <CenteredStack className="!mb-0">
           <QuestionTextandDescription surveyID={surveyID} question={question} />
         </CenteredStack>
         <ResponseContainer className="!mt-0 !mb-0 md:!px-0">

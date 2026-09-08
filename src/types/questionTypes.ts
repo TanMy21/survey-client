@@ -148,6 +148,7 @@ export interface SlideMotionProps {
   children: React.ReactNode;
   direction: "left" | "right";
   keyProp: string | number;
+  className?: string;
 }
 
 export type GetPulseTargets = () => Array<HTMLElement | null>;

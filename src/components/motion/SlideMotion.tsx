@@ -19,7 +19,12 @@ const variants = {
   }),
 };
 
-export const SlideMotion = ({ children, direction, keyProp }: SlideMotionProps) => {
+export const SlideMotion = ({
+  children,
+  direction,
+  keyProp,
+  className = "flex min-h-0 w-full flex-1 flex-col",
+}: SlideMotionProps) => {
   return (
     <AnimatePresence custom={direction} mode="wait">
       <motion.div
@@ -30,7 +35,7 @@ export const SlideMotion = ({ children, direction, keyProp }: SlideMotionProps) 
         animate="center"
         exit="exit"
         transition={{ duration: 0.3 }}
-        className="h-auto w-full md:h-full"
+        className={className}
       >
         {children}
       </motion.div>

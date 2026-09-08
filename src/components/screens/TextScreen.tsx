@@ -28,7 +28,7 @@ const TextScreen = ({ surveyID, question }: QuestionProps) => {
           />
         </div>
       )}
-      <CenteredStack marginTopOverride="-1%">
+      <CenteredStack>
         <QuestionTextandDescription surveyID={surveyID} question={question} />
       </CenteredStack>
       <ResponseContainer>

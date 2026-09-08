@@ -1,16 +1,11 @@
-import { useIsMobile } from "@/hooks/useIsMobile";
 import type { ScreenRootProps } from "@/types/layoutTypes";
 
 const ScreenRoot = ({ children, className = "" }: ScreenRootProps) => {
-  const isMobile = useIsMobile();
   return (
-    <div
-      className={`z-20 mx-auto flex w-full flex-col items-center justify-center p-1 transition-all duration-300 sm:w-[100%] sm:p-1 md:min-h-screen md:w-[96%] md:p-4 lg:w-[84%] xl:w-[78%] 2xl:w-[72%] ${className}`}
-      style={{
-        width: isMobile ? "98%" : "80%",
-      }}
-    >
-      {children}
+    <div className={`z-20 box-border flex min-h-0 w-full flex-1 flex-col ${className}`}>
+      <div className="my-auto box-border flex w-full flex-col items-center px-5 py-8 md:px-10 md:py-12">
+        <div className="flex w-full max-w-[860px] flex-col items-center">{children}</div>
+      </div>
     </div>
   );
 };

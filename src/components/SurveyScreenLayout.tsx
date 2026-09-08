@@ -37,6 +37,7 @@ const SurveyScreenLayout = ({
   const runtime = useFlowRuntime();
   const { canProceed } = useSurveyFlow();
   const isEnd = currentQuestion.type === "END_SCREEN";
+  const isWelcome = currentQuestion.type === "WELCOME_SCREEN";
   const isConsentScreen = currentQuestion.type === "CONSENT";
   const canScrollNext = !isConsentScreen && canProceed;
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -187,8 +188,8 @@ const SurveyScreenLayout = ({
       <div className="flex min-h-0 w-full flex-1 flex-col" style={backgroundStyle}>
         <div
           ref={scrollRef}
-          style={{ touchAction: "pan-y", padding: isMobile ? "1px" : "2px" }}
-          className="scrollbar-hidden flex min-h-0 flex-grow flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto border-2 pb-6 md:flex-row md:items-center md:justify-center md:p-1 md:pb-20"
+          style={{ touchAction: "pan-y" }}
+          className="scrollbar-hidden flex min-h-0 w-full flex-1 flex-col items-stretch overflow-x-hidden overflow-y-auto"
         >
           <BehaviorEventProvider>
             <SlideMotion direction={"right"} keyProp={currentQuestionID}>
