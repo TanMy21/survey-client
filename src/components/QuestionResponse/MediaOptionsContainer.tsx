@@ -208,9 +208,9 @@ const MediaOptionsContainer = ({ options, question, surveyID }: MediaOptionsProp
         ref={containerRef}
         tabIndex={0}
         onKeyDown={handleKeyDown}
-        className={`mb-4 grid w-full px-1 ${
-          isMobile ? "grid-cols-1" : "sm:grid-cols-2 md:grid-cols-3"
-        } smm:w-full mx-auto gap-4 sm:gap-3 md:w-[100%] md:gap-6 xl:w-4/5`}
+        className={`mx-auto mb-4 grid w-full gap-6 px-4 ${
+          isMobile ? "grid-cols-1" : "sm:grid-cols-2 md:grid-cols-[repeat(3,minmax(0,216px))]"
+        } md:gap-8 md:px-9`}
       >
         {sortedOptions.map((option) => {
           const isSelected = selectedSet.has(option.optionID);

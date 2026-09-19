@@ -1,5 +1,4 @@
 import type { MediaOptionProps } from "@/types/responseTypes";
-import { getMediaOptionBadge } from "@/utils/utils";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -83,13 +82,13 @@ const MediaOption = ({ option, isSelected, onSelect }: MediaOptionProps) => {
   return (
     <div
       onClick={onSelect}
-      className={`relative flex min-h-[240px] flex-1 cursor-pointer flex-col overflow-hidden rounded-4xl border-2 bg-[#F9F9F9] transition-shadow duration-200 hover:border-[#F9F9F9] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:min-h-[200px] xl:min-h-[240px] ${
-        isSelected ? "border-[#005BC4] shadow-[0_0_0_4px_#D2DEFF]" : "border-[#F1F1F1]"
-      }`}
+      className="group flex w-full cursor-pointer flex-col"
     >
       {/* Image area preserves the complete uploaded image. */}
       <div
-        className="relative flex h-[240px] w-full shrink-0 items-center justify-center overflow-hidden bg-[#F4F7FB] sm:h-[160px] md:h-[180px] xl:h-[200px]"
+        className={`relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-xl border bg-[#F9F9F9] transition duration-200 group-hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] ${
+          isSelected ? "border-[#005BC4] ring-4 ring-[#D2DEFF]" : "border-[#F1F1F1]"
+        }`}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onMouseMove={handleMove}
@@ -98,7 +97,7 @@ const MediaOption = ({ option, isSelected, onSelect }: MediaOptionProps) => {
           <img
             src={imageSrc}
             alt={option.value}
-            className="h-full w-full object-fill"
+            className="h-full w-full object-cover"
             loading="lazy"
             decoding="async"
             referrerPolicy="no-referrer"
@@ -135,24 +134,9 @@ const MediaOption = ({ option, isSelected, onSelect }: MediaOptionProps) => {
           portalEl
         )}
 
-      {/* Text and option badge area. */}
-      <div className="relative flex min-h-[40px] w-full flex-grow items-start gap-1 bg-white p-1 xl:min-h-[60px]">
-        <div
-          className={`flex min-h-[80%] w-[16%] justify-center ${
-            option.value.length > 24 ? "items-center" : "items-start"
-          } ${option.value.length <= 30 ? "pt-[4px]" : ""}`}
-        >
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-[#5B6AD0] text-[12px] font-bold text-white">
-            {getMediaOptionBadge(option.order)}
-          </div>
-        </div>
-
-        <div className="flex min-h-[40px] flex-1 items-start justify-start px-2 pr-4 break-words">
-          <p className="p-1 text-[16px] leading-[1.4] font-medium break-words whitespace-pre-wrap text-black">
-            {option.value}
-          </p>
-        </div>
-      </div>
+      <p className="mt-3 px-1 text-[16px] leading-[1.4] font-semibold break-words whitespace-pre-wrap text-black">
+        {option.value}
+      </p>
     </div>
   );
 };
