@@ -1,98 +1,28 @@
-import { motion, type Transition } from "motion/react";
+import { Box } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 
 const Model3dLoader = () => {
-  const size = 64;
-  const halfSize = size / 2;
-
-  const faceTransition: Transition = {
-    duration: 2,
-    ease: "easeInOut",
-    repeat: Infinity,
-    repeatType: "reverse",  
-  };
+  const reduceMotion = useReducedMotion();
 
   return (
-    <motion.div style={{ perspective: 1000 }}>
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex flex-col items-center px-6 text-center text-gray-800"
+    >
       <motion.div
-        className="relative"
-        style={{
-          width: size,
-          height: size,
-          transformStyle: "preserve-3d",
-        }}
-        animate={{ rotateX: -30, rotateY: -45 }}
-        transition={{
-          duration: 8,
-          ease: "linear",
-          repeat: Infinity,
-          repeatType: "loop",
-        }}
+        aria-hidden="true"
+        className="mb-6"
+        animate={reduceMotion ? { rotate: 0 } : { rotate: [0, 12, 0, -12, 0] }}
+        transition={{ duration: 4, ease: "easeInOut", repeat: Infinity }}
       >
-        {/* Front Face */}
-        <motion.div
-          className="absolute h-full w-full border-2 border-gray-800 bg-transparent"
-          animate={{
-            transform: [`rotateY(0deg) translateZ(0px)`, `rotateY(0deg) translateZ(${halfSize}px)`],
-          }}
-          transition={faceTransition}
-        />
-        {/* Back Face */}
-        <motion.div
-          className="absolute h-full w-full border-2 border-gray-800 bg-transparent"
-          animate={{
-            transform: [
-              `rotateY(0deg) translateZ(0px)`,
-              `rotateY(180deg) translateZ(${halfSize}px)`,
-            ],
-          }}
-          transition={faceTransition}
-        />
-        {/* Left Face */}
-        <motion.div
-          className="absolute h-full w-full border-2 border-gray-800 bg-transparent"
-          animate={{
-            transform: [
-              `rotateY(0deg) translateZ(0px)`,
-              `rotateY(-90deg) translateZ(${halfSize}px)`,
-            ],
-          }}
-          transition={faceTransition}
-        />
-        {/* Right Face */}
-        <motion.div
-          className="absolute h-full w-full border-2 border-gray-800 bg-transparent"
-          animate={{
-            transform: [
-              `rotateY(0deg) translateZ(0px)`,
-              `rotateY(90deg) translateZ(${halfSize}px)`,
-            ],
-          }}
-          transition={faceTransition}
-        />
-        {/* Top Face */}
-        <motion.div
-          className="absolute h-full w-full border-2 border-gray-800 bg-transparent"
-          animate={{
-            transform: [
-              `rotateX(0deg) translateZ(0px)`,
-              `rotateX(90deg) translateZ(${halfSize}px)`,
-            ],
-          }}
-          transition={faceTransition}
-        />
-        {/* Bottom Face */}
-        <motion.div
-          className="absolute h-full w-full border-2 border-gray-800 bg-transparent"
-          animate={{
-            transform: [
-              `rotateX(0deg) translateZ(0px)`,
-              `rotateX(-90deg) translateZ(${halfSize}px)`,
-            ],
-          }}
-          transition={faceTransition}
-        />
+        <Box size={56} strokeWidth={1.25} />
       </motion.div>
-    </motion.div>
+      <p className="text-base font-medium">Loading 3D model…</p>
+      <p className="mt-2 max-w-72 text-sm text-gray-500">
+        Getting your interactive view ready
+      </p>
+    </div>
   );
 };
 

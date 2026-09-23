@@ -10,7 +10,6 @@ import {
 import {
   useGLTF,
   useEnvironment,
-  useProgress,
 } from "@react-three/drei";
 
 import { Canvas } from "@react-three/fiber";
@@ -31,18 +30,6 @@ import {
 } from "./Model3DErrorBoundary";
 
 import { Model3DRenderMonitor } from "./Model3DRenderMonitor";
-
-function LoaderOverlay() {
-  const { active, progress } = useProgress();
-
-  if (!active) return null;
-
-  return (
-    <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/70">
-      Loading 3D model... {Math.round(progress)}%
-    </div>
-  );
-}
 
 export function Interactive3DModelViewer(
   props: Interactive3DModelViewerProps
@@ -96,6 +83,8 @@ function ViewerAttempt({
   const [problem, setProblem] =
     useState<string | null>(null);
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const [
     initializationFailed,
     setInitializationFailed,
@@ -131,7 +120,10 @@ function ViewerAttempt({
   );
 
   const onHealthy = useCallback(
-    () => setProblem(null),
+    () => {
+      setProblem(null);
+      setIsLoading(false);
+    },
     []
   );
 
@@ -239,7 +231,11 @@ function ViewerAttempt({
         minHeight: 200,
       }}
     >
-      <LoaderOverlay />
+      {isLoading && !problem && !initializationFailed && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white">
+          <Model3dLoader />
+        </div>
+      )}
 
       {validSrc && !initializationFailed && (
         <Model3DErrorBoundary
@@ -333,7 +329,7 @@ function ViewerAttempt({
               onHealthy={onHealthy}
             />
 
-            <Suspense fallback={<Model3dLoader />}>
+            <Suspense fallback={null}>
               <Scene
                 isMobile={isMobile}
                 validSrc={validSrc}
